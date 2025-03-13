@@ -31,9 +31,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
 
-  viewport: "width=device-width, initial-scale=1.0",
   robots: "index, follow",
-  themeColor: "#ffffff",
 };
 
 
