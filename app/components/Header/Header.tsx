@@ -208,6 +208,7 @@ export default function Header() {
                                         ? styles.leadingPPos
                                         : styles.leadingPNeg
                                     : ''}>
+
                                     {data.regularMarketPrice?.toFixed(2)
                                     }</p>
                                 <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
@@ -229,29 +230,30 @@ export default function Header() {
                     }
                 </div>
             </div>
+
             {/* Top Element Mobile */}
             <div className={styles.headerElementSmallMobile}>
                 <div className={styles.indexes}>
                     <p>{indexesList[2]?.symbol}</p>
                     <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
-                        ? indexesList[2].regularMarketChangePercent > 0
-                            ? styles.leadingPPos
-                            : styles.leadingPNeg
-                        : ''
-                    }>{indexesList[2]?.regularMarketPrice?.toFixed(2)}</p>
+                        ? indexesList[2].regularMarketChangePercent > 0 ? styles.leadingPPos : styles.leadingPNeg : ''}
+                    >
+                        {indexesList[2]?.regularMarketPrice && indexesList[2].regularMarketPrice.toFixed(2)}
+                    </p>
+                    <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
+                        ? indexesList[2].regularMarketChangePercent > 0 ? styles.leadingPPos : styles.leadingPNeg : ''}
+                    >
+                        {(indexesList[2]?.regularMarketChange && formatPlusMinus(indexesList[2]?.regularMarketChange))}
+                    </p>
                     <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
                         ? indexesList[2].regularMarketChangePercent > 0
                             ? styles.leadingPPos
                             : styles.leadingPNeg
                         : ''
                     }
-                    >{formatPlusMinus(indexesList[2]?.regularMarketChange)}</p>
-                    <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
-                        ? indexesList[2].regularMarketChangePercent > 0
-                            ? styles.leadingPPos
-                            : styles.leadingPNeg
-                        : ''
-                    }>{`(${formatPlusMinus(indexesList[2]?.regularMarketChangePercent)})%`}</p>
+                    >
+                        {indexesList[2]?.regularMarketChangePercent && `(${formatPlusMinus(indexesList[2].regularMarketChangePercent)})%`}
+                    </p>
                 </div>
             </div>
 
@@ -273,17 +275,18 @@ export default function Header() {
                         slotProps={{
                             input: {
                                 endAdornment: (
-                                    <InputAdornment position="end" sx={{ 
-                                        touchAction: 'none', 
+                                    <InputAdornment position="end" sx={{
+                                        touchAction: 'none',
                                         padding: 0,
-                                        margin: 0 }}>
-                                        <SearchOutlined onClick={handleFetchStockData} 
+                                        margin: 0
+                                    }}>
+                                        <SearchOutlined onClick={handleFetchStockData}
                                             sx={{
                                                 cursor: 'pointer',
-                                                userSelect: 'none',  
-                                                touchAction: 'none', 
+                                                userSelect: 'none',
+                                                touchAction: 'none',
                                                 '&:focus': {
-                                                    outline: 'none', 
+                                                    outline: 'none',
                                                 }
                                             }} />
                                     </InputAdornment>
@@ -291,9 +294,9 @@ export default function Header() {
                             }
                         }}>
                     </StyledTextField>
-                    <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined/>Charts</Link>
-                    <Link className={styles.linkDesktop} href={'/options'}><CropOutlined/>Options</Link>
-                    <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined/>Projects</Link>
+                    <Link className={styles.linkDesktop} href={'/'}><CropOutlined />Options</Link>
+                    <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link>
+                    <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link>
                 </div>
                 <div className={styles.trailing}>
                     {/* {
@@ -327,21 +330,20 @@ export default function Header() {
                             isMenuOpen && (
                                 <div className={styles.menu} ref={menuRef} onMouseEnter={handleDeviceMenuClose}>
                                     <Link className={styles.link} href={'/'} onMouseEnter={handleDeviceMenuClose}>
-                                        Home
+                                        Options
                                     </Link>
                                     <Link className={styles.link} href={'/charts'} onMouseEnter={handleDeviceMenuClose}>
                                         Charts
                                     </Link>
-                                    <Link className={styles.link} href={'/options'} onMouseEnter={handleDeviceMenuClose}>
-                                        Options
-                                    </Link>
                                     <Link className={styles.link} href={'/projects'} onMouseEnter={handleDeviceMenuClose}>
                                         Projects
                                     </Link>
-                                    <div onClick={handleDeviceMenuOpen}
-                                        onMouseEnter={handleDeviceMenuOpen}
-                                        className={styles.link}>
-                                        <p>Device</p>
+                                    <div className={styles.anchor}>
+                                        <div onClick={handleDeviceMenuOpen}
+                                            onMouseEnter={handleDeviceMenuOpen}
+                                            className={styles.link}>
+                                            <p>Device</p>
+                                        </div>
                                         {isDeviceMenuOpen && (
                                             <div className={styles.modeMenu} ref={deviceMenuRef}>
                                                 <div className={styles.link}><LightModeOutlined /><p>Light Mode</p></div>
@@ -444,7 +446,13 @@ export default function Header() {
                                             </div>
                                             <div className={styles.td}>
                                                 <p>Div Yield</p>
-                                                <p>{currentStock.dividendYield} {currentStock.currency}</p>
+                                                <p>
+                                                    {
+                                                        (currentStock.dividendYield != null && currentStock.dividendYield != 0)
+                                                            ? `${(currentStock.dividendYield).toFixed(2)}%`
+                                                            : '0.00%'
+                                                    }
+                                                </p>
                                             </div>
                                             <div className={styles.td}>
                                                 <p>52 Week Range</p>

@@ -2,9 +2,10 @@
 
 import React, { useEffect } from 'react';
 import styles from './Modal.module.css';
-import { IconButton, Paper } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import Account from './Views/Account';
+import Analytics from './Views/Analytics';
 import { useAppContext } from '../../providers/AppProvider';
 
 export default function Modal() {
@@ -14,6 +15,8 @@ export default function Modal() {
         switch (modalView.toLowerCase()) {
             case 'account':
                 return <Account />;
+            case 'analytics':
+                return <Analytics />;
             default:
                 return null;
         }
@@ -35,7 +38,7 @@ export default function Modal() {
     return (
         modalView && (
             <div className={styles.modal}>
-                <Paper className={styles.wrapper} elevation={8}>
+                <div className={styles.wrapper}>
                     <div className={styles.header}>
                         <div className={styles.headerLeading}>
                         </div>
@@ -44,7 +47,7 @@ export default function Modal() {
                         </div>
                     </div>
                     {renderView()}
-                </Paper>
+                </div>
             </div>
         )
     );

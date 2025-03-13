@@ -84,6 +84,13 @@ a {
   text-decoration: none;
 }
 
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  touch-action: none;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
