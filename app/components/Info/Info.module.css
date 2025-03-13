@@ -5,7 +5,7 @@
 }
 
 .info {
-    border: 1px solid gray;
+    background-color: #0a0a0a;
     display: flex;
     gap: 1rem;
     flex-direction: row;
@@ -27,6 +27,8 @@
     color: #ededed;
 }
 
-/* @media (prefers-color-scheme: dark) {
-
-} */
+@media (prefers-color-scheme: dark) {
+    .info {
+        border: 1px solid gray;
+    }
+}
