@@ -188,4 +188,14 @@ background-color: #ededed;
     .menu {
         background-color:#0a0a0a;
     }
+
+    .tableHeader {
+        background-color: #0a0a0a;
+    }
+
+        .tableThStrike,
+        .tableTdStrike,
+        .tableThType{ 
+            background-color: gray;
+        }
 }
