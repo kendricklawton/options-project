@@ -1,16 +1,14 @@
 import { IconButton, styled, TextField } from "@mui/material";
 
-export const StyledTextField = styled(TextField)({
+export const StyledTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         fontFamily: 'inherit',
         borderRadius: '0',
         height: '2rem',
         fontSize: 'inherit',
-        '& fieldset': {
-            // borderColor: 'grey'
-        }
+        backgroundColor: theme.palette.mode === 'dark' ? 'grey' : 'inherit'
     }
-});
+}));
 
 // border: '1px solid grey',
 // outline: '1px solid #64b5f6',

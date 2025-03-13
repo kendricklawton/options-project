@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { AccountTreeOutlined, ArrowDropDownOutlined, ArrowLeftOutlined, CropOutlined, DarkModeOutlined, LightModeOutlined, Menu, PlaylistAdd, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
-import { CircularProgress, InputAdornment, Paper } from '@mui/material';
+import { CircularProgress, InputAdornment } from '@mui/material';
 import {
     usePathname
 } from 'next/navigation';
@@ -318,7 +318,7 @@ export default function Header() {
                         </StyledIconButton>
                         {
                             isMenuOpen && (
-                                <Paper className={styles.menu} ref={menuRef} onMouseEnter={handleDeviceMenuClose}>
+                                <div className={styles.menu} ref={menuRef} onMouseEnter={handleDeviceMenuClose}>
                                     <Link className={styles.link} href={'/'} onMouseEnter={handleDeviceMenuClose}>
                                         Home
                                     </Link>
@@ -329,7 +329,6 @@ export default function Header() {
                                         Options
                                     </Link>
                                     <Link className={styles.link} href={'/projects'} onMouseEnter={handleDeviceMenuClose}>
-                                        <AccountTreeOutlined />
                                         Projects
                                     </Link>
                                     <div onClick={handleDeviceMenuOpen}
@@ -337,14 +336,14 @@ export default function Header() {
                                         className={styles.link}>
                                         <p>Device</p>
                                         {isDeviceMenuOpen && (
-                                            <Paper className={styles.modeMenu} ref={deviceMenuRef}>
+                                            <div className={styles.modeMenu} ref={deviceMenuRef}>
                                                 <div className={styles.link}><LightModeOutlined /><p>Light Mode</p></div>
                                                 <div className={styles.link}><DarkModeOutlined /><p>Dark Mode</p></div>
-                                            </Paper>
+                                            </div>
                                         )}
                                     </div>
                                     {/* <div className={styles.menuItem} onMouseEnter={handleDeviceMenuClose}><p>Logout</p></div> */}
-                                </Paper>
+                                </div>
 
                             )}
                     </div>

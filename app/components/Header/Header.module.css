@@ -117,7 +117,7 @@
 .menu,
 .modeMenu {
     background-color: #ffffff;
-    border-radius: 0px;
+    border: 1px solid gray;
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
@@ -132,7 +132,7 @@
 
 .modeMenu {
     position: absolute;
-    right: 8rem;
+    right: 5.5rem;
 }
 
 .link,

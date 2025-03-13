@@ -54,7 +54,7 @@
 .optionChainTable {
     display: flex;
     flex-direction: column;
-    min-height: 40vh;
+    min-height: 40svh;
     overflow: auto;
     width: 100%;
     height: 100%;
