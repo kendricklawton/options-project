@@ -8,39 +8,22 @@ export const StyledTextField = styled(TextField)(({ }) => ({
         fontSize: 'inherit',
     },
     '@media (prefers-color-scheme: dark)': {
-        '& .MuiInput-underline': {
-            '&:before': {
-                borderBottom: '1px solid gray',
-            },
-            '&:hover:before': {
-                borderBottom: '2px solid gray',
-            },
-        },
-        '& .MuiFilledInput-root': {
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        },
-        '& .MuiInputBase-input': {
-            color: 'lightgray',
-        },
-        '& label': {
-            color: 'gray',
-        },
-        '& label.Mui-focused': {
-            color: 'gray',
-        },
         '& .MuiOutlinedInput-root': {
-            backgroundColor: 'grey', // Set background color for dark mode
+            backgroundColor: 'lightgray',
             '& fieldset': {
                 border: '1px solid gray',
             },
             '&:hover fieldset': {
-                borderColor: 'lightgray',
+                border: 'none',
+                // borderColor: 'lightgray',
             },
             '&.Mui-focused fieldset': {
-                borderColor: 'lightgray',
+                border: 'none',
+                // borderColor: 'lightgray',
             },
             '&.Mui-active fieldset': {
-                borderColor: 'lightgray',
+                border: 'none',
+                // borderColor: 'lightgray',
             },
         },
     },

@@ -283,11 +283,7 @@ export default function Header() {
                                         <SearchOutlined onClick={handleFetchStockData}
                                             sx={{
                                                 cursor: 'pointer',
-                                                userSelect: 'none',
-                                                touchAction: 'none',
-                                                '&:focus': {
-                                                    outline: 'none',
-                                                }
+                                                color: 'grey',
                                             }} />
                                     </InputAdornment>
                                 )
