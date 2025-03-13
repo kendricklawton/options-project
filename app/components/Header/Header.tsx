@@ -276,9 +276,18 @@ export default function Header() {
                                     <InputAdornment position="end" sx={{ 
                                         padding: 0,
                                         margin: 0 }}>
-                                        <SearchOutlined onClick={handleFetchStockData} sx={{
-                                            cursor: 'pointer'
-                                        }} />
+                                        <SearchOutlined onClick={handleFetchStockData} 
+                                            sx={{
+                                                cursor: 'pointer',
+                                                userSelect: 'none',  
+                                                touchAction: 'none', 
+                                                '&:focus': {
+                                                    outline: 'none', 
+                                                },
+                                                '&:active': {
+                                                    outline: 'none',  
+                                                },
+                                            }} />
                                     </InputAdornment>
                                 )
                             }
