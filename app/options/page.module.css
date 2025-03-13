@@ -183,3 +183,9 @@ background-color: #ededed;
         display: none;
     } */
 }
+
+@media (prefers-color-scheme: dark) {
+    .menu {
+        background-color:#0a0a0a;
+    }
+}

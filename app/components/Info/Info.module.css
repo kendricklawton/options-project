@@ -5,7 +5,7 @@
 }
 
 .info {
-    background-color: #171717;
+    border: 1px solid gray;
     display: flex;
     gap: 1rem;
     flex-direction: row;

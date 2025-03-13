@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './Info.module.css';
 import { CloseOutlined } from '@mui/icons-material';
 import { useAuthContext } from '../../providers/AuthProvider';
-import { IconButton, Paper } from '@mui/material';
+import { IconButton } from '@mui/material';
 
 export default function Info() {
     const { info, setInfo } = useAuthContext();
@@ -18,7 +18,7 @@ export default function Info() {
     return (
         show && (
             <div className={styles.wrapper}>
-                <Paper className={styles.info}>
+                <div className={styles.info}>
                     <div>
                         <p>{info}</p>
                     </div>
@@ -28,7 +28,7 @@ export default function Info() {
                     >
                         <CloseOutlined sx={{ color: '#ededed' }} />
                     </IconButton>
-                </Paper>
+                </div>
             </div>
         )
     );
