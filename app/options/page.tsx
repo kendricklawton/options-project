@@ -8,7 +8,7 @@ import { useAppContext } from "../providers/AppProvider";
 import { useAuthContext } from "../providers/AuthProvider";
 import { ArrowDropDownOutlined, CheckOutlined } from "@mui/icons-material";
 import { OptionType, StrikeType } from "../types/types";
-import { StyledTextField } from "../components/Styled";
+// import { StyledTextField } from "../components/Styled";
 
 const menuButtonStyle = {
   borderRadius: '0px',
@@ -21,17 +21,19 @@ const menuButtonStyle = {
 }
 
 export default function Options() {
-  const { currentExpirationDate, currentNearPrice, currentStock, isPageExt, optionChain, optionExpirationDates, totalStrikesToDisplay, fetchStockData } = useAppContext();
+  const { currentExpirationDate,
+    //  currentNearPrice,
+     currentStock, isPageExt, optionChain, optionExpirationDates, totalStrikesToDisplay, fetchStockData } = useAppContext();
   const { setInfo } = useAuthContext();
-  const [nearPriceInputValue, setNearInputValue] = useState(0);
+  // const [nearPriceInputValue, setNearInputValue] = useState(0);
   const [isStrikesMenuOpen, setIsStrikesMenuOpen] = useState(false);
 
   const strikesMenuRef = React.useRef<HTMLDivElement>(null);
   const strikesMenuButtonRef = React.useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    setNearInputValue(currentNearPrice || 0);
-  }, [currentNearPrice]);
+  // useEffect(() => {
+  //   setNearInputValue(currentNearPrice || 0);
+  // }, [currentNearPrice]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -159,7 +161,7 @@ export default function Options() {
                 )}
             </div>
           </div>
-          <div className={optionStyles.controlsLeadingElement}>
+          {/* <div className={optionStyles.controlsLeadingElementNear}>
             <p>Near</p>
             <StyledTextField
               id="nearPrice"
@@ -167,11 +169,11 @@ export default function Options() {
               value={nearPriceInputValue.toFixed(2)}
               // onChange={(event) => setNearInputValue(event.target.value)}
               sx={{
-                maxWidth: '5rem',
+                width: '5rem',
 
               }}
               autoComplete="off"></StyledTextField>
-          </div>
+          </div> */}
         </div>
       </div>
 
