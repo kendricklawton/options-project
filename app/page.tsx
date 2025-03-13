@@ -242,7 +242,7 @@ export default function Options() {
       <div className={styles.optionChainTable}>
         <div className={styles.tableHeaderWrapper}>
           <div className={styles.tableHeader}>
-            <div className={styles.tableRowHeader}>
+            <div className={styles.tableRowCallHeader}>
               <div className={styles.tableTh}>
                 <p>Bid</p>
               </div>
@@ -251,6 +251,9 @@ export default function Options() {
               </div>
               <div className={styles.tableTh}>
                 <p>Ask</p>
+              </div>
+              <div className={styles.tableTh}>
+                <p>Last</p>
               </div>
               <div className={styles.tableTh}>
                 <p>Change</p>
@@ -275,7 +278,7 @@ export default function Options() {
             </div>
           </div>
           <div className={styles.tableHeader} >
-            <div className={styles.tableRowHeader}>
+            <div className={styles.tableRowPutHeader}>
               <div className={styles.tableTh}>
                 <p>Bid</p>
               </div>
@@ -284,6 +287,9 @@ export default function Options() {
               </div>
               <div className={styles.tableTh}>
                 <p>Ask</p>
+              </div>
+              <div className={styles.tableTh}>
+                <p>Last</p>
               </div>
               <div className={styles.tableTh}>
                 <p>Change</p>
@@ -306,7 +312,7 @@ export default function Options() {
           <div className={styles.table} >
             {
               optionChain?.calls.map((data: OptionType, index: React.Key | null | undefined) => (
-                <div className={styles.tableRow} key={index} onClick={() => handleDisplayOptionAnalytics(data)}>
+                <div className={styles.tableRowCall} key={index} onClick={() => handleDisplayOptionAnalytics(data)}>
                   <div className={styles.tableTdLink}>
                     <p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p>
                   </div>
@@ -321,6 +327,15 @@ export default function Options() {
                   </div>
                   <div className={styles.tableTdLink}>
                     <p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p>
+                  </div>
+                  <div className={
+                    data?.percentChange != null && data?.percentChange != 0
+                      ? data.percentChange > 0
+                        ? styles.tableTdPositive
+                        : styles.tableTdNegative
+                      : styles.tableTd
+                  }>
+                    <p>{data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p>
                   </div>
                   <div className={
                     data?.percentChange != null && data?.percentChange != 0
@@ -365,7 +380,7 @@ export default function Options() {
           <div className={styles.table} >
             {
               optionChain?.puts.map((data: OptionType, index: React.Key | null | undefined) => (
-                <div className={styles.tableRow} key={index} onClick={() => handleDisplayOptionAnalytics(data)}>
+                <div className={styles.tableRowPut} key={index} onClick={() => handleDisplayOptionAnalytics(data)}>
                   <div className={styles.tableTdLink}>
                     <p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p>
                   </div>
@@ -378,6 +393,15 @@ export default function Options() {
                   </div>
                   <div className={styles.tableTdLink}>
                     <p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p>
+                  </div>
+                  <div className={
+                    data?.percentChange != null && data?.percentChange != 0
+                      ? data.percentChange > 0
+                        ? styles.tableTdPositive
+                        : styles.tableTdNegative
+                      : styles.tableTd
+                  }>
+                    <p>{data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p>
                   </div>
                   <div className={
                     data?.percentChange != null && data?.percentChange != 0

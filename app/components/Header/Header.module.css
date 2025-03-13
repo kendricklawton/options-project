@@ -3,12 +3,11 @@
     background-color: inherit;
     display: flex;
     flex-direction: column;
-    padding: 0 8vw;
+    padding: 0 4vw;
     position: sticky;
     top: 0;
     width: 100%;
     z-index: 9;
-    /* border-bottom:1px solid lightgray; */
 }
 
 .headerScrolled {

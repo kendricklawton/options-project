@@ -6,25 +6,18 @@ export const StyledTextField = styled(TextField)(({ }) => ({
         borderRadius: '0',
         height: '2rem',
         fontSize: 'inherit',
-    },
-    '@media (prefers-color-scheme: dark)': {
-        '& .MuiOutlinedInput-root': {
-            backgroundColor: 'lightgray',
-            '& fieldset': {
-                border: '1px solid gray',
-            },
-            '&:hover fieldset': {
-                border: 'none',
-                // borderColor: 'lightgray',
-            },
-            '&.Mui-focused fieldset': {
-                border: 'none',
-                // borderColor: 'lightgray',
-            },
-            '&.Mui-active fieldset': {
-                border: 'none',
-                // borderColor: 'lightgray',
-            },
+        backgroundColor: 'lightgray',
+        '& fieldset': {
+            border: 'none',
+        },
+        '&:hover fieldset': {
+            border: 'none',
+        },
+        '&.Mui-focused fieldset': {
+            border: 'none',
+        },
+        '&.Mui-active fieldset': {
+            border: 'none',
         },
     },
 }));
