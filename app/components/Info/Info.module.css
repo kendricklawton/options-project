@@ -1,0 +1,32 @@
+.wrapper {
+    position: fixed;
+    left: 8vw;
+    bottom: 1rem;
+}
+
+.info {
+    background-color: #171717;
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    padding: 1rem;
+    z-index: 6;
+    border-radius: 0px;
+}   
+
+.info div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 200px;
+    text-align: baseline;
+}
+
+.info p {
+    word-wrap: break-word;
+    color: #ededed;
+}
+
+/* @media (prefers-color-scheme: dark) {
+
+} */
