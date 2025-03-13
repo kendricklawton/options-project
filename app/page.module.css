@@ -44,8 +44,9 @@
     min-height: 3rem;
 }
 
-.controls {
-    justify-content: space-between;
+
+.controlsMobile {
+    display: none;
 }
 
 .controlsLeading,
@@ -91,7 +92,7 @@
 .optionChainTable {
     display: flex;
     flex-direction: column;
-    min-height: 50svh;
+    min-height: 40svh;
     overflow: auto;
     width: 100%;
     height: 100%;
@@ -232,6 +233,14 @@
 @media screen and (max-width: 536px) {
     /* .controlsLeadingElementNear {
         display: none;
+    }
+
+    .controlsMobile {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        min-height: 3rem;
+        gap: 0.5rem;
     } */
 }
 

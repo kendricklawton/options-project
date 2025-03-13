@@ -196,12 +196,24 @@ export default function Options() {
               onChange={(event) => setNearInputValue(event.target.value)}
               sx={{
                 width: '5rem',
-
               }}
               autoComplete="off"></StyledTextField>
           </div>
         </div>
       </div>
+
+      <div className={styles.controlsMobile}>
+        <p>Near</p>
+        <StyledTextField
+          id="nearPrice"
+          variant="outlined"
+          value={nearPriceInputValue}
+          onChange={(event) => setNearInputValue(event.target.value)}
+          sx={{ width: '5rem' }}
+          autoComplete="off">
+        </StyledTextField>
+      </div>
+
 
       {/* Dates */}
       <div className={styles.dates}>

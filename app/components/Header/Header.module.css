@@ -151,13 +151,9 @@
     padding: 0.5rem 0.5rem;
 }
 
-.linkActive {
-    background-color: #ededed;
-}
-
+.linkActive,
 .link:hover {
-    background-color: #ededed;
-    cursor: pointer;
+    background-color: lightgray;
 }
 
 @media screen and (max-width: 754px) {
@@ -179,7 +175,13 @@
 }
 
 @media(prefers-color-scheme: dark) {
-    .menu {
+    .linkActive,
+    .link:hover {
+        background-color: #424242;
+    }
+
+    .menu,
+    .modeMenu {
         background-color: #0a0a0a;
     }
 }
