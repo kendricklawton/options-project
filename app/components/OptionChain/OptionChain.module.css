@@ -338,6 +338,17 @@
 }
 
 @media (prefers-color-scheme: dark) {
+
+    .elementsHeaderThStrikes,
+    .elementsHeaderThCalls,
+    .elementsHeaderThPuts,
+    .tableHeaderCalls,
+    .tableHeaderStrikes,
+    .tableHeaderPuts {
+        background-color: #0a0a0a;
+    }
+
+    .elementTh,
     .elementsHeaderThStrikes,
     .elementsHeaderThCalls,
     .elementsHeaderThPuts,
