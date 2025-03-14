@@ -163,7 +163,6 @@
 }
 
 
-
 .tableRowCall:hover,
 .tableRowPut:hover {
     background-color: #ededed;
@@ -264,4 +263,9 @@
     .tableRowStrike {
             background-color: #0a0a0a;
     }
+
+        .tableRowCall:hover,
+        .tableRowPut:hover {
+            background-color: #424242;
+        }
 }

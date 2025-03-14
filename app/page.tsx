@@ -1,34 +1,12 @@
-// 'use client'
-
-// import React from "react";
-// import pageStyles from "./page.module.css";
-// import { useAppContext } from "./providers/AppProvider";
-
-// export default function Options() {
-
-//   const { isPageExt } = useAppContext();
-
-//   return (
-//     <div className={isPageExt ? pageStyles.pageExt : pageStyles.page}>
-//       <div className={pageStyles.pageHeader}>
-//         <h1>Welcome to Options Project</h1>
-//         <h2>An easy to use options analytical tool.</h2>
-//         <h2>Search a symbol to get started.</h2>
-//       </div>
-//     </div>
-//   );
-// };
-
 'use client'
 
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { Button } from "@mui/material";
 import { useAppContext } from "./providers/AppProvider";
 import { useAuthContext } from "./providers/AuthProvider";
 import { ArrowDropDownOutlined, CheckOutlined } from "@mui/icons-material";
 import { OptionType, StrikeType } from "./types/types";
-import { StyledTextField } from "./components/Styled";
+import { StyledButton, StyledButtonTwo, StyledTextField } from "./components/Styled";
 import { formatDate, formatPlusMinus } from "./utils/utils";
 
 const menuButtonStyle = {
@@ -38,7 +16,7 @@ const menuButtonStyle = {
   border: 'none',
   justifyContent: 'space-between',
   height: '2rem',
-  minWidth: '6rem'
+  // minWidth: '6rem'
 }
 
 export default function Options() {
@@ -126,20 +104,20 @@ export default function Options() {
       {/* Controls */}
       <div className={styles.controls}>
         <div className={styles.controlsLeading}>
-          <Button variant="contained"
+          <StyledButton variant="contained"
             onClick={handleOptionStrategy}
             endIcon={<ArrowDropDownOutlined />}
             sx={{
               borderRadius: '0px',
               width: 'fit-content',
               height: '2rem',
-              // whiteSpace:
-              //   'nowrap',
-            }}>CALL / PUT</Button>
+              whiteSpace:
+                'nowrap',
+            }}>CALL / PUT</StyledButton>
           <div className={styles.controlsLeadingElement}>
             <p>Strikes</p>
             <div className={styles.anchor}>
-              <Button variant="contained"
+              <StyledButton variant="contained"
                 onClick={() => setIsStrikesMenuOpen(prev => !prev)}
                 endIcon={<ArrowDropDownOutlined />}
                 ref={strikesMenuButtonRef}
@@ -149,19 +127,21 @@ export default function Options() {
                   justifyContent: 'space-between',
                   height: '2rem',
                   minWidth: '6rem',
-                }}>{totalStrikesToDisplay === 1 ? "ALL" : totalStrikesToDisplay}</Button>
+                  whiteSpace:
+                    'nowrap',
+                }}>{totalStrikesToDisplay === 1 ? "ALL" : totalStrikesToDisplay}</StyledButton>
               {
                 isStrikesMenuOpen && (
                   <div className={styles.menu} ref={strikesMenuRef}>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</Button>
-                    <Button variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</Button>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
+                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo>
                   </div >
                 )}
             </div>

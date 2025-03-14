@@ -1,4 +1,22 @@
-import { IconButton, styled, TextField } from "@mui/material";
+import {Button, IconButton, styled, TextField } from "@mui/material";
+
+export const StyledButton = styled(Button)({
+    backgroundColor: 'grey',
+    color: 'white',
+    '& .MuiButton-label': {
+        color: 'white',
+    },    
+});
+
+export const StyledButtonTwo = styled(Button)({
+    width: '100%',
+    color: 'inherit',
+});
+
+export const StyledIconButton = styled(IconButton)({
+    border: 'none',
+    color: 'grey'
+});
 
 export const StyledTextField = styled(TextField)(({ }) => ({
     '& .MuiOutlinedInput-root': {
@@ -21,9 +39,3 @@ export const StyledTextField = styled(TextField)(({ }) => ({
         },
     },
 }));
-
-export const StyledIconButton = styled(IconButton)({
-    // border: '1px solid grey',
-    border: 'none',
-    color: 'grey'
-});

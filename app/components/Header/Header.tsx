@@ -136,24 +136,6 @@ export default function Header() {
                         indexesList.map((data, index) => (
                             <div className={styles.indexes} key={index}>
                                 <p>{data.symbol}</p>
-                                {
-                                    data.regularMarketPrice && (
-                                        <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
-                                            ? data.regularMarketChangePercent > 0
-                                                ? styles.leadingPPos
-                                                : styles.leadingPNeg
-                                            : ''
-                                        }>
-                                            {
-                                                data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
-                                                    ? data.regularMarketChangePercent > 0
-                                                        ? <ArrowDropDownOutlined />
-                                                        : <ArrowDropDownOutlined />
-                                                    : null
-                                            }
-                                        </p>
-                                    )
-                                }
                                 <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
                                     ? data.regularMarketChangePercent > 0
                                         ? styles.leadingPPos
@@ -162,20 +144,25 @@ export default function Header() {
 
                                     {data.regularMarketPrice?.toFixed(2)
                                     }</p>
-                                <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
-                                    ? data.regularMarketChangePercent > 0
-                                        ? styles.leadingPPos
-                                        : styles.leadingPNeg
-                                    : ''}>
-                                    {formatPlusMinus(data.regularMarketChange)}
-                                </p>
-                                <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
+                                {
+                                    data.regularMarketPrice && (
+                                        <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
+                                            ? data.regularMarketChangePercent > 0
+                                                ? styles.leadingPPos
+                                                : styles.leadingPNeg
+                                            : ''
+                                        }>
+                                            {`(${formatPlusMinus(data.regularMarketChange)})`}
+                                        </p>
+                                    )
+                                }
+                             <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
                                     ? data.regularMarketChangePercent > 0
                                         ? styles.leadingPPos
                                         : styles.leadingPNeg
                                     : ''}>
                                     {`(${formatPlusMinus(data.regularMarketChangePercent)})%`}
-                                </p>
+                                </p> 
                             </div>
                         ))
                     }
@@ -186,24 +173,6 @@ export default function Header() {
             <div className={styles.headerElementSmallMobile}>
                 <div className={styles.indexes}>
                     <p>{indexesList[2]?.symbol}</p>
-                    {
-                        indexesList[2]?.regularMarketPrice && (
-                            <p className={indexesList[2].regularMarketChangePercent != null && indexesList[2].regularMarketChangePercent != 0
-                                ? indexesList[2].regularMarketChangePercent > 0
-                                    ? styles.leadingPPos
-                                    : styles.leadingPNeg
-                                : ''
-                            }>
-                                {
-                                    indexesList[2].regularMarketChangePercent != null && indexesList[2].regularMarketChangePercent != 0
-                                        ? indexesList[2].regularMarketChangePercent > 0
-                                            ? <ArrowDropDownOutlined />
-                                            : <ArrowDropDownOutlined />
-                                        : null
-                                }
-                            </p>
-                        )
-                    }
                     <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
                         ? indexesList[2].regularMarketChangePercent > 0 ? styles.leadingPPos : styles.leadingPNeg : ''}
                     >
@@ -331,22 +300,25 @@ export default function Header() {
                                 <>
                                     <div className={styles.containerRow}>
                                         <div className={styles.wrapperRow}>
-                                            <div className={styles.leading}>
-                                                <p>{currentStock.shortName?.toLocaleUpperCase()}</p>
-                                                <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
+                                            <div className={styles.indexes}>
+                                                <p style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}>{currentStock.shortName?.toLocaleUpperCase()}
+                                                    {
+                                                        currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
+                                                            ? currentStock.regularMarketChangePercent > 0
+                                                                ? <ArrowDropDownOutlined />
+                                                                : <ArrowDropDownOutlined />
+                                                            : null
+                                                    } <span className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
                                                     ? currentStock.regularMarketChangePercent > 0
                                                         ? styles.leadingPPos
                                                         : styles.leadingPNeg
                                                     : ''
-                                                }
-                                                >{
-                                                        currentStock.regularMarketPrice?.toFixed(2)
-                                                    }</p>
-                                                {
-                                                    currentStock.currentPrice && (
-                                                        <p>{currentStock.currency}</p>
-                                                    )
-                                                }
+                                                }>{currentStock.regularMarketPrice?.toFixed(2)} {currentStock.currency}</span></p>
                                             </div>
                                             <div className={styles.leadingTwo}>
                                                 <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
