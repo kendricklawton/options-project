@@ -220,7 +220,7 @@ export default function Options() {
           <div className={styles.tableStrike}>
             <div className={styles.tableRowStrike}>
            <div className={styles.tableThStrike}>
-                <p>Strike</p>
+                <p>Strikes</p>
           </div>
             </div>
             <div className={styles.tableRowType}>

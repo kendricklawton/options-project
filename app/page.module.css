@@ -214,6 +214,13 @@
     min-width: 6.0rem;
 }
 
+.tableTdStrike p,
+.tableThStrike p,
+.tableRowType p  {
+    color: gray;
+    font-weight: 900;
+} 
+
 .tableTdLink p {
     color: blueviolet;
     cursor: pointer;
