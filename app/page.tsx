@@ -154,8 +154,8 @@ export default function Options() {
               borderRadius: '0px',
               width: 'fit-content',
               height: '2rem',
-              whiteSpace:
-                'nowrap',
+              // whiteSpace:
+              //   'nowrap',
             }}>CALL / PUT</Button>
           <div className={styles.controlsLeadingElement}>
             <p>Strikes</p>
@@ -213,7 +213,6 @@ export default function Options() {
           autoComplete="off">
         </StyledTextField>
       </div>
-
 
       {/* Dates */}
       <div className={styles.dates}>
@@ -282,15 +281,18 @@ export default function Options() {
                 <p>Imp Vol</p>
               </div>
             </div>
-            <div className={styles.tableThType}>
+            <div className={styles.tableRowType}>
               <p>Calls</p>
             </div>
           </div>
           <div className={styles.tableStrike}>
-            <div className={styles.tableThStrike}>
-              <p>Strikes</p>
+            <div className={styles.tableRowStrike}>
+           <div className={styles.tableThStrike}>
+                <p>Strike</p>
+          </div>
+         
             </div>
-            <div className={styles.tableThType}>
+            <div className={styles.tableRowType}>
               <p>{formatDate(currentExpirationDate)}</p>
             </div>
           </div>
@@ -318,7 +320,7 @@ export default function Options() {
                 <p>Imp Vol</p>
               </div>
             </div>
-            <div className={styles.tableThType}>
+            <div className={styles.tableRowType}>
               <p>Puts</p>
             </div>
           </div>

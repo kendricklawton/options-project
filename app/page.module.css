@@ -96,10 +96,6 @@
 
 .menu {
     background-color: #fff;
-    /* box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1); */
-    /* border-left: 1px solid gray;
-    border-right: 1px solid gray;
-    border-bottom: 1px solid gray; */
     border: 1px solid gray;
     border-radius: 0px;
     display: flex;
@@ -134,7 +130,6 @@
 .tableHeaderWrapper {
     position: sticky;
     top: 0;
-    background-color: #fff;
 }
 
 .table,
@@ -147,30 +142,27 @@
 
 .tableRowCall,
 .tableRowPut,
+.tableRowType,
 .tableRowCallHeader,
 .tableRowPutHeader,
 .tableRowStrike {
+    background-color: #fff;
     display: flex;
     flex-direction: row;
     width: 100%;
 }
 
-.tableRowCallHeader,
-.tableRowPutHeader {
-    background-color: #fff;
-}
-
-.tableRowCall,
-.tableRowPut,
-.tableRowCallHeader,
-.tableRowPutHeader {
-    padding: 0 0.5rem;
-}
-
-
+.tableRowType,
 .tableRowStrike {
+    align-items: center;
     justify-content: center;
 }
+
+.tableRowType {
+    height: 2rem;
+}
+
+
 
 .tableRowCall:hover,
 .tableRowPut:hover {
@@ -209,8 +201,7 @@
 }
 
 .tableThStrike,
-.tableTdStrike,
-.tableThType {
+.tableTdStrike {
     align-items: center;
     cursor: default;
     display: flex;
@@ -222,10 +213,6 @@
 .tableThStrike,
 .tableTdStrike {
     min-width: 6.0rem;
-}
-
-.tableThType {
-    width: 100%;
 }
 
 .tableTdLink p {
@@ -251,7 +238,7 @@
 }
 
 @media screen and (max-width: 536px) {
-    /* .controlsLeadingElementNear {
+    .controlsLeadingElementNear {
         display: none;
     }
 
@@ -261,7 +248,7 @@
         flex-direction: row;
         min-height: 3rem;
         gap: 0.5rem;
-    } */
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -269,13 +256,6 @@
         background-color: #0a0a0a;
     }
 
-    .tableHeader {
-        background-color: #0a0a0a;
-    }
 
-    .tableThStrike,
-    .tableTdStrike,
-    .tableThType {
-        background-color: #0a0a0a;
-    }
+
 }
