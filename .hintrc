@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "compat-api/css": [
+      "default",
+      {
+        // Ignore the `min-width: fit-content` property in the CSS compatibility check
+        // Not Compatible with Samsung Browser
+        "ignore": [
+          "min-width: fit-content"
+        ]
+      }
+    ]
+  }
+}

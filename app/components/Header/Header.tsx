@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { AccountTreeOutlined, ArrowDropDownOutlined, ArrowLeftOutlined, CropOutlined, DarkModeOutlined, LightModeOutlined, Menu, PlaylistAdd, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
+import { AccountTreeOutlined, CropOutlined, DarkModeOutlined, LightModeOutlined, Menu, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
 import { CircularProgress, InputAdornment } from '@mui/material';
 import {
     usePathname
@@ -11,10 +11,10 @@ import { useAuthContext } from '@/app/providers/AuthProvider';
 import styles from "./Header.module.css";
 import Link from 'next/link';
 import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
-import { convertUnixTimestamp, formatMarketCap, formatPlusMinus } from '@/app/utils/utils';
+import { formatPlusMinus } from '@/app/utils/utils';
 
 export default function Header() {
-    const { currentExpirationDate, currentStock, isPageExt, indexesList, fetchStockData, fetchWatchListData, handleIsPageExt } = useAppContext();
+    const { currentExpirationDate, currentStock, indexesList, fetchStockData, fetchWatchListData } = useAppContext();
     const { isLoading } = useAuthContext();
 
     const [inputValue, setInputValue] = useState('');
@@ -31,19 +31,10 @@ export default function Header() {
     //     setModalView('account');
     //     setIsMenuOpen(false);
     // };
-
-    const handleAddToWatchList = () => {
-        console.log('Add to watch list');
+    const isNumPositive = (num: number) => {
+        return num > 0;
     };
-
-    // const handleClearStockData = () => {
-    //     if (!currentStock) {
-    //         return;
-    //     }
-    //     setInputValue('');
-    //     clearStockData();
-    // };
-
+    
     const handleDeviceMenuOpen = () => {
         setIsDeviceMenuOpen(true);
     };
@@ -102,7 +93,6 @@ export default function Header() {
                 }
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -136,31 +126,17 @@ export default function Header() {
                         indexesList.map((data, index) => (
                             <div className={styles.indexes} key={index}>
                                 <p>{data.symbol}</p>
-                                <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
-                                    ? data.regularMarketChangePercent > 0
-                                        ? styles.leadingPPos
-                                        : styles.leadingPNeg
-                                    : ''}>
-
+                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                                     {data.regularMarketPrice?.toFixed(2)
                                     }</p>
                                 {
                                     data.regularMarketPrice && (
-                                        <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
-                                            ? data.regularMarketChangePercent > 0
-                                                ? styles.leadingPPos
-                                                : styles.leadingPNeg
-                                            : ''
-                                        }>
+                                        <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                                             {`(${formatPlusMinus(data.regularMarketChange)})`}
                                         </p>
                                     )
                                 }
-                             <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
-                                    ? data.regularMarketChangePercent > 0
-                                        ? styles.leadingPPos
-                                        : styles.leadingPNeg
-                                    : ''}>
+                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                                     {`(${formatPlusMinus(data.regularMarketChangePercent)})%`}
                                 </p> 
                             </div>
@@ -173,29 +149,19 @@ export default function Header() {
             <div className={styles.headerElementSmallMobile}>
                 <div className={styles.indexes}>
                     <p>{indexesList[2]?.symbol}</p>
-                    <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
-                        ? indexesList[2].regularMarketChangePercent > 0 ? styles.leadingPPos : styles.leadingPNeg : ''}
-                    >
+                    <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                         {indexesList[2]?.regularMarketPrice && indexesList[2].regularMarketPrice.toFixed(2)}
                     </p>
-                    <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
-                        ? indexesList[2].regularMarketChangePercent > 0 ? styles.leadingPPos : styles.leadingPNeg : ''}
-                    >
+                    <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                         {(indexesList[2]?.regularMarketChange && formatPlusMinus(indexesList[2]?.regularMarketChange))}
                     </p>
-                    <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
-                        ? indexesList[2].regularMarketChangePercent > 0
-                            ? styles.leadingPPos
-                            : styles.leadingPNeg
-                        : ''
-                    }
-                    >
+                    <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                         {indexesList[2]?.regularMarketChangePercent && `(${formatPlusMinus(indexesList[2].regularMarketChangePercent)})%`}
                     </p>
                 </div>
             </div>
 
-            {/* Center Element */}
+            {/* Bottom Element */}
             <div className={styles.headerElement}>
                 <div className={styles.leading}>
                     <Link href={'/'}
@@ -233,15 +199,6 @@ export default function Header() {
                     <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link>
                 </div>
                 <div className={styles.trailing}>
-                    {/* {
-                        currentStock && (
-                            <StyledIconButton ref={menuButtonRef}
-                                size='small'
-                                onClick={handleClearStockData}>
-                                <CloseOutlined />
-                            </StyledIconButton>
-                        )
-                    } */}
                     <StyledIconButton ref={menuButtonRef}
                         size='small'
                         onClick={handleRefreshStockData}>
@@ -291,107 +248,6 @@ export default function Header() {
                     </div>
                 </div>
             </div >
-            {
-                currentStock && (
-                    <>
-                        {/* Center Element */}
-                        <div className={styles.headerElement}>
-                            {currentStock && (
-                                <>
-                                    <div className={styles.containerRow}>
-                                        <div className={styles.wrapperRow}>
-                                            <div className={styles.indexes}>
-                                                <p>{currentStock.shortName?.toLocaleUpperCase()}</p>
-                                                <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                                    ? currentStock.regularMarketChangePercent > 0
-                                                        ? styles.leadingTwoPPos
-                                                        : styles.leadingTwoPNeg
-                                                    : ''
-                                                }>{currentStock.regularMarketPrice?.toFixed(2)} </p>
-                                                <p>{currentStock.currency}</p>
-                                            </div>
-                                            <div className={styles.leadingTwo}>
-                                                <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                                    ? currentStock.regularMarketChangePercent > 0
-                                                        ? styles.leadingTwoPPos
-                                                        : styles.leadingTwoPNeg
-                                                    : ''
-                                                }>{formatPlusMinus(currentStock.regularMarketChange)}</p>
-                                                <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                                    ? currentStock.regularMarketChangePercent > 0
-                                                        ? styles.leadingTwoPPos
-                                                        : styles.leadingTwoPNeg
-                                                    : ''
-                                                }>({formatPlusMinus(currentStock.regularMarketChangePercent)}%)</p>
-                                                <p>{convertUnixTimestamp(currentStock.regularMarketTime)}</p>
-                                            </div>
-                                        </div>
-                                        <StyledIconButton onClick={handleAddToWatchList} size='small'>
-                                            <PlaylistAdd />
-                                        </StyledIconButton>
-                                    </div>
-                                    <div className={styles.trailing}>
-                                        <StyledIconButton onClick={handleIsPageExt} size='small'>
-                                            {
-                                                isPageExt
-                                                    ?
-                                                    <ArrowLeftOutlined />
-                                                    :
-                                                    <ArrowDropDownOutlined />
-                                            }
-                                        </StyledIconButton>
-                                    </div>
-                                </>
-                            )}
-                        </div >
-                        {/* Bottom Element */}
-                        {
-                            !isPageExt && (
-                                <div className={styles.headerElement}>
-                                    {currentStock && (
-                                        <div className={styles.row}>
-                                            <div className={styles.td}>
-                                                <p>Open</p>
-                                                <p>{currentStock.regularMarketOpen}</p>
-                                            </div>
-                                            <div className={styles.td}>
-                                                <p>High</p>
-                                                <p>{currentStock.regularMarketDayHigh}</p>
-                                            </div>
-                                            <div className={styles.td}>
-                                                <p>Low</p>
-                                                <p>{currentStock.regularMarketDayLow}</p>
-                                            </div>
-                                            <div className={styles.td}>
-                                                <p>Market Cap</p>
-                                                <p>{formatMarketCap(currentStock.marketCap)}</p>
-                                            </div>
-                                            <div className={styles.td}>
-                                                <p>P/E Ratio</p>
-                                                <p>{currentStock.forwardPE?.toFixed(2)}</p>
-                                            </div>
-                                            <div className={styles.td}>
-                                                <p>Div Yield</p>
-                                                <p>
-                                                    {
-                                                        (currentStock.dividendYield != null && currentStock.dividendYield != 0)
-                                                            ? `${(currentStock.dividendYield).toFixed(2)}%`
-                                                            : '0.00%'
-                                                    }
-                                                </p>
-                                            </div>
-                                            <div className={styles.td}>
-                                                <p>52 Week Range</p>
-                                                <p>{currentStock.fiftyTwoWeekRange}</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        }
-                    </>
-                )
-            }
         </header>
     );
 };

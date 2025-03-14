@@ -3,7 +3,7 @@
     background-color: inherit;
     display: flex;
     flex-direction: column;
-    padding: 0 4vw;
+    padding: 0 8svw;
     position: sticky;
     top: 0;
     width: 100%;
@@ -29,95 +29,51 @@
     display: none;
 }
 
-
 .headerElement {
-    height: 3rem;
+    min-height: 3rem;
 }
 
 .headerElementSmallDesktop,
 .headerElementSmallMobile {
-    height: 2rem;
+    min-height: 2rem;
 }
 
 .headerElementScroll {
     overflow-x: auto;
 }
 
-.containerRow {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-}
-
-.wrapperRow {
-    display: flex;
-    flex-direction: column;
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    overflow-x: auto;
-    width: 100%;
-    overflow-x: auto;
-}
-
-.indexes {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-}
-
+.indexes,
 .indexesList,
 .leading,
-.leadingTwo,
 .trailing {
     align-items: center;
     display: flex;
     flex-direction: row;
 }
 
-.indexesList,
-.indexesListMobile {
-    width: 100%;
-}
-
 .indexesList {
+    width: 100%;
     justify-content: space-between;
 }
 
-
-.leading,
-.leadingTwo {
+.indexes,
+.leading {
     gap: 0.5rem;
 }
 
 .leading a,
 .leading p,
-.leadingPPos,
-.leadingPNeg {
+.negative,
+.positive {
     white-space: nowrap;
 }
 
-.leadingPPos,
-.leadingTwoPPos {
+.positive {
     color: green;
 }
 
-.leadingPNeg,
-.leadingTwoPNeg {
+.negative {
     color: red;
-}
-
-.td {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    white-space: nowrap;
-    color: gray;
 }
 
 .anchor {
@@ -168,6 +124,10 @@
 }
 
 @media screen and (max-width: 754px) {
+    .headerElementSmallDesktop {
+        display: none;
+    }
+
     .headerElementSmallMobile {
         align-items: center;
         display: flex;
@@ -179,13 +139,9 @@
     .linkDesktop {
         display: none;
     }
-
-    .headerElementSmallDesktop {
-        display: none;
-    }
 }
 
-@media(prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
 
     .linkActive,
     .link:hover {
