@@ -6,11 +6,12 @@ import { CircularProgress, InputAdornment } from '@mui/material';
 import {
     usePathname
 } from 'next/navigation';
-import { useAppContext } from '../../providers/AppProvider';
-import { useAuthContext } from '../../providers/AuthProvider';
+import { useAppContext } from '@/app/providers/AppProvider';
+import { useAuthContext } from '@/app/providers/AuthProvider';
 import styles from "./Header.module.css";
 import Link from 'next/link';
-import { StyledIconButton, StyledTextField } from '../Styled';
+import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
+import { convertUnixTimestamp, formatMarketCap, formatPlusMinus } from '@/app/utils/utils';
 
 export default function Header() {
     const { currentExpirationDate, currentStock, isPageExt, indexesList, fetchStockData, fetchWatchListData, handleIsPageExt } = useAppContext();
@@ -25,75 +26,6 @@ export default function Header() {
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const deviceMenuRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
-
-    const holidays = [
-        '2025-01-01', // New Year's Day
-        '2025-01-20', // Martin Luther King Jr. Day
-        '2025-02-17', // Presidents' Day
-        '2025-04-18', // Good Friday
-        '2025-05-26', // Memorial Day
-        '2025-07-04', // Independence Day
-        '2025-09-01', // Labor Day
-        '2025-11-27', // Thanksgiving Day
-        '2025-12-25', // Christmas Day
-    ];
-
-    const formatPlusMinus = (price: number | undefined): string => {
-        if (price == 0 || price == null) return '0.00';
-        return price > 0 ? `+${price.toFixed(2)}` : price.toFixed(2);
-    };
-
-    const formatMarketCap = (marketCap: number | undefined): string => {
-        if (marketCap == null) return '';
-        if (marketCap >= 1_000_000_000_000) {
-            return `${(marketCap / 1_000_000_000_000).toFixed(2)}T`;
-        }
-        if (marketCap >= 1_000_000_000) {
-            return `${(marketCap / 1_000_000_000).toFixed(2)}B`;
-        }
-        if (marketCap >= 1_000_000) {
-            return `${(marketCap / 1_000_000).toFixed(2)}M`;
-        }
-        return `${marketCap}`;
-    };
-
-    const isHoliday = (date: Date): boolean => {
-        const dateString = date.toISOString().split('T')[0];
-        return holidays.includes(dateString);
-    };
-
-    const convertUnixTimestamp = (timestamp: number | undefined): string => {
-        if (timestamp == null) return '';
-
-        const dateObj = new Date(timestamp * 1000);
-        const hours = dateObj.getUTCHours();
-        const minutes = dateObj.getUTCMinutes();
-        const day = dateObj.getUTCDay();
-
-        // Convert UTC time to Eastern Time (ET)
-        const easternHours = (hours - 5 + 24) % 24; // ET is UTC-5
-
-        // Check if it's a weekend (Saturday or Sunday) or a holiday
-        if (day === 0 || day === 6 || isHoliday(dateObj)) {
-            return 'US Market Closed';
-        }
-
-        // Check if the market is open (9:30 AM ET to 4:00 PM ET)
-        if (easternHours < 9 || (easternHours === 9 && minutes < 30) || easternHours >= 16) {
-            return 'US Market Closed';
-        }
-
-        // Format the time as "as of 12:50 PM ET"
-        const options: Intl.DateTimeFormatOptions = {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true,
-            timeZone: 'America/New_York'
-        };
-        const formattedTime = dateObj.toLocaleTimeString('en-US', options);
-
-        return `as of ${formattedTime} ET`;
-    };
 
     // const handleAccount = () => {
     //     setModalView('account');
@@ -129,6 +61,7 @@ export default function Header() {
         if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
         try {
             await fetchStockData(inputValue);
+            setInputValue('');
         } catch (error) {
             console.log(error);
         }
@@ -198,11 +131,29 @@ export default function Header() {
         <header className={headerScrolled ? styles.headerScrolling : styles.header}>
             {/* Top Element Desktop */}
             <div className={styles.headerElementSmallDesktop}>
-                <div className={styles.leading}>
+                <div className={styles.indexesList}>
                     {
                         indexesList.map((data, index) => (
                             <div className={styles.indexes} key={index}>
                                 <p>{data.symbol}</p>
+                                {
+                                    data.regularMarketPrice && (
+                                        <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
+                                            ? data.regularMarketChangePercent > 0
+                                                ? styles.leadingPPos
+                                                : styles.leadingPNeg
+                                            : ''
+                                        }>
+                                            {
+                                                data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
+                                                    ? data.regularMarketChangePercent > 0
+                                                        ? <ArrowDropDownOutlined />
+                                                        : <ArrowDropDownOutlined />
+                                                    : null
+                                            }
+                                        </p>
+                                    )
+                                }
                                 <p className={data.regularMarketChangePercent != null && data.regularMarketChangePercent != 0
                                     ? data.regularMarketChangePercent > 0
                                         ? styles.leadingPPos
@@ -235,6 +186,24 @@ export default function Header() {
             <div className={styles.headerElementSmallMobile}>
                 <div className={styles.indexes}>
                     <p>{indexesList[2]?.symbol}</p>
+                    {
+                        indexesList[2]?.regularMarketPrice && (
+                            <p className={indexesList[2].regularMarketChangePercent != null && indexesList[2].regularMarketChangePercent != 0
+                                ? indexesList[2].regularMarketChangePercent > 0
+                                    ? styles.leadingPPos
+                                    : styles.leadingPNeg
+                                : ''
+                            }>
+                                {
+                                    indexesList[2].regularMarketChangePercent != null && indexesList[2].regularMarketChangePercent != 0
+                                        ? indexesList[2].regularMarketChangePercent > 0
+                                            ? <ArrowDropDownOutlined />
+                                            : <ArrowDropDownOutlined />
+                                        : null
+                                }
+                            </p>
+                        )
+                    }
                     <p className={indexesList[2]?.regularMarketChangePercent != null && indexesList[2]?.regularMarketChangePercent != 0
                         ? indexesList[2].regularMarketChangePercent > 0 ? styles.leadingPPos : styles.leadingPNeg : ''}
                     >
@@ -349,7 +318,6 @@ export default function Header() {
                                     </div>
                                     {/* <div className={styles.menuItem} onMouseEnter={handleDeviceMenuClose}><p>Logout</p></div> */}
                                 </div>
-
                             )}
                     </div>
                 </div>

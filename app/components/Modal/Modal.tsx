@@ -41,6 +41,9 @@ export default function Modal() {
                 <div className={styles.wrapper}>
                     <div className={styles.header}>
                         <div className={styles.headerLeading}>
+                            <h1>
+                                {modalView === 'account' ? 'Account' : 'Analytics'}
+                            </h1>
                         </div>
                         <div className={styles.headerTrailing}>
                             <IconButton onClick={onClose}><Close /></IconButton>

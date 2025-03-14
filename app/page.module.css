@@ -256,6 +256,12 @@
         background-color: #0a0a0a;
     }
 
-
-
+    .tableRowCall,
+    .tableRowPut,
+    .tableRowType,
+    .tableRowCallHeader,
+    .tableRowPutHeader,
+    .tableRowStrike {
+            background-color: #0a0a0a;
+    }
 }

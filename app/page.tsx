@@ -29,6 +29,7 @@ import { useAuthContext } from "./providers/AuthProvider";
 import { ArrowDropDownOutlined, CheckOutlined } from "@mui/icons-material";
 import { OptionType, StrikeType } from "./types/types";
 import { StyledTextField } from "./components/Styled";
+import { formatDate, formatPlusMinus } from "./utils/utils";
 
 const menuButtonStyle = {
   borderRadius: '0px',
@@ -70,28 +71,6 @@ export default function Options() {
     };
   }, []);
 
-  const formatDate = (date: string | undefined) => {
-    if (date == null) return '';
-    const dateObj = new Date(date + 'T00:00:00Z');
-    const currentYear = new Date().getFullYear();
-
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short",
-      day: "numeric",
-      timeZone: "UTC"
-    };
-
-    if (dateObj.getFullYear() !== currentYear) {
-      options.year = "2-digit";
-    }
-
-    return dateObj.toLocaleDateString("en-US", options);
-  };
-
-  const formatPlusMinus = (price: number | undefined): string => {
-    if (price == 0 || price == null) return '0.00';
-    return price > 0 ? `+${price.toFixed(2)}` : price.toFixed(2);
-  };
 
   const handleFetchExpirationDate = async (expirationDate: string) => {
     console.log('currentExpirationDate', currentExpirationDate);
@@ -217,38 +196,11 @@ export default function Options() {
       {/* Dates */}
       <div className={styles.dates}>
         {optionExpirationDates.map((date: string, index) => (
-          // <Button key={index}
-          //   variant={date == currentExpirationDate ? 'outlined' : 'text'}
-          //   // variant={date == currentExpirationDate ? 'contained' : 'text'}
-          //   // variant='text'
-          //   onClick={() => handleFetchExpirationDate(date)}
-          //   sx={{
-          //     textAlign: 'center',
-          //     borderRadius: '0px',
-          //     whiteSpace: 'nowrap',
-          //     minWidth: 'fit-content',
-          //     height: '2rem',
-          //     transition: 'background-color 0.3s, border-color 0.3s, transform 0.3s', // Add transition effect
-          //     // '&:hover': {
-          //     //   backgroundColor: date == currentExpirationDate ? 'primary.main' : 'transparent', // Ensure background color remains consistent
-          //     //   transform: 'scale(1.05)', // Slightly scale up the button on hover
-          //     // },
-          //     // '& .MuiButton-startIcon': {
-          //     //   transition: 'transform 0.3s', // Add transition effect to startIcon
-          //     // },
-          //     // '&:hover .MuiButton-startIcon': {
-          //     //   transform: 'scale(1.1)', // Scale up the startIcon on hover
-          //     // },
-          //   }}
-          //   startIcon={
-          //     date == currentExpirationDate
-          //       ? <CheckOutlined />
-          //       : null
-          //   }>{formatDate(date)}
-          // </Button>
           <div className={styles.date} key={index} onClick={() => handleFetchExpirationDate(date)}>{
             date == currentExpirationDate
-              ? <CheckOutlined  />
+              ? <CheckOutlined style={{
+                color: 'gray'
+              }} />
               : null
           }{formatDate(date)}</div>
         ))}
@@ -290,7 +242,6 @@ export default function Options() {
            <div className={styles.tableThStrike}>
                 <p>Strike</p>
           </div>
-         
             </div>
             <div className={styles.tableRowType}>
               <p>{formatDate(currentExpirationDate)}</p>
