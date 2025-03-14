@@ -301,24 +301,14 @@ export default function Header() {
                                     <div className={styles.containerRow}>
                                         <div className={styles.wrapperRow}>
                                             <div className={styles.indexes}>
-                                                <p style={{
-                                                    display: 'flex',
-                                                    flexDirection: 'row',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}>{currentStock.shortName?.toLocaleUpperCase()}
-                                                    {
-                                                        currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                                            ? currentStock.regularMarketChangePercent > 0
-                                                                ? <ArrowDropDownOutlined />
-                                                                : <ArrowDropDownOutlined />
-                                                            : null
-                                                    } <span className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
+                                                <p>{currentStock.shortName?.toLocaleUpperCase()}</p>
+                                                <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
                                                     ? currentStock.regularMarketChangePercent > 0
-                                                        ? styles.leadingPPos
-                                                        : styles.leadingPNeg
+                                                        ? styles.leadingTwoPPos
+                                                        : styles.leadingTwoPNeg
                                                     : ''
-                                                }>{currentStock.regularMarketPrice?.toFixed(2)} {currentStock.currency}</span></p>
+                                                }>{currentStock.regularMarketPrice?.toFixed(2)} </p>
+                                                <p>{currentStock.currency}</p>
                                             </div>
                                             <div className={styles.leadingTwo}>
                                                 <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
