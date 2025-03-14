@@ -44,6 +44,29 @@
     min-height: 3rem;
 }
 
+.dates {
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+.date {
+    align-items: center;
+    border: 1px solid gray;
+    border-radius: 18px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    height: 2rem;
+
+    justify-content: center;
+    /* padding: 0.5rem; */
+    padding: 0 0.5rem;
+    white-space: nowrap;
+
+
+}
+
 
 .controlsMobile {
     display: none;
@@ -73,9 +96,11 @@
 
 .menu {
     background-color: #fff;
-    border-left: 1px solid #64b5f6;
-    border-right: 1px solid #64b5f6;
-    border-bottom: 1px solid #64b5f6;
+    /* box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1); */
+    /* border-left: 1px solid gray;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray; */
+    border: 1px solid gray;
     border-radius: 0px;
     display: flex;
     flex-direction: column;
@@ -84,10 +109,6 @@
     z-index: 11;
 }
 
-.dates {
-    gap: 0.5rem;
-    overflow-x: auto;
-}
 
 .optionChainTable {
     display: flex;
@@ -191,7 +212,6 @@
 .tableTdStrike,
 .tableThType {
     align-items: center;
-    background-color: #ffffff;
     cursor: default;
     display: flex;
     flex-direction: column;

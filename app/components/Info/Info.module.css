@@ -1,14 +1,17 @@
 .wrapper {
+    align-items: center;
+    bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    left: 50svw;
+    right: 50svw;
     position: fixed;
-    left: 8vw;
-    bottom: 1rem;
-    right: 0;
-    left: 0;
 }
 
 .info {
     background-color: #0a0a0a;
     display: flex;
+    max-width: 300px;
     gap: 1rem;
     flex-direction: row;
     padding: 1rem;

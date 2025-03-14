@@ -147,7 +147,7 @@ export default function Options() {
       {/* Controls */}
       <div className={styles.controls}>
         <div className={styles.controlsLeading}>
-          <Button variant="outlined"
+          <Button variant="contained"
             onClick={handleOptionStrategy}
             endIcon={<ArrowDropDownOutlined />}
             sx={{
@@ -160,7 +160,7 @@ export default function Options() {
           <div className={styles.controlsLeadingElement}>
             <p>Strikes</p>
             <div className={styles.anchor}>
-              <Button variant="outlined"
+              <Button variant="contained"
                 onClick={() => setIsStrikesMenuOpen(prev => !prev)}
                 endIcon={<ArrowDropDownOutlined />}
                 ref={strikesMenuButtonRef}
@@ -218,35 +218,40 @@ export default function Options() {
       {/* Dates */}
       <div className={styles.dates}>
         {optionExpirationDates.map((date: string, index) => (
-          <Button key={index}
-            variant={date == currentExpirationDate ? 'outlined' : 'text'}
-            // variant={date == currentExpirationDate ? 'contained' : 'text'}
-            // variant='text'
-            onClick={() => handleFetchExpirationDate(date)}
-            sx={{
-              textAlign: 'center',
-              borderRadius: '0px',
-              whiteSpace: 'nowrap',
-              minWidth: 'fit-content',
-              height: '2rem',
-              transition: 'background-color 0.3s, border-color 0.3s, transform 0.3s', // Add transition effect
-              // '&:hover': {
-              //   backgroundColor: date == currentExpirationDate ? 'primary.main' : 'transparent', // Ensure background color remains consistent
-              //   transform: 'scale(1.05)', // Slightly scale up the button on hover
-              // },
-              // '& .MuiButton-startIcon': {
-              //   transition: 'transform 0.3s', // Add transition effect to startIcon
-              // },
-              // '&:hover .MuiButton-startIcon': {
-              //   transform: 'scale(1.1)', // Scale up the startIcon on hover
-              // },
-            }}
-            startIcon={
-              date == currentExpirationDate
-                ? <CheckOutlined />
-                : null
-            }>{formatDate(date)}
-          </Button>
+          // <Button key={index}
+          //   variant={date == currentExpirationDate ? 'outlined' : 'text'}
+          //   // variant={date == currentExpirationDate ? 'contained' : 'text'}
+          //   // variant='text'
+          //   onClick={() => handleFetchExpirationDate(date)}
+          //   sx={{
+          //     textAlign: 'center',
+          //     borderRadius: '0px',
+          //     whiteSpace: 'nowrap',
+          //     minWidth: 'fit-content',
+          //     height: '2rem',
+          //     transition: 'background-color 0.3s, border-color 0.3s, transform 0.3s', // Add transition effect
+          //     // '&:hover': {
+          //     //   backgroundColor: date == currentExpirationDate ? 'primary.main' : 'transparent', // Ensure background color remains consistent
+          //     //   transform: 'scale(1.05)', // Slightly scale up the button on hover
+          //     // },
+          //     // '& .MuiButton-startIcon': {
+          //     //   transition: 'transform 0.3s', // Add transition effect to startIcon
+          //     // },
+          //     // '&:hover .MuiButton-startIcon': {
+          //     //   transform: 'scale(1.1)', // Scale up the startIcon on hover
+          //     // },
+          //   }}
+          //   startIcon={
+          //     date == currentExpirationDate
+          //       ? <CheckOutlined />
+          //       : null
+          //   }>{formatDate(date)}
+          // </Button>
+          <div className={styles.date} key={index} onClick={() => handleFetchExpirationDate(date)}>{
+            date == currentExpirationDate
+              ? <CheckOutlined  />
+              : null
+          }{formatDate(date)}</div>
         ))}
       </div>
 
