@@ -235,8 +235,7 @@
 }
 
 
-.elementsHeaderTdCallsGreater
-.elementsHeaderTdCallsLess {
+.elementsHeaderTdCallsGreater .elementsHeaderTdCallsLess {
     background-color: lightslategray;
 }
 
@@ -286,7 +285,7 @@
 .tableHeaderStrikes p,
 .elementTdStrikes p,
 .elementThStrikes p {
-        color: gray;
+    color: gray;
 }
 
 /* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
@@ -338,4 +337,13 @@
     }
 }
 
-
+@media (prefers-color-scheme: dark) {
+    .elementsHeaderThStrikes,
+    .elementsHeaderThCalls,
+    .elementsHeaderThPuts,
+    .tableHeaderCalls,
+    .tableHeaderStrikes,
+    .tableHeaderPuts {
+        background-color: #0a0a0a;
+    }
+}
