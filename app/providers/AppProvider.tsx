@@ -5,7 +5,9 @@ import { FirebaseError } from 'firebase/app';
 import axios from 'axios';
 
 import { useAuthContext } from './AuthProvider';
-import { AppContextType, OptionChainType, OptionType, StockType, StrikeType } from '../types/types';
+import { AppContextType, OptionChainType, OptionType, StockType, 
+    // StrikeType 
+} from '../types/types';
 // import { loadCSVFiles } from '../utils/utils';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -218,7 +220,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             const optionDates: string[] = response.data.dates;
             const calls: OptionType[] = response.data.calls;
             let puts: OptionType[] = response.data.puts;
-            const strikes: StrikeType[] = response.data.strikes;
+            // const strikes: StrikeType[] = response.data.strikes;
+            const strikes: number[] = response.data.strikes;
+
             let displayStrikes;
             let price;
 
@@ -273,7 +277,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             } else {
                 let endIndex;
                 let startIndex;
-                let closestIndex = strikes.findIndex(strike => strike.strike >= price);
+                // let closestIndex = strikes.findIndex(strike => strike.strike >= price);
+                let closestIndex = strikes.findIndex(strike => strike >= price);
 
                 if (closestIndex === -1) {
                     closestIndex = strikes.length - 1;

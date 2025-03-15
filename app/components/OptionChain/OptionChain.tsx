@@ -7,8 +7,10 @@ import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '@/app/providers/AppProvider';
 import { useAuthContext } from '@/app/providers/AuthProvider';
 import { StyledButton, StyledButtonTwo, StyledIconButton, StyledTextField } from '../Styled';
-import { convertUnixTimestamp, formatDate, formatMarketCap, formatPlusMinus } from '@/app/utils/utils';
-import { OptionType, StrikeType } from '@/app/types/types';
+import { convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus } from '@/app/utils/utils';
+import { OptionType,
+    //  StrikeType 
+} from '@/app/types/types';
 import React from 'react';
 
 const menuButtonStyle = {
@@ -125,102 +127,156 @@ export default function OptionChain() {
         });
     };
 
-    {/* Details */ }
-    const Details = () => {
-        return (
-            <React.Fragment>
-                {/* Details Element */}
-                {currentStock && (
-                    <div className={styles.details}>
-                        <div>
-                            <p>{currentStock.shortName?.toLocaleUpperCase()}</p>
-                            <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                ? currentStock.regularMarketChangePercent > 0
-                                    ? styles.positive
-                                    : styles.negative
-                                : ''
-                            }>{currentStock.regularMarketPrice?.toFixed(2)} </p>
-                            <p>{currentStock.currency}</p>
-                            <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                ? currentStock.regularMarketChangePercent > 0
-                                    ? styles.positive
-                                    : styles.negative
-                                : ''
-                            }>{formatPlusMinus(currentStock.regularMarketChange)}</p>
-                            <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                                ? currentStock.regularMarketChangePercent > 0
-                                    ? styles.positive
-                                    : styles.negative
-                                : ''
-                            }>({formatPlusMinus(currentStock.regularMarketChangePercent)}%)</p>
-                            <p>{convertUnixTimestamp(currentStock.regularMarketTime)}</p>
+    useEffect(() => {
+        const callTable = callTableRef.current;
+        const strikeTable = strikeTableRef.current;
+        const putTable = putTableRef.current;
+        console.log('callTable', callTable);
+        console.log('strikeTable', strikeTable);
+        console.log('putTable', putTable);
+        if (callTable && strikeTable && putTable) {
+            const handleScroll = (source: HTMLElement) => {
+                syncScroll(source, [callTable, strikeTable, putTable]);
+            };
 
-                            <StyledIconButton onClick={handleAddToWatchList} size='small'>
-                                <PlaylistAdd />
-                            </StyledIconButton>
-                        </div>
-                        <div>
-                            <StyledIconButton onClick={handleSetIsBottomElementOpen} size='small'>
-                                {isBottomElementOpen
-                                    ?
-                                    <ArrowDropDownOutlined />
+            callTable.addEventListener('scroll', () => handleScroll(callTable));
+            strikeTable.addEventListener('scroll', () => handleScroll(strikeTable));
+            putTable.addEventListener('scroll', () => handleScroll(putTable));
 
-                                    :
-                                    <ArrowLeftOutlined />
-                                }
-                            </StyledIconButton>
-                        </div>
-                    </div >
-                )}
+            return () => {
+                callTable.removeEventListener('scroll', () => handleScroll(callTable));
+                strikeTable.removeEventListener('scroll', () => handleScroll(strikeTable));
+                putTable.removeEventListener('scroll', () => handleScroll(putTable));
+            };
+        }
+    }, [optionChain, isCallTableOpen, isPutTableOpen]);
 
-                {/* Details Extended Element */}
-                {
-                    (isBottomElementOpen && currentStock) && (
-                        <div className={styles.detailsExt}>
-                            <div className={styles.elementTh}>
-                                <p>Open</p>
-                                <p>{currentStock.regularMarketOpen}</p>
-                            </div>
-                            <div className={styles.elementTh}>
-                                <p>High</p>
-                                <p>{currentStock.regularMarketDayHigh}</p>
-                            </div>
-                            <div className={styles.elementTh}>
-                                <p>Low</p>
-                                <p>{currentStock.regularMarketDayLow}</p>
-                            </div>
-                            <div className={styles.elementTh}>
-                                <p>Market Cap</p>
-                                <p>{formatMarketCap(currentStock.marketCap)}</p>
-                            </div>
-                            <div className={styles.elementTh}>
-                                <p>P/E Ratio</p>
-                                <p>{currentStock.forwardPE?.toFixed(2)}</p>
-                            </div>
-                            <div className={styles.elementTh}>
-                                <p>Div Yield</p>
-                                <p>
-                                    {
-                                        (currentStock.dividendYield != null && currentStock.dividendYield != 0)
-                                            ? `${(currentStock.dividendYield).toFixed(2)}%`
-                                            : '0.00%'
-                                    }
-                                </p>
-                            </div>
-                            <div className={styles.elementTh}>
-                                <p>52 Week Range</p>
-                                <p>{currentStock.fiftyTwoWeekRange}</p>
-                            </div>
-                        </div>
-                    )
+    useEffect(() => {
+        setNearInputValue(currentNearPrice?.toFixed(2) || '');
+    }, [currentNearPrice]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (strikesMenuRef.current && !strikesMenuRef.current.contains(event.target as Node)) {
+                if (!strikesMenuButtonRef.current?.contains(event.target as Node)) {
+                    setIsStrikesMenuOpen(false);
                 }
-            </React.Fragment>
-        );
-    };
+            }
+        };
 
-    {/* Controls */ }
-    const Controls = () => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+
+    if (currentStock == null)
         return (
+            <div className={styles.pageHeader}>
+                <h1>Welcome to Options Project</h1>
+                <h2>An easy to use options analytical tool.</h2>
+                <h2>Search a symbol to get started.</h2>
+            </div>
+        );
+
+    return (
+        <div className={styles.wrapper}>
+            {/* Details Element */}
+            {currentStock && (
+                <div className={styles.details}>
+                    <div>
+                        <p>{currentStock.shortName?.toLocaleUpperCase()}</p>
+                        <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
+                            ? currentStock.regularMarketChangePercent > 0
+                                ? styles.positive
+                                : styles.negative
+                            : ''
+                        }>{currentStock.regularMarketPrice?.toFixed(2)} </p>
+                        <p>{currentStock.currency}</p>
+                        <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
+                            ? currentStock.regularMarketChangePercent > 0
+                                ? styles.positive
+                                : styles.negative
+                            : ''
+                        }>{formatPlusMinus(currentStock.regularMarketChange)}</p>
+                        <p className={currentStock.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
+                            ? currentStock.regularMarketChangePercent > 0
+                                ? styles.positive
+                                : styles.negative
+                            : ''
+                        }>({formatPlusMinus(currentStock.regularMarketChangePercent)}%)</p>
+                        <p>{convertUnixTimestamp(currentStock.regularMarketTime)}</p>
+
+                        <StyledIconButton onClick={handleAddToWatchList} size='small'>
+                            <PlaylistAdd />
+                        </StyledIconButton>
+                    </div>
+                    <div>
+                        <StyledIconButton onClick={handleSetIsBottomElementOpen} size='small'>
+                            {isBottomElementOpen
+                                ?
+                                <ArrowDropDownOutlined />
+
+                                :
+                                <ArrowLeftOutlined />
+                            }
+                        </StyledIconButton>
+                    </div>
+                </div >
+            )}
+
+            {/* Details Extended Element */}
+            {
+                (isBottomElementOpen && currentStock) && (
+                    <div className={styles.detailsExt}>
+                        <div className={styles.elementTh}>
+                            <p>Open</p>
+                            <p>{currentStock.regularMarketOpen}</p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>High</p>
+                            <p>{currentStock.regularMarketDayHigh}</p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>Low</p>
+                            <p>{currentStock.regularMarketDayLow}</p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>Market Cap</p>
+                            <p>{formatMarketCap(currentStock.marketCap)}</p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>P/E Ratio</p>
+                            <p>{currentStock.forwardPE?.toFixed(2)}</p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>Div Yield</p>
+                            <p>
+                                {
+                                    (currentStock.dividendYield != null && currentStock.dividendYield != 0)
+                                        ? `${(currentStock.dividendYield).toFixed(2)}%`
+                                        : '0.00%'
+                                }
+                            </p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>Div Date</p>
+                            <p>
+                                {
+                                    (currentStock.dividendDate)
+                                        ? convertUnixTimestampTwo(currentStock.dividendDate)
+                                        : ''
+                                }
+                            </p>
+                        </div>
+                        <div className={styles.elementTh}>
+                            <p>52 Week Range</p>
+                            <p>{currentStock.fiftyTwoWeekRange}</p>
+                        </div>
+                    </div>
+                )
+            }
             <div className={styles.controls}>
                 <div className={styles.controlsLeading}>
                     <StyledButton variant="contained"
@@ -279,12 +335,6 @@ export default function OptionChain() {
                     </div>
                 </div>
             </div>
-        );
-    };
-
-    {/* Controls Mobile */ }
-    const ControlsMobile = () => {
-        return (
             <div className={styles.controlsMobile}>
                 <p>Near</p>
                 <StyledTextField
@@ -296,67 +346,6 @@ export default function OptionChain() {
                     autoComplete="off">
                 </StyledTextField>
             </div>
-        );
-    };
-
-    useEffect(() => {
-        const callTable = callTableRef.current;
-        const strikeTable = strikeTableRef.current;
-        const putTable = putTableRef.current;
-        console.log('callTable', callTable);
-        console.log('strikeTable', strikeTable);
-        console.log('putTable', putTable);
-        if (callTable && strikeTable && putTable) {
-            const handleScroll = (source: HTMLElement) => {
-                syncScroll(source, [callTable, strikeTable, putTable]);
-            };
-
-            callTable.addEventListener('scroll', () => handleScroll(callTable));
-            strikeTable.addEventListener('scroll', () => handleScroll(strikeTable));
-            putTable.addEventListener('scroll', () => handleScroll(putTable));
-
-            return () => {
-                callTable.removeEventListener('scroll', () => handleScroll(callTable));
-                strikeTable.removeEventListener('scroll', () => handleScroll(strikeTable));
-                putTable.removeEventListener('scroll', () => handleScroll(putTable));
-            };
-        }
-    }, [optionChain, isCallTableOpen, isPutTableOpen]);
-
-    useEffect(() => {
-        setNearInputValue(currentNearPrice?.toFixed(2) || '');
-    }, [currentNearPrice]);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (strikesMenuRef.current && !strikesMenuRef.current.contains(event.target as Node)) {
-                if (!strikesMenuButtonRef.current?.contains(event.target as Node)) {
-                    setIsStrikesMenuOpen(false);
-                }
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-
-    if (currentStock == null)
-        return (
-            <div className={styles.pageHeader}>
-                <h1>Welcome to Options Project</h1>
-                <h2>An easy to use options analytical tool.</h2>
-                <h2>Search a symbol to get started.</h2>
-            </div>
-        );
-
-    return (
-        <div className={styles.wrapper}>
-            <Details />
-            <Controls />
-            <ControlsMobile />
             <div className={styles.dates}>
                 {optionExpirationDates.map((date: string, index) => (
                     <div className={styles.date} key={index} onClick={() => handleFetchExpirationDate(date)}>{
@@ -369,6 +358,7 @@ export default function OptionChain() {
                 ))}
             </div>
             <div className={styles.optionChainWrapper}>
+                {/* Calls Table */}
                 {
                     isCallTableOpen &&
                     (
@@ -394,7 +384,7 @@ export default function OptionChain() {
                                     }
                                 </div>
                             </div>
-                            <div className={styles.elementsHeaderThCalls}>
+                            <div className={styles.elementsHeaderTh}>
                                 <div className={styles.elementTh}><p>Bid</p></div>
                                 <div className={styles.elementTh}><p>Mark</p></div>
                                 <div className={styles.elementTh}><p>Ask</p></div>
@@ -405,9 +395,13 @@ export default function OptionChain() {
                                 <div className={styles.elementTh}><p>Implied</p><p>Volatility</p></div>
                                 <div className={styles.elementTh}><p>Contart</p><p>Size</p></div>
                                 <div className={styles.elementTh}><p>Open</p><p>Interest</p></div>
+                                {/* <div className={styles.elementTh}><p>Strike</p></div> */}
                             </div>
                             {optionChain?.calls.map((data: OptionType, index: React.Key | null | undefined) => (
-                                <div key={index} className={styles.elementsHeaderTdCalls} onClick={() => handleDisplayOptionAnalytics(data)}>
+                                <div key={index} className={
+                                    (data?.strike && currentNearPrice) &&
+                                        data?.strike < currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
+                                } onClick={() => handleDisplayOptionAnalytics(data)}>
                                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p
                                         className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}>{data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
@@ -419,26 +413,31 @@ export default function OptionChain() {
                                     <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '0.00%'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : '0'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '0'}</p></div>
+                                    {/* <div className={styles.elementTd}><p>{data?.strike ? data.strike : '0'}</p></div> */}
                                 </div>
                             ))}
                         </div>
                     )
                 }
+
+                {/* Strikes Table */}
                 <div className={styles.tableStrikes} ref={strikeTableRef}>
                     <div className={styles.tableHeaderStrikes}>
                         <p>Strikes</p>
                     </div>
 
                     <div className={styles.elementsHeaderThStrikes}>
-                        <div className={styles.elementThStrikes}><p>{currentExpirationDate}</p></div>
+                        <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)}</p></div>
                     </div>
 
-                    {optionChain?.strikes.map((data: StrikeType, index: React.Key | null | undefined) => (
+                    {optionChain?.strikes.map((data: number, index: React.Key | null | undefined) => (
                         <div key={index} className={styles.elementsHeaderTdStrikes}>
-                            <div className={styles.elementTdStrikes}> <p>{data.strike}</p></div>
+                            <div className={styles.elementTdStrikes}><p>{data.toString()}</p></div>
                         </div>
                     ))}
                 </div>
+
+                {/* Puts Table */}
                 {
                     isPutTableOpen &&
                     (
@@ -464,7 +463,7 @@ export default function OptionChain() {
                                     }
                                 </div>
                             </div>
-                            <div className={styles.elementsHeaderThPuts}>
+                            <div className={styles.elementsHeaderTh}>
                                 <div className={styles.elementTh}><p>Bid</p></div>
                                 <div className={styles.elementTh}><p>Mark</p></div>
                                 <div className={styles.elementTh}><p>Ask</p></div>
@@ -475,9 +474,13 @@ export default function OptionChain() {
                                 <div className={styles.elementTh}><p>Implied</p><p>Volatility</p></div>
                                 <div className={styles.elementTh}><p>Contart</p><p>Size</p></div>
                                 <div className={styles.elementTh}><p>Open</p><p>Interest</p></div>
+                                {/* <div className={styles.elementTh}><p>Strike</p></div> */}
                             </div>
                             {optionChain?.puts.map((data: OptionType, index: React.Key | null | undefined) => (
-                                <div key={index} className={styles.elementsHeaderTdCalls} onClick={() => handleDisplayOptionAnalytics(data)}>
+                                <div key={index} className={
+                                    (data?.strike && currentNearPrice) &&
+                                        data?.strike > currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
+                                } onClick={() => handleDisplayOptionAnalytics(data)}>
                                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}>{data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p></div>
@@ -488,6 +491,7 @@ export default function OptionChain() {
                                     <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '0.00%'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : '0'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '0'}</p></div>
+                                    {/* <div className={styles.elementTd}><p>{data?.strike ? data.strike: '0'}</p></div> */}
                                 </div>
                             ))}
                         </div>

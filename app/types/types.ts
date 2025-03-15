@@ -59,14 +59,15 @@ export interface OptionType {
     volume?: number;
 }
 
-export interface StrikeType {
-    strike: number;
-}
+// export interface StrikeType {
+//     strike: number;
+// }
 
 export interface OptionChainType {
     calls: OptionType[]; 
     puts: OptionType[];
-    strikes: StrikeType[];
+    // strikes: StrikeType[];
+    strikes: number[];
 }
 
 export interface StockType {

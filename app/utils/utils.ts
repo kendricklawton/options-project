@@ -78,6 +78,29 @@ export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     return `as of ${formattedTime} ET`;
 };
 
+export const convertUnixTimestampTwo = (timestamp: number | undefined): string => {
+    if (timestamp == null) return 'No Date';
+
+    const dateObj = new Date(timestamp * 1000);
+
+    // Convert UTC time to Eastern Time (ET)
+
+    // Format the time as "as of 12:50 PM ET"
+    const options: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        // hour: 'numeric',
+        // minute: 'numeric',
+        // hour12: true,
+        // timeZone: 'America/New_York'
+    };
+    // const formattedTime = dateObj.toLocaleTimeString('en-US', options);
+    const formattedTime = dateObj.toLocaleDateString('en-US', options)
+
+    return `${formattedTime}`;
+};
+
 export const formatDate = (date: string | undefined) => {
     if (date == null) return '';
     const dateObj = new Date(date + 'T00:00:00Z');
