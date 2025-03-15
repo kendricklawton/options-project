@@ -31,10 +31,11 @@ export default function Header() {
     //     setModalView('account');
     //     setIsMenuOpen(false);
     // };
+
     const isNumPositive = (num: number) => {
         return num > 0;
     };
-    
+
     const handleDeviceMenuOpen = () => {
         setIsDeviceMenuOpen(true);
     };
@@ -52,6 +53,16 @@ export default function Header() {
         if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
         try {
             await fetchStockData(inputValue);
+            setInputValue('');
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleFetchStockDataSymbol = async (symbol: string) => {
+        if (symbol.length === 0) return;
+        try {
+            await fetchStockData(symbol);
             setInputValue('');
         } catch (error) {
             console.log(error);
@@ -125,10 +136,11 @@ export default function Header() {
                     {
                         indexesList.map((data, index) => (
                             <div className={styles.indexes} key={index}>
-                                <p>{data.symbol}</p>
+                                <p className={styles.symbol} onClick={() => handleFetchStockDataSymbol(
+                                    data?.symbol ? data?.symbol : ''
+                                )}>{data.symbol}</p>
                                 <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                    {data.regularMarketPrice?.toFixed(2)
-                                    }</p>
+                                    {data.regularMarketPrice?.toFixed(2)}</p>
                                 {
                                     data.regularMarketPrice && (
                                         <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
@@ -138,7 +150,7 @@ export default function Header() {
                                 }
                                 <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                                     {`(${formatPlusMinus(data.regularMarketChangePercent)})%`}
-                                </p> 
+                                </p>
                             </div>
                         ))
                     }
@@ -148,7 +160,11 @@ export default function Header() {
             {/* Top Element Mobile */}
             <div className={styles.headerElementSmallMobile}>
                 <div className={styles.indexes}>
-                    <p>{indexesList[2]?.symbol}</p>
+                    <p
+                        onClick={() => handleFetchStockDataSymbol(
+                            indexesList[2]?.symbol ? indexesList[2]?.symbol : ''
+                        )}
+                    >{indexesList[2]?.symbol}</p>
                     <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                         {indexesList[2]?.regularMarketPrice && indexesList[2].regularMarketPrice.toFixed(2)}
                     </p>

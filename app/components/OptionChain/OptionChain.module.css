@@ -137,7 +137,6 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
-    /* height: 100%; */
 }
 
 
@@ -276,7 +275,6 @@
 .tableHeaderStrikes,
 .elementTdStrikes,
 .elementThStrikes {
-    /* background-color: lightgray; */
     align-items: center;
     padding: 0 0.5rem;
 }
@@ -312,7 +310,6 @@
 .tableStrikes::-webkit-scrollbar-thumb,
 .tablePuts::-webkit-scrollbar-thumb {
     background: transparent;
-    /* border-radius: 4px; */
 }
 
 .dates::-webkit-scrollbar-thumb:hover,
@@ -338,7 +335,6 @@
 }
 
 @media (prefers-color-scheme: dark) {
-
     .elementsHeaderThStrikes,
     .elementsHeaderThCalls,
     .elementsHeaderThPuts,
