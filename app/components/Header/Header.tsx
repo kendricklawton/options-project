@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { AccountTreeOutlined, CropOutlined, DarkModeOutlined, LightModeOutlined, Menu, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
-import { CircularProgress, Divider, InputAdornment } from '@mui/material';
+import { CircularProgress, InputAdornment } from '@mui/material';
 import {
     usePathname
 } from 'next/navigation';
@@ -144,7 +144,7 @@ export default function Header() {
                                 {
                                     data.regularMarketPrice && (
                                         <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                            {`(${formatPlusMinus(data.regularMarketChange)})`}
+                                            {`${formatPlusMinus(data.regularMarketChange)}`}
                                         </p>
                                     )
                                 }

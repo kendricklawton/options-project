@@ -20,7 +20,6 @@ const menuButtonStyle = {
     height: '2rem',
 }
 
-
 export default function OptionChain() {
     const {
         currentExpirationDate,

@@ -280,11 +280,11 @@
 }
 
 
-.tableHeaderStrikes p,
+/* .tableHeaderStrikes p,
 .elementTdStrikes p,
 .elementThStrikes p {
     color: gray;
-}
+} */
 
 /* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
 .dates::-webkit-scrollbar,
