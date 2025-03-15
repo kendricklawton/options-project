@@ -37,11 +37,17 @@
     justify-content: space-between;
 }
 
-
 .headerLeading,
 .headerTrailing {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .wrapper {
+        background-color: #0a0a0a;
+        color: #fff;
+    }
 }

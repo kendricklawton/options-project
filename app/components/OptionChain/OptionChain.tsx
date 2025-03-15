@@ -343,7 +343,7 @@ export default function OptionChain() {
         };
     }, []);
 
-    
+
     if (currentStock == null)
         return (
             <div className={styles.pageHeader}>
@@ -379,14 +379,18 @@ export default function OptionChain() {
                                     {
                                         !isPutTableOpen &&
                                         (<IconButton size='small' onClick={handleSetIsCallTableOpen}>
-                                            <ArrowLeftOutlined />
+                                            <ArrowLeftOutlined sx={{
+                                                color: 'gray'
+                                            }} />
                                         </IconButton>)
                                     }
                                     <p>Calls</p>
                                     {
                                         isPutTableOpen && (
                                             <IconButton size='small' onClick={handleSetIsCallTableOpen}>
-                                                <ArrowRightOutlined />
+                                                <ArrowRightOutlined sx={{
+                                                    color: 'gray'
+                                                }} />
                                             </IconButton>)
                                     }
                                 </div>
@@ -407,7 +411,7 @@ export default function OptionChain() {
                                 <div key={index} className={styles.elementsHeaderTdCalls} onClick={() => handleDisplayOptionAnalytics(data)}>
                                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p
-                                    className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}>{data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
+                                        className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}>{data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative} >{data?.change ? formatPlusMinus(data.change) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '0.00%'}</p></div>
@@ -445,14 +449,18 @@ export default function OptionChain() {
                                     {
                                         isCallTableOpen &&
                                         (<IconButton size='small' onClick={handleSetIsPutTableOpen}>
-                                            <ArrowLeftOutlined />
+                                            <ArrowLeftOutlined sx={{
+                                                color: 'gray'
+                                            }} />
                                         </IconButton>)
                                     }
                                     <p>Puts</p>
                                     {
                                         !isCallTableOpen && (
                                             <IconButton size='small' onClick={handleSetIsPutTableOpen}>
-                                                <ArrowRightOutlined />
+                                                <ArrowRightOutlined sx={{
+                                                    color: 'gray'
+                                                }} />
                                             </IconButton>)
                                     }
                                 </div>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { AccountTreeOutlined, CropOutlined, DarkModeOutlined, LightModeOutlined, Menu, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
-import { CircularProgress, InputAdornment } from '@mui/material';
+import { CircularProgress, Divider, InputAdornment } from '@mui/material';
 import {
     usePathname
 } from 'next/navigation';
@@ -254,6 +254,7 @@ export default function Header() {
                                         {isDeviceMenuOpen && (
                                             <div className={styles.modeMenu} ref={deviceMenuRef}>
                                                 <div className={styles.link}><LightModeOutlined /><p>Light Mode</p></div>
+                               
                                                 <div className={styles.link}><DarkModeOutlined /><p>Dark Mode</p></div>
                                             </div>
                                         )}
