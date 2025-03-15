@@ -411,7 +411,7 @@ export default function OptionChain() {
                                     <div className={styles.elementTd}><p className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.volume ? data.volume : '0'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '0.00%'}</p></div>
-                                    <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : '0'}</p></div>
+                                    <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : ''}</p></div>
                                     <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '0'}</p></div>
                                     {/* <div className={styles.elementTd}><p>{data?.strike ? data.strike : '0'}</p></div> */}
                                 </div>
@@ -489,7 +489,7 @@ export default function OptionChain() {
                                     <div className={styles.elementTd}><p className={isNumPositive(data?.percentChange ? data.percentChange : 0) ? styles.positive : styles.negative}> {data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.volume ? data.volume : '0'}</p></div>
                                     <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '0.00%'}</p></div>
-                                    <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : '0'}</p></div>
+                                    <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : ''}</p></div>
                                     <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '0'}</p></div>
                                     {/* <div className={styles.elementTd}><p>{data?.strike ? data.strike: '0'}</p></div> */}
                                 </div>
