@@ -87,11 +87,13 @@
 .menu,
 .modeMenu {
     background-color: #ffffff;
-    border: 1px solid gray;
+    box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    /* border: 1px solid gray; */
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
     z-index: 7;
+    /* width: 10rem; */
 }
 
 .menu {
@@ -103,7 +105,7 @@
 .modeMenu {
     position: absolute;
     right: 5rem;
-    bottom: -0.55rem;
+    bottom: -0.5rem;
 }
 
 .link,
@@ -154,6 +156,9 @@
 
     .menu,
     .modeMenu {
+        border: 1px solid gray;
         background-color: #0a0a0a;
     }
+
+    
 }

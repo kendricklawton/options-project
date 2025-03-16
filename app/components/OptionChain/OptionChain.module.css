@@ -116,7 +116,8 @@
 
 .menu {
     background-color: #fff;
-    border: 1px solid gray;
+    box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    /* border: 1px solid gray; */
     border-radius: 0px;
     display: flex;
     flex-direction: column;
@@ -233,7 +234,7 @@
 }
 
 .elementsHeaderTdTwo {
-    background-color: rgb(239, 239, 239);
+    background-color: #f6faff;
 }
 
 .elementsHeadersTdStrikes {
@@ -275,7 +276,6 @@
     align-items: center;
     padding: 0 0.5rem;
 }
-
 
 /* .tableHeaderStrikes p,
 .elementTdStrikes p,
@@ -352,4 +352,15 @@
     .tableHeaderPuts {
         background-color: #0a0a0a;
     }
+
+    .elementsHeaderTdTwo {
+        background-color: #2a3b4c;
+        /* Dark blue color for dark mode */
+    }
+
+        .menu {
+            background-color: #0a0a0a;
+            box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+            border: 1px solid gray;
+        }
 }

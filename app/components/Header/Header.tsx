@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { AccountTreeOutlined, CropOutlined, DarkModeOutlined, LightModeOutlined, Menu, RefreshOutlined, SearchOutlined, SettingsSystemDaydreamOutlined, StackedBarChartOutlined } from '@mui/icons-material';
+import { AccountTreeOutlined, CropOutlined, Menu, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
 import { CircularProgress, InputAdornment } from '@mui/material';
 import {
     usePathname
@@ -253,9 +253,12 @@ export default function Header() {
                                         </div>
                                         {isDeviceMenuOpen && (
                                             <div className={styles.modeMenu} ref={deviceMenuRef}>
-                                                <div className={styles.link}><LightModeOutlined /><p>Light Mode</p></div>
+                                                <div className={styles.link}><p>Light Mode</p></div>
+                                                <div className={styles.link}><p>Dark Mode</p></div>
+                                                <div className={styles.link}><p>System</p></div>
+                                                {/* <div className={styles.link}><LightModeOutlined /><p>Light Mode</p></div>
                                                 <div className={styles.link}><DarkModeOutlined /><p>Dark Mode</p></div>
-                                                <div className={styles.link}><SettingsSystemDaydreamOutlined /><p>System</p></div>
+                                                <div className={styles.link}><SettingsSystemDaydreamOutlined /><p>System</p></div> */}
                                             </div>
                                         )}
                                     </div>

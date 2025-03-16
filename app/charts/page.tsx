@@ -4,7 +4,9 @@ import React from "react";
 import pageStyles from "../page.module.css";
 import { useAppContext } from "../providers/AppProvider";
 
+
 export default function Charts() {
+
   const { currentStock, isPageExt } = useAppContext();
 
   if (currentStock == null)
@@ -18,10 +20,10 @@ export default function Charts() {
     );
 
   return (
-    <div className={isPageExt ? pageStyles.pageExt : pageStyles.page}>
-      <div className={pageStyles.pageHeader}>
-      <h1>Charts Development In Progress</h1>
-      </div>
+    <div className={pageStyles.page}>
+      {/* <div className={pageStyles.pageHeader}>
+        <h1>Charts Development In Progress</h1>
+      </div> */}
     </div>
   );
 };
