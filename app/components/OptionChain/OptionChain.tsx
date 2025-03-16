@@ -224,7 +224,6 @@ export default function OptionChain() {
                                 {isBottomElementOpen
                                     ?
                                     <ArrowDropDownOutlined />
-
                                     :
                                     <ArrowLeftOutlined />
                                 }
@@ -258,7 +257,11 @@ export default function OptionChain() {
                         </div>
                         <div className={styles.elementTh}>
                             <p>P/E Ratio</p>
-                            <p>{currentStock.forwardPE?.toFixed(2)}</p>
+                            <p>{
+                                currentStock.forwardPE ?
+                                    currentStock.forwardPE?.toFixed(2) :
+                                    'N/A'
+                            }</p>
                         </div>
                         <div className={styles.elementTh}>
                             <p>Div Yield</p>
