@@ -135,10 +135,10 @@ export default function Header() {
                 <div className={styles.indexesList}>
                     {
                         indexesList.map((data, index) => (
-                            <div className={styles.indexes} key={index}>
-                                <p className={styles.symbol} onClick={() => handleFetchStockDataSymbol(
-                                    data?.symbol ? data?.symbol : ''
-                                )}>{data.symbol}</p>
+                            <div className={styles.indexes} key={index} onClick={() => handleFetchStockDataSymbol(
+                                data?.symbol ? data?.symbol : ''
+                            )}>
+                                <p className={styles.symbol}>{data.symbol}</p>
                                 <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                                     {data.regularMarketPrice?.toFixed(2)}</p>
                                 {
@@ -159,12 +159,10 @@ export default function Header() {
 
             {/* Top Element Mobile */}
             <div className={styles.headerElementSmallMobile}>
-                <div className={styles.indexes}>
-                    <p
-                        onClick={() => handleFetchStockDataSymbol(
-                            indexesList[2]?.symbol ? indexesList[2]?.symbol : ''
-                        )}
-                    >{indexesList[2]?.symbol}</p>
+                <div className={styles.indexes} onClick={() => handleFetchStockDataSymbol(
+                    indexesList[2]?.symbol ? indexesList[2]?.symbol : ''
+                )}>
+                    <p>{indexesList[2]?.symbol}</p>
                     <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
                         {indexesList[2]?.regularMarketPrice && indexesList[2].regularMarketPrice.toFixed(2)}
                     </p>
