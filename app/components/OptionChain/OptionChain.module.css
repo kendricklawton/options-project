@@ -40,11 +40,15 @@
     min-width: fit-content;
 }
 
-.details div {
-    gap: 0.5rem;
+.detailsLeading,
+.detailsTrailing {
     display: flex;
     align-items: center;
     flex-direction: row;
+}
+
+.detailsLeading {
+    gap: 0.5rem;
 }
 
 .detailsExt {
@@ -169,6 +173,7 @@
 
 .tableHeaderCalls {
     justify-content: flex-end;
+    padding-right: 0.5rem;
 }
 
 .tableHeaderCalls div,
@@ -184,7 +189,8 @@
 }
 
 .tableHeaderPuts {
-    justify-content: flex-start
+    justify-content: flex-start;
+        padding-left: 0.5rem;
 }
 
 .elementsHeaderTd,
@@ -225,6 +231,7 @@
 .elementsHeaderTdTwo,
 .elementsHeaderTh {
     justify-content: space-between;
+    padding: 0 0.5rem;
 }
 
 
@@ -251,6 +258,11 @@
     justify-content: flex-end;
     min-height: 2rem;
 }
+
+/* .elementTdStrikes {
+    border-left: 0.25px solid gray;
+    border-right: 0.25px solid gray;
+} */
 
 .elementTh,
 .elementThStrikes {
@@ -358,9 +370,9 @@
         /* Dark blue color for dark mode */
     }
 
-        .menu {
-            background-color: #0a0a0a;
-            box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
-            border: 1px solid gray;
-        }
+    .menu {
+        background-color: #0a0a0a;
+        box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+        border: 1px solid gray;
+    }
 }
