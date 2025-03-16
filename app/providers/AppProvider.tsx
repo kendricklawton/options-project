@@ -89,36 +89,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }, []);
 
     // Fetch News Data
-    const fetchNewsData = useCallback(async (): Promise<void> => {
-        console.log('Fetching News Data');
-        setIsLoading(true);
-        const source = axios.CancelToken.source();
-        const timeout = setTimeout(() => {
-            source.cancel('Request Timed Out');
-        }, 12000);
+    // const fetchNewsData = useCallback(async (): Promise<void> => {
+    //     setIsLoading(true);
+    //     const source = axios.CancelToken.source();
+    //     const timeout = setTimeout(() => {
+    //         source.cancel('Request Timed Out');
+    //     }, 12000);
 
-        try {
-            const response = await axios.get(`${url}news-data`, {
-                cancelToken: source.token
-            });
+    //     try {
+    //         const response = await axios.get(`${url}news-data`, {
+    //             cancelToken: source.token
+    //         });
 
-            clearTimeout(timeout);
-            console.log(response.data);
-        } catch (error) {
-            if (axios.isCancel(error)) {
-                setInfo('Request timed out');
-            } else {
-                handleError(error);
-            }
-        } finally {
-            setIsLoading(false);
-        }
+    //         clearTimeout(timeout);
+    //     } catch (error) {
+    //         if (axios.isCancel(error)) {
+    //             setInfo('Request timed out');
+    //         } else {
+    //             handleError(error);
+    //         }
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
 
-    }, [handleError, setInfo, setIsLoading, url]);
+    // }, [handleError, setInfo, setIsLoading, url]);
 
     // Fetch Indexes Data
     const fetchIndexesData = useCallback(async (): Promise<void> => {
-        console.log('Fetching Indexes Data');
         setIsLoading(true);
         const source = axios.CancelToken.source();
         const timeout = setTimeout(() => {
@@ -131,8 +128,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             });
 
             clearTimeout(timeout);
-            console.log(response.data);
-
             const indexesData: StockType[] = Object.values(response.data);
             setIndexesList(indexesData);
         } catch (error) {
@@ -161,7 +156,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             });
 
             clearTimeout(timeout);
-            console.log(response.data);
 
             // Check if response data is valid
             if (response.data == undefined || response.data.info == undefined || response.data.calls == undefined || response.data.puts == undefined) {
@@ -169,58 +163,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 return;
             }
 
-            // const stockData: StockType = {
-            //     ask: response.data.info?.ask,
-            //     bid: response.data.info?.bid,
-            //     country: response.data.info?.country,
-            //     currency: response.data.info?.currency,
-            //     currentPrice: response.data.info?.currentPrice,
-            //     dayHigh: response.data.info?.dayHigh,
-            //     dayLow: response.data.info?.dayLow,
-            //     debtToEquity: response.data.info?.debtToEquity,
-            //     displayName: response.data.info?.displayName,
-            //     dividendDate: response.data.info?.dividendDate,
-            //     dividendRate: response.data.info?.dividendRate,
-            //     dividendYield: response.data.info?.dividendYield,
-            //     earningsCallTimestampEnd: response.data.info?.earningsCallTimestampEnd,
-            //     earningsCallTimestampStart: response.data.info?.earningsCallTimestampStart,
-            //     earningsGrowth: response.data.info?.earningsGrowth,
-            //     earningsQuarterlyGrowth: response.data.info?.earningsQuarterlyGrowth,
-            //     earningsTimestamp: response.data.info?.earningsTimestamp,
-            //     earningsTimestampEnd: response.data.info?.earningsTimestampEnd,
-            //     earningsTimestampStart: response.data.info?.earningsTimestampStart,
-            //     exDividendDate: response.data.info?.exDividendDate,
-            //     fiftyTwoWeekRange: response.data.info?.fiftyTwoWeekRange,
-            //     forwardPE: response.data.info?.forwardPE,
-            //     industry: response.data.info?.industry,
-            //     isEarningsDateEstimate: response.data.info?.isEarningsDateEstimate,
-            //     lastDividendDate: response.data.info?.lastDividendDate,
-            //     lastDividendValue: response.data.info?.lastDividendValue,
-            //     longName: response.data.info?.longName,
-            //     market: response.data.info?.market,
-            //     marketCap: response.data.info?.marketCap,
-            //     priceToBook: response.data.info?.priceToBook,
-            //     regularMarketChange: response.data.info?.regularMarketChange,
-            //     regularMarketChangePercent: response.data.info?.regularMarketChangePercent,
-            //     regularMarketDayHigh: response.data.info?.regularMarketDayHigh,
-            //     regularMarketDayLow: response.data.info?.regularMarketDayLow,
-            //     regularMarketDayRange: response.data.info?.regularMarketDayRange,
-            //     regularMarketOpen: response.data.info?.regularMarketOpen,
-            //     regularMarketPreviousClose: response.data.info?.regularMarketPreviousClose,
-            //     regularMarketPrice: response.data.info?.regularMarketPrice,
-            //     regularMarketTime: response.data.info?.regularMarketTime,
-            //     regularMarketVolume: response.data.info?.regularMarketVolume,
-            //     sector: response.data.info?.sector,
-            //     shortName: response.data.info?.shortName,
-            //     symbol: response.data.info?.symbol,
-            //     volume: response.data.info?.volume,
-            //     website: response.data.info?.website,
-            // };
-
             const optionDates: string[] = response.data.dates;
             const calls: OptionType[] = response.data.calls;
             let puts: OptionType[] = response.data.puts;
-            // const strikes: StrikeType[] = response.data.strikes;
             const strikes: number[] = response.data.strikes;
 
             let displayStrikes;
@@ -272,7 +217,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
             if (displayStrikes === 1) {
                 // Display All Strikes
-                console.log('Display All Strikes');
                 setOptionChain(optionChainData);
             } else {
                 let endIndex;
@@ -322,7 +266,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     // Fetch Watch List Data
     const fetchWatchListData = useCallback(async (): Promise<void> => {
-        console.log('Fetching Watch List Data');
         if (watchList.length === 0) {
             return;
         }
@@ -339,7 +282,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                 cancelToken: source.token
             });
             clearTimeout(timeout);
-            console.log(response.data);
             const watchListData: StockType[] = response.data.watchList;
             setWatchList(watchListData);
         } catch (error) {
@@ -371,7 +313,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
 
         loadData();
-    }, [fetchNewsData, fetchIndexesData, fetchWatchListData, handleError, setIsLoading,]);
+    }, [
+        // fetchNewsData, 
+        fetchIndexesData, fetchWatchListData, handleError, setIsLoading,]);
 
     const contextValue = useMemo(() => ({
         currentNearPrice,

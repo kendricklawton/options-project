@@ -132,9 +132,6 @@ export default function OptionChain() {
         const callTable = callTableRef.current;
         const strikeTable = strikeTableRef.current;
         const putTable = putTableRef.current;
-        console.log('callTable', callTable);
-        console.log('strikeTable', strikeTable);
-        console.log('putTable', putTable);
         if (callTable && strikeTable && putTable) {
             const handleScroll = (source: HTMLElement) => {
                 syncScroll(source, [callTable, strikeTable, putTable]);
@@ -349,15 +346,49 @@ export default function OptionChain() {
                 </div>
             </div>
             <div className={styles.controlsMobile}>
-                <p>Near</p>
-                <StyledTextField
-                    id="nearPrice"
-                    variant="outlined"
-                    value={nearPriceInputValue}
-                    onChange={(event) => setNearInputValue(event.target.value)}
-                    sx={{ width: '5rem' }}
-                    autoComplete="off">
-                </StyledTextField>
+                <div className={styles.controlsLeadingMobile}>
+                    <p>Strikes</p>
+                    <div className={styles.anchor}>
+                        <StyledButton variant="contained"
+                            onClick={() => setIsStrikesMenuOpen(prev => !prev)}
+                            endIcon={<ArrowDropDownOutlined />}
+                            ref={strikesMenuButtonRef}
+                            sx={{
+                                borderRadius: '0px',
+                                backgroundColor: 'fff',
+                                justifyContent: 'space-between',
+                                height: '2rem',
+                                minWidth: '6rem',
+                                whiteSpace:
+                                    'nowrap',
+                            }}>{totalStrikesToDisplay === 1 ? "ALL" : totalStrikesToDisplay}</StyledButton>
+                        {
+                            isStrikesMenuOpen && (
+                                <div className={styles.menu} ref={strikesMenuRef}>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
+                                    <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo>
+                                </div >
+                            )}
+                    </div>
+                </div>
+                <div className={styles.controlsTrailingMobile}>
+                    <p>Near</p>
+                    <StyledTextField
+                        id="nearPrice"
+                        variant="outlined"
+                        value={nearPriceInputValue}
+                        onChange={(event) => setNearInputValue(event.target.value)}
+                        sx={{ width: '5rem' }}
+                        autoComplete="off">
+                    </StyledTextField>
+                </div>
             </div>
             <div className={styles.dates}>
                 {optionExpirationDates.map((date: string, index) => (
