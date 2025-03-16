@@ -31,144 +31,341 @@
     font-weight: 500;
 }
 
-.optionChainTable {
-    display: flex;
-    flex-direction: column;
-    min-height: 40svh;
-    overflow: auto;
-    width: 100%;
-    height: 100%;
-}
 
-.optionChainTable::-webkit-scrollbar-track {
-    margin-top: 4rem;
-}
-
-.tableHeaderWrapper,
-.tableWrapper {
+.details,
+.detailsExt {
     display: flex;
+    align-items: center;
     flex-direction: row;
+    overflow-x: auto;
+}
+
+.details {
     justify-content: space-between;
+    min-height: fit-content;
+    min-width: fit-content;
+}
+
+.detailsLeading,
+.detailsTrailing {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.detailsLeading {
+    gap: 0.5rem;
+}
+
+.detailsExt {
+    min-height: 3rem;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.positive {
+    color: green;
+}
+
+.negative {
+    color: red;
+}
+
+.controls,
+.dates {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    min-height: 3rem;
+}
+
+.dates {
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+.date {
+    align-items: center;
+    box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    /* border: 1px solid gray; */
+    border-radius: 18px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    height: 2rem;
+    justify-content: center;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+}
+
+.controlsMobile {
+    display: none;
+}
+
+.controls {
+    gap: 1rem;
+}
+
+.controlsElement,
+.controlsElementTwo {
+    position: relative;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.anchor {
+    position: relative;
+}
+
+.menu {
+    background-color: #fff;
+    box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    /* border: 1px solid gray; */
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 100%;
+    z-index: 11;
+}
+
+.optionChainWrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.tableCalls,
+.tableStrikes,
+.tablePuts {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+
+.tableCalls,
+.tablePuts {
     width: 100%;
 }
 
-.tableHeaderWrapper {
-    position: sticky;
+.tableStrikes {
+    min-width: 6rem;
+    /* padding: 0 0.5rem; */
+}
+
+.tableHeaderCalls,
+.tableHeaderStrikes,
+.tableHeaderPuts {
     top: 0;
-}
-
-.table,
-.tableStrike,
-.tableHeader {
+    position: sticky;
     align-items: center;
-    display: flex;
-    flex-direction: column;
-}
-
-.tableRowCall,
-.tableRowPut,
-.tableRowType,
-.tableRowCallHeader,
-.tableRowPutHeader,
-.tableRowStrike {
-    background-color: #fff;
     display: flex;
     flex-direction: row;
     width: 100%;
-}
-
-.tableRowType,
-.tableRowStrike {
-    align-items: center;
-    justify-content: center;
-}
-
-.tableRowType {
-    height: 2rem;
+    min-height: 3rem;
+    background-color: #fff;
 }
 
 
-.tableRowCall:hover,
-.tableRowPut:hover {
-    background-color: #ededed;
-}
-
-.tableRowCallHeader,
-.tableRowCall {
-    justify-content: flex-start;
-}
-
-.tableRowPutHeader,
-.tableRowPut {
+.tableHeaderCalls {
+    right: 0;
+    left: 0;
     justify-content: flex-end;
+    padding-right: 0.5rem;
 }
 
-.tableTd,
-.tableTdLink,
-.tableTdPositive,
-.tableTdNegative,
-.tableTh {
-    align-items: flex-start;
-    cursor: default;
+.tableHeaderCalls div,
+.tableHeaderPuts div {
     display: flex;
-    flex-direction: column;
-    height: 2rem;
-    justify-content: center;
-}
-
-.tableTd,
-.tableTdLink,
-.tableTdPositive,
-.tableTdNegative,
-.tableTh {
-    min-width: 5rem;
-}
-
-.tableThStrike,
-.tableTdStrike {
+    flex-direction: row;
+    gap: 0.5rem;
     align-items: center;
-    cursor: default;
-    display: flex;
-    flex-direction: column;
-    height: 2rem;
+}
+
+.tableHeaderStrikes {
     justify-content: center;
 }
 
-.tableThStrike,
-.tableTdStrike {
-    min-width: 6.0rem;
+.tableHeaderPuts {
+    right: 0;
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
 }
 
-.tableTdStrike p,
-.tableRowType p  {
-    color: gray;
-    font-weight: 900;
-} 
+.elementsHeaderTd,
+.elementsHeaderTdTwo,
+.elementsHeaderTdLess,
+.elementsHeaderTh {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: fit-content;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    /* padding-bottom: 0.5rem; */
+}
 
-.tableTdLink p {
+.elementsHeaderThStrikes {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    /* padding-bottom: 0.5rem; */
+}
+
+.elementsHeaderTh,
+.elementsHeaderThStrikes {
+    width: 100%;
+    position: sticky;
+    top: 3rem;
+}
+
+.elementTh,
+.elementsHeaderThStrikes,
+.elementsHeaderTh,
+.tableHeaderCalls,
+.tableHeaderStrikes,
+.tableHeaderPuts {
+    background-color: #fff;
+    z-index: 5;
+}
+
+.elementsHeaderTd,
+.elementsHeaderTdTwo,
+.elementsHeaderTh {
+    justify-content: space-between;
+}
+
+.elementsHeaderTd:hover,
+.elementsHeaderTdTwo:hover {
+    background-color: lightgray;
+}
+
+.elementsHeaderTdTwo {
+    background-color: #f6faff;
+}
+
+.elementsHeadersTdStrikes {
+    padding: 0.5rem;
+    /* justify-content: center; */
+}
+
+.elementTh,
+.elementThStrikes,
+.elementTd,
+.elementTdLink,
+.elementTdStrikes {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 2rem;
+}
+
+.elementTh,
+.elementThStrikes {
+    /* padding-bottom: 0.5rem; */
+}
+
+/* .elementTdStrikes {
+    border-left: 0.25px solid gray;
+    border-right: 0.25px solid gray;
+} */
+
+.elementTh,
+.elementThStrikes {
+    z-index: 6;
+    /* padding: 0.5rem; */
+}
+
+.elementTh,
+.elementTd,
+.elementTdLink {
+    align-items: flex-start;
+    min-width: 6rem;
+    /* justify-content: center; */
+    white-space: nowrap;
+    /* padding: 0.5rem; */
+}
+
+.elementTdStrikes {
+    /* border-left: 0.5px solid lightgray;
+    border-right: 0.5px solid lightgray; */
+}
+
+.elementThTwo {
+    align-items: flex-start;
+    white-space: nowrap;
+}
+
+.elementTdLink p {
     color: blueviolet;
     cursor: pointer;
 }
 
-.positiveChange,
-.negativeChange {
-    display: flex;
-    text-align: center;
+.tableHeaderStrikes,
+.elementTdStrikes,
+.elementThStrikes {
     align-items: center;
+    /* justify-content: center; */
+
 }
 
-.positiveChange,
-.tableTdPositive p {
-    color: green;
+/* .elementTdStrikes,
+.elementThStrikes {
+
+} */
+
+
+
+/* .tableHeaderStrikes p,
+.elementTdStrikes p,
+.elementThStrikes p {
+    color: gray;
+} */
+
+/* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
+.dates::-webkit-scrollbar,
+.detailsExt::-webkit-scrollbar,
+.tableCalls::-webkit-scrollbar,
+.tableStrikes::-webkit-scrollbar,
+.tablePuts::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
 }
 
-.negativeChange,
-.tableTdNegative p {
-    color: red;
+.dates::-webkit-scrollbar-track,
+.detailsExt::-webkit-scrollbar-track,
+.tableCalls::-webkit-scrollbar-track,
+.tableStrikes::-webkit-scrollbar-track,
+.tablePuts::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dates::-webkit-scrollbar-thumb,
+.detailsExt::-webkit-scrollbar-thumb,
+.tableCalls::-webkit-scrollbar-thumb,
+.tableStrikes::-webkit-scrollbar-thumb,
+.tablePuts::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.dates::-webkit-scrollbar-thumb:hover,
+.detailsExt::-webkit-scrollbar-thumb:hover,
+.tableCalls::-webkit-scrollbar-thumb:hover,
+.tableStrikes::-webkit-scrollbar-thumb:hover,
+.tablePuts::-webkit-scrollbar-thumb:hover {
+    background: transparent;
 }
 
 @media screen and (max-width: 536px) {
-    .controlsLeadingElementNear {
+    .controlsElementTwo {
         display: none;
     }
 
@@ -177,26 +374,40 @@
         display: flex;
         flex-direction: row;
         min-height: 3rem;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 }
 
 @media (prefers-color-scheme: dark) {
-    .menu {
+    .date {
+        border: 1px solid gray;
+    }
+
+    .elementsHeaderThStrikes,
+    .elementsHeaderTh,
+    .tableHeaderCalls,
+    .tableHeaderStrikes,
+    .tableHeaderPuts {
         background-color: #0a0a0a;
     }
 
-    .tableRowCall,
-    .tableRowPut,
-    .tableRowType,
-    .tableRowCallHeader,
-    .tableRowPutHeader,
-    .tableRowStrike {
-            background-color: #0a0a0a;
+    .elementTh,
+    .elementsHeaderThStrikes,
+    .elementsHeaderTh,
+    .tableHeaderCalls,
+    .tableHeaderStrikes,
+    .tableHeaderPuts {
+        background-color: #0a0a0a;
     }
 
-        .tableRowCall:hover,
-        .tableRowPut:hover {
-            background-color: #424242;
-        }
+    .elementsHeaderTdTwo {
+        background-color: #2a3b4c;
+        /* Dark blue color for dark mode */
+    }
+
+    .menu {
+        background-color: #0a0a0a;
+        box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+        border: 1px solid gray;
+    }
 }

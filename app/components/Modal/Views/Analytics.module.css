@@ -1,199 +1,23 @@
-.header,
-.headerScrolled {
-    background-color: inherit;
-    display: flex;
-    flex-direction: column;
-    padding: 0 4vw;
-    position: sticky;
-    top: 0;
-    width: 100%;
-    z-index: 9;
-}
-
-.headerScrolled {
-    box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
-}
-
-.headerElement,
-.headerElementSmallDesktop,
-.headerElementScroll {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.headerElementSmallMobile {
-    display: none;
-}
-
-
 .headerElement {
-    height: 3rem;
-}
-
-.headerElementSmallDesktop,
-.headerElementSmallMobile {
-    height: 2rem;
-}
-
-.headerElementScroll {
-    overflow-x: auto;
-}
-
-.containerRow {
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
-}
-
-.wrapperRow {
-    display: flex;
-    flex-direction: column;
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    overflow-x: auto;
-    width: 100%;
-    overflow-x: auto;
-}
-
-.indexes {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 0.25rem;
-}
-
-.indexesList,
-.leading,
-.leadingTwo,
-.trailing {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-}
-
-.indexesList,
-.indexesListMobile {
-    width: 100%;
-}
-
-.indexesList {
+    min-height: 3rem;
     justify-content: space-between;
+    width: 100%;
 }
 
-
-.leading,
-.leadingTwo {
+.headerElement div {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
     gap: 0.5rem;
 }
 
-.leading a,
-.leading p,
-.leadingPPos,
-.leadingPNeg {
-    white-space: nowrap;
+.positive {
+    color: green
 }
 
-.leadingPPos,
-.leadingTwoPPos {
-    color: green;
-}
-
-.leadingPNeg,
-.leadingTwoPNeg {
-    color: red;
-}
-
-.td {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    white-space: nowrap;
-    color: gray;
-}
-
-.anchor {
-    position: relative;
-}
-
-.menu,
-.modeMenu {
-    background-color: #ffffff;
-    border: 1px solid gray;
-    display: flex;
-    flex-direction: column;
-    padding: 0.5rem;
-    z-index: 7;
-}
-
-.menu {
-    position: absolute;
-    margin-top: 0.5rem;
-    right: 0;
-}
-
-.modeMenu {
-    position: absolute;
-    right: 5rem;
-    bottom: -1.75rem;
-}
-
-.link,
-.linkDesktop {
-    align-items: center;
-    color: gray;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    gap: 0.25rem;
-    white-space: nowrap;
-}
-
-.link {
-    height: 2rem;
-    padding: 0.5rem 0.5rem;
-}
-
-.linkActive,
-.link:hover {
-    background-color: lightgray;
-}
-
-@media screen and (max-width: 754px) {
-    .headerElementSmallMobile {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        width: 100%;
-    }
-
-    .linkDesktop {
-        display: none;
-    }
-
-    .headerElementSmallDesktop {
-        display: none;
-    }
-}
-
-@media(prefers-color-scheme: dark) {
-
-    .linkActive,
-    .link:hover {
-        background-color: #424242;
-    }
-
-    .menu,
-    .modeMenu {
-        background-color: #0a0a0a;
-    }
+.negative {
+    color: red
 }

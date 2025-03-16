@@ -1,16 +1,16 @@
 'use client'
 
 import React from "react";
-import pageStyles from "../page.module.css";
+import styles from "../page.module.css";
 import { useAppContext } from "../providers/AppProvider";
 
 export default function Projects() {
-  const { currentStock, isPageExt } = useAppContext();
+  const { currentStock } = useAppContext();
 
   if (currentStock == null)
     return (
-      <div className={isPageExt ? pageStyles.pageExt : pageStyles.page}>
-        <div className={pageStyles.pageHeader}>
+      <div className={styles.page}>
+        <div className={styles.pageHeader}>
           <h1>Trade Projects</h1>
           <h2>Search for a symbol to create a project</h2>
         </div>
@@ -18,8 +18,8 @@ export default function Projects() {
     );
 
   return (
-    <div className={isPageExt ? pageStyles.pageExt : pageStyles.page}>
-      <div className={pageStyles.pageHeader}>
+    <div className={styles.page}>
+      <div className={styles.pageHeader}>
         <h1>Projects Development In Progress</h1>
       </div>
     </div>

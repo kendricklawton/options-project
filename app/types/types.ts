@@ -6,7 +6,6 @@ export interface AppContextType {
     currentOption?: OptionType;
     currentExpirationDate?: string;
     indexesList: StockType[];
-    isPageExt: boolean
     modalView: string;
     optionChain?: OptionChainType;
     optionExpirationDates: string[];
@@ -16,7 +15,6 @@ export interface AppContextType {
     clearStockData: () => void;
     fetchStockData: (symbol: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => Promise<void>;
     fetchWatchListData: () => Promise<void>;
-    handleIsPageExt: () => void;
     setCurrentNearPrice: (price: number) => void;
     setCurrentOption: (option: OptionType) => void;
     setModalView: (view: string) => void;
@@ -59,14 +57,9 @@ export interface OptionType {
     volume?: number;
 }
 
-// export interface StrikeType {
-//     strike: number;
-// }
-
 export interface OptionChainType {
     calls: OptionType[]; 
     puts: OptionType[];
-    // strikes: StrikeType[];
     strikes: number[];
 }
 
@@ -206,7 +199,3 @@ export interface StockType {
     volume?: number;
     website?: string;
 }
-
-// export interface StrikeType {
-//     strike: number;
-// }

@@ -21,29 +21,6 @@ const holidays = [
     '2025-12-25', // Christmas Day
 ];
 
-export const formatPlusMinus = (price: number | undefined): string => {
-    if (price == 0 || price == null) return '0.00';
-    return price > 0 ? `+${price.toFixed(2)}` : price.toFixed(2);
-};
-
-export const formatMarketCap = (marketCap: number | undefined): string => {
-    if (marketCap == null) return '';
-    if (marketCap >= 1_000_000_000_000) {
-        return `${(marketCap / 1_000_000_000_000).toFixed(2)}T`;
-    }
-    if (marketCap >= 1_000_000_000) {
-        return `${(marketCap / 1_000_000_000).toFixed(2)}B`;
-    }
-    if (marketCap >= 1_000_000) {
-        return `${(marketCap / 1_000_000).toFixed(2)}M`;
-    }
-    return `${marketCap}`;
-};
-
-export const isHoliday = (date: Date): boolean => {
-    const dateString = date.toISOString().split('T')[0];
-    return holidays.includes(dateString);
-};
 
 export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     if (timestamp == null) return '';
@@ -100,7 +77,6 @@ export const convertUnixTimestampTwo = (timestamp: number | undefined): string =
 
     return `${formattedTime}`;
 };
-
 export const formatDate = (date: string | undefined) => {
     if (date == null) return '';
     const dateObj = new Date(date + 'T00:00:00Z');
@@ -119,6 +95,50 @@ export const formatDate = (date: string | undefined) => {
     return dateObj.toLocaleDateString("en-US", options);
 };
 
+export const formatMarketCap = (marketCap: number | undefined): string => {
+    if (marketCap == null) return '';
+    if (marketCap >= 1_000_000_000_000) {
+        return `${(marketCap / 1_000_000_000_000).toFixed(2)}T`;
+    }
+    if (marketCap >= 1_000_000_000) {
+        return `${(marketCap / 1_000_000_000).toFixed(2)}B`;
+    }
+    if (marketCap >= 1_000_000) {
+        return `${(marketCap / 1_000_000).toFixed(2)}M`;
+    }
+    return `${marketCap}`;
+};
+
+export const formatPlusMinus = (price: number | undefined): string => {
+    if (price == 0 || price == null) return '0.00';
+    return price > 0 ? `+${price.toFixed(2)}` : price.toFixed(2);
+};
+
+// Function to get filtered symbols based on user input
+export const getFilteredSymbols = (input: string): string[] => {
+    const lowercasedInput = input.toLowerCase();
+
+    // Filter symbols from both files that start with the input string
+    const filteredFile1Symbols = Array.from(file1Symbols).filter(symbol =>
+        symbol.toLowerCase().startsWith(lowercasedInput)
+    );
+
+    const filteredFile2Symbols = Array.from(file2Symbols).filter(symbol =>
+        symbol.toLowerCase().startsWith(lowercasedInput)
+    );
+
+    // Combine results from both files
+    return [...filteredFile1Symbols, ...filteredFile2Symbols];
+};
+
+export const isHoliday = (date: Date): boolean => {
+    const dateString = date.toISOString().split('T')[0];
+    return holidays.includes(dateString);
+};
+
+export const isNumPositive = (num: number) => {
+    return num > 0;
+};
 
 // Function to load CSV files into memory
 export const loadCSVFiles = async () => {
@@ -149,19 +169,30 @@ export const loadCSVFiles = async () => {
     });
 };
 
-// Function to get filtered symbols based on user input
-export const getFilteredSymbols = (input: string): string[] => {
-    const lowercasedInput = input.toLowerCase();
 
-    // Filter symbols from both files that start with the input string
-    const filteredFile1Symbols = Array.from(file1Symbols).filter(symbol =>
-        symbol.toLowerCase().startsWith(lowercasedInput)
-    );
 
-    const filteredFile2Symbols = Array.from(file2Symbols).filter(symbol =>
-        symbol.toLowerCase().startsWith(lowercasedInput)
-    );
+const erf = (x: number) => {
+    const sign = x >= 0 ? 1 : -1;
+    x = Math.abs(x);
+    const a1 = 0.254829592;
+    const a2 = -0.284496736;
+    const a3 = 1.421413741;
+    const a4 = -1.453152027;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
-    // Combine results from both files
-    return [...filteredFile1Symbols, ...filteredFile2Symbols];
+    const t = 1.0 / (1.0 + p * x);
+    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+    return sign * y;
+};
+
+const cdf = (x: number) => {
+    return (1.0 + erf(x / Math.sqrt(2))) / 2.0;
+};
+
+export const blackScholesCall = (S: number, X: number, T: number, r: number, sigma: number) => {
+    const d1 = (Math.log(S / X) + (r + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
+    const d2 = d1 - sigma * Math.sqrt(T);
+    return S * cdf(d1) - X * Math.exp(-r * T) * cdf(d2);
 };
