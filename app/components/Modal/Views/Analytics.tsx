@@ -22,7 +22,7 @@ export default function Analytics() {
     const stockPrices = [];
     const currentStockPrice = currentStock?.regularMarketPrice || 0;
     const roundedStockPrice = Math.round(currentStockPrice);
-    const priceBottom = currentOption?.strike || 0;
+    const priceBottom = roundedStockPrice - (roundedStockPrice / 2);
     const priceTop = roundedStockPrice + 40;
 
     for (let price = priceBottom; price <= priceTop; price += 0.01) {
