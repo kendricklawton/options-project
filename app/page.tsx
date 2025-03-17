@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '@/app/providers/AppProvider';
 import { useAuthContext } from '@/app/providers/AuthProvider';
 import { StyledButton, StyledButtonTwo, StyledIconButton, StyledTextField } from '@/app/components/Styled';
-import { convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus, isNumPositive } from '@/app/utils/utils';
+import { calculateDaysRemaining, convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus, isNumPositive } from '@/app/utils/utils';
 import { OptionType } from '@/app/types/types';
 import React from 'react';
 
@@ -16,8 +16,8 @@ const menuButtonStyle = {
   borderTop: 'none',
   borderBottom: 'none',
   border: 'none',
-  justifyContent: 'space-between',
-  height: '1.5rem',
+  justifyContent: 'flex-start',
+  width: '6rem',
 }
 
 export default function Home() {
@@ -312,7 +312,6 @@ export default function Home() {
             sx={{
               borderRadius: '0px',
               width: 'fit-content',
-              height: '1.5rem',
               whiteSpace:
                 'nowrap',
             }}>CALL / PUT</StyledButton>
@@ -328,10 +327,8 @@ export default function Home() {
                 borderRadius: '0px',
                 backgroundColor: 'fff',
                 justifyContent: 'space-between',
-                height: '1.5rem',
                 minWidth: '6rem',
-                whiteSpace:
-                  'nowrap',
+                whiteSpace: 'nowrap',
               }}>{totalStrikesToDisplay === 1 ? "ALL" : totalStrikesToDisplay}</StyledButton>
             {
               isStrikesMenuOpen && (
@@ -376,10 +373,8 @@ export default function Home() {
                 borderRadius: '0px',
                 backgroundColor: 'fff',
                 justifyContent: 'space-between',
-                height: '2rem',
                 minWidth: '6rem',
-                whiteSpace:
-                  'nowrap',
+                whiteSpace: 'nowrap',
               }}>{totalStrikesToDisplay === 1 ? "ALL" : totalStrikesToDisplay}</StyledButton>
             {
               isStrikesMobileMenuOpen && (
@@ -479,7 +474,7 @@ export default function Home() {
             <p>Strikes</p>
           </div>
           <div className={styles.elementsHeaderThStrikes}>
-            <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)}</p></div>
+            <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)} ({calculateDaysRemaining(currentExpirationDate)} days)</p></div>
           </div>
           {optionChain?.strikes.map((data: number, index: React.Key | null | undefined) => (
             <div key={index} className={styles.elementsHeaderTdStrikes}>

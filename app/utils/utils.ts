@@ -1,5 +1,6 @@
 import Papa, { ParseResult } from 'papaparse';
 
+
 // Store the symbols from both CSV files
 let file1Symbols: Set<string> = new Set();
 let file2Symbols: Set<string> = new Set();
@@ -195,4 +196,14 @@ export const blackScholesCall = (S: number, X: number, T: number, r: number, sig
     const d1 = (Math.log(S / X) + (r + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
     const d2 = d1 - sigma * Math.sqrt(T);
     return S * cdf(d1) - X * Math.exp(-r * T) * cdf(d2);
+};
+
+// Function to calculate the number of days remaining until the expiration date
+export const calculateDaysRemaining = (expirationDate: string | undefined) => {
+    if (expirationDate == null) return 0;
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+    const timeDiff = expiration.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysDiff;
 };

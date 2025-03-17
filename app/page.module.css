@@ -156,9 +156,21 @@
     width: 100%;
 }
 
+.tableCalls {
+    border-right: 1px solid gray;
+}
+
+.tablePuts {
+    border-left: 1px solid gray;
+}
+
 .tableStrikes {
-    min-width: 6rem;
-    /* padding: 0 0.5rem; */
+    min-width: min-content;
+}
+
+.elementThStrikes {
+    padding: 0 0.5rem;
+    white-space: nowrap;
 }
 
 .tableHeaderCalls,
@@ -171,7 +183,6 @@
     flex-direction: row;
     width: 100%;
     min-height: 3rem;
-    
     background-color: #fff;
 }
 
@@ -179,6 +190,7 @@
 .tableHeaderCalls {
     right: 0;
     left: 0;
+    /* min-width: 50rem; */
     justify-content: flex-end;
     padding-right: 0.5rem;
 }
@@ -198,9 +210,12 @@
 .tableHeaderPuts {
     right: 0;
     left: 0;
+    /* min-width: 50rem; */
     justify-content: flex-start;
     padding-left: 0.5rem;
 }
+
+
 
 .elementsHeaderTd,
 .elementsHeaderTdTwo,
@@ -267,14 +282,11 @@
 .elementTdStrikes {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     min-height: 2rem;
 }
 
-.elementTh,
-.elementThStrikes {
-    /* padding-bottom: 0.5rem; */
-}
+
 
 /* .elementTdStrikes {
     border-left: 0.25px solid gray;

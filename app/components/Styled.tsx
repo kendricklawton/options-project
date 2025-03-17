@@ -2,7 +2,12 @@ import {Button, IconButton, styled, TextField } from "@mui/material";
 
 export const StyledButton = styled(Button)({
     backgroundColor: 'grey',
+    height: '2rem',
     color: 'white',
+    width: 'fit-content',
+    // justifyContent: 'space-between',
+    borderRadius: '0',
+    whiteSpace: 'nowrap',
     '& .MuiButton-label': {
         color: 'white',
     },
@@ -22,7 +27,7 @@ export const StyledTextField = styled(TextField)(({ }) => ({
     '& .MuiOutlinedInput-root': {
         fontFamily: 'inherit',
         borderRadius: '0',
-        height: '1.5rem',
+        height: '2rem',
         fontSize: 'inherit',
         backgroundColor: 'lightgray',
         '& fieldset': {

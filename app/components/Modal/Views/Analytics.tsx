@@ -75,73 +75,35 @@ export default function Analytics() {
             </div>
             <div className={styles.controls}>
                 <div className={styles.controlsElement}>
-        
-                        <p>Action</p>
-           
-                        <StyledButton variant="contained"
-                            sx={{
-                                borderRadius: '0px',
-                                width: 'fit-content',
-                                height: '1.5rem',
-                                whiteSpace:
-                                    'nowrap',
-                            }}>
-                            BUY
-                        </StyledButton>
-          
-                </div>
 
-                <div className={styles.controlsElement}>
-           
-                        <p>Quantity</p>
-     
-                        <StyledButton variant="contained"
-                            sx={{
-                                borderRadius: '0px',
-                                width: 'fit-content',
-                                height: '1.5rem',
-                                whiteSpace:
-                                    'nowrap',
-                            }}>
-                            {quantity}
-                        </StyledButton>
-            
-                </div>
+                    <p>Action</p>
 
-                <div className={styles.controlsElement}>
-   
-                        <p>Expiration</p>
- 
-                        <StyledButton variant="contained"
-                            sx={{
-                                borderRadius: '0px',
-                                width: 'fit-content',
-                                height: '1.5rem',
-                                whiteSpace:
-                                    'nowrap',
-                            }}>
-                            {currentExpirationDate}
-                        </StyledButton>
+                    <StyledButton variant="contained">
+                        BUY
+                    </StyledButton>
 
                 </div>
 
                 <div className={styles.controlsElement}>
-  
-                        <p>Strike</p>
-    
-                        <StyledButton variant="contained"
-                            sx={{
-                                borderRadius: '0px',
-                                width: 'fit-content',
-                                height: '1.5rem',
-                                whiteSpace:
-                                    'nowrap',
-                            }}>
-                            {currentOption?.strike}
-                        </StyledButton>
-           
+                    <p>Quantity</p>
+                    <StyledButton variant="contained">
+                        {quantity}
+                    </StyledButton>
                 </div>
 
+                <div className={styles.controlsElement}>
+                    <p>Expiration</p>
+                    <StyledButton variant="contained">
+                        {currentExpirationDate}
+                    </StyledButton>
+                </div>
+
+                <div className={styles.controlsElement}>
+                    <p>Strike</p>
+                    <StyledButton variant="contained">
+                        {currentOption?.strike}
+                    </StyledButton>
+                </div>
             </div>
 
             <div className={styles.element}>

@@ -1,7 +1,7 @@
 
 .controls,
 .element {
-        min-height: 3rem;
+    min-height: 3rem;
     align-items: center;
     display: flex;
     flex-direction: row;
@@ -15,7 +15,6 @@
 }
 
 .element {
-
     background-color: aquamarine;
 }
 
@@ -26,6 +25,7 @@
     width: 100%;
     /* gap: 0.5rem; */
 }
+
 .top,
 .bottom {
     display: flex;
