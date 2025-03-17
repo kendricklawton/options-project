@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react';
 import { useAppContext } from "@/app/providers/AppProvider";
 // import { SearchOutlined } from "@mui/icons-material";
 import styles from './Analytics.module.css';
@@ -10,8 +11,9 @@ import {
     //  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
     //  TooltipProps 
 } from 'recharts';
-import { SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
-import { StyledButton } from "../../Styled";
+import { CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
+import { StyledButton, StyledTextField } from "../../Styled";
+// import { StyledButton } from "../../Styled";
 // import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
 
 
@@ -19,8 +21,9 @@ import { StyledButton } from "../../Styled";
 export default function Analytics() {
     const {
         currentExpirationDate,
-        currentOption } = useAppContext();
-    // const [inputValue, setInputValue] = useState('');
+        // currentOption,
+        currentOptionOrder } = useAppContext();
+    const [inputValue, setInputValue] = useState<number>(currentOptionOrder?.quantity || 0);
     // const [quantity, setQuantity] = useState(10);
 
     const determineOptionType = (symbol: string): string => {
@@ -45,19 +48,19 @@ export default function Analytics() {
         throw new Error('Invalid option contract symbol');
     };
 
-    const optionType = determineOptionType(currentOption?.contractSymbol || '');
+    const optionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
     const quantity = 10;
-    const maxLoss = currentOption?.ask ? currentOption?.ask * 100 * quantity : 0;
+    const maxLoss = currentOptionOrder?.option?.ask ? currentOptionOrder?.option?.ask * 100 * quantity : 0;
 
     let breakEvenPrice;
     let maxProfit;
-    if (currentOption?.strike && currentOption?.ask) {
+    if (currentOptionOrder?.option?.strike && currentOptionOrder?.option?.ask) {
         if (optionType === 'Calls') {
-            breakEvenPrice = currentOption?.strike + currentOption?.ask;
+            breakEvenPrice = currentOptionOrder?.option?.strike + currentOptionOrder?.option?.ask;
             maxProfit = Infinity;
         } else {
-            breakEvenPrice = currentOption?.strike - currentOption?.ask;
-            maxProfit = (currentOption?.strike - currentOption?.ask) * 100 * quantity;
+            breakEvenPrice = currentOptionOrder?.option?.strike - currentOptionOrder?.option?.ask;
+            maxProfit = (currentOptionOrder?.option?.strike - currentOptionOrder?.option?.ask) * 100 * quantity;
         }
     }
 
@@ -66,46 +69,46 @@ export default function Analytics() {
             {/* <div className={styles.element}>
                 <div>
                     {currentStock && (
-                        <p>{currentStock.symbol} | Buy {quantity} {optionType} @ {currentOption?.ask} * 100</p>
+                        <p>{currentStock.symbol} | Buy {quantity} {optionType} @ {currentOptionOrder?.option?.ask} * 100</p>
                     )}
                 </div>
             </div> */}
             <div className={styles.element}>
                 <p>Risk Reward at Expiration</p>
             </div>
-            <div className={styles.controls}>
-                <div className={styles.controlsElement}>
+      
 
-                    <p>Action</p>
-
-                    <StyledButton variant="contained">
-                        BUY
-                    </StyledButton>
-
-                </div>
-
-                <div className={styles.controlsElement}>
-                    <p>Quantity</p>
-                    <StyledButton variant="contained">
-                        {quantity}
-                    </StyledButton>
-                </div>
-
-                <div className={styles.controlsElement}>
-                    <p>Expiration</p>
-                    <StyledButton variant="contained">
-                        {currentExpirationDate}
-                    </StyledButton>
-                </div>
-
-                <div className={styles.controlsElement}>
-                    <p>Strike</p>
-                    <StyledButton variant="contained">
-                        {currentOption?.strike}
-                    </StyledButton>
-                </div>
-            </div>
-
+                        <div className={styles.elementTwo}>
+                            <div>
+                                <p>Action </p>
+                                <StyledButton   endIcon={<CachedOutlined />} 
+                                >{currentOptionOrder?.action ? currentOptionOrder.action : 'Action'}</StyledButton>
+                            </div>
+                            <div>
+                                <p>Quantity</p>
+                                <StyledTextField
+                                    className={styles.numberInput}
+                                    type="number"   
+                                    value={inputValue}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setInputValue(parseInt(value));
+                                    }}
+                                ></StyledTextField>
+                                {/* <StyledButton endIcon={<CachedOutlined />}
+                                >{currentOptionOrder?.quantity ? currentOptionOrder.quantity : 'Quantity'}</StyledButton> */}
+                            </div>
+                        </div>
+                        <div className={styles.elementTwo}>
+                            <div>
+                                <p>Expiration: {currentExpirationDate}</p>
+                            </div>
+                            <div>
+                                <p>Strike: {currentOptionOrder?.option?.strike}</p>
+                            </div>
+                        </div>
+                    
+           
             <div className={styles.element}>
                 <div>
                     <SentimentVerySatisfied sx={{ color: 'green' }} fontSize="large" /> <p>Max Profit: {maxProfit?.toFixed(2)}</p>
@@ -126,7 +129,7 @@ export default function Analytics() {
                 </div>
             </div>
             {/* <p>Quantity: {quantity}</p> */}
-            {/* <p>Option Ask Price: {currentOption?.ask}</p> */}
+            {/* <p>Option Ask Price: {currentOptionOrder?.option?.ask}</p> */}
             {/* <p>Option Total Cost: {cost}</p> */}
         </>
     );

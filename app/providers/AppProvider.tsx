@@ -5,7 +5,7 @@ import { FirebaseError } from 'firebase/app';
 import axios from 'axios';
 
 import { useAuthContext } from './AuthProvider';
-import { AppContextType, OptionChainType, OptionType, StockType, 
+import { AppContextType, OptionChainType, OptionOrderType, OptionType, StockType, 
     // StrikeType 
 } from '../types/types';
 // import { loadCSVFiles } from '../utils/utils';
@@ -19,6 +19,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         // 'GOOGL', 'GOOGL', 'GOOGL', 'GOOGL', 'GOOGL'
     ]);
     const [currentOption, setCurrentOption] = useState<OptionType>();
+    const [currentOptionOrder, setCurrentOptionOrder] = useState<OptionOrderType>();
     const [currentNearPrice, setCurrentNearPrice] = useState<number>();
     const [currentStock, setCurrentStock] = useState<StockType>();
     const [totalStrikesToDisplay, setTotalStrikesToDisplay] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
@@ -258,7 +259,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             if (axios.isCancel(error)) {
                 setInfo('Request timed out');
             } else {
-                handleError(error);
+                handleError("Could not fetch stock data for " + symbol.toUpperCase() + ". Please check the symbol and try again");
             }
         } finally {
             setIsLoading(false);
@@ -289,7 +290,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             if (axios.isCancel(error)) {
                 setInfo('Request timed out');
             } else {
-                handleError(error);
+                handleError("Could not fetch watch list data");
             }
         } finally {
             setIsLoading(false);
@@ -321,6 +322,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const contextValue = useMemo(() => ({
         currentNearPrice,
         currentOption,
+        currentOptionOrder,
         currentExpirationDate,
         currentStock,
         modalView,
@@ -335,14 +337,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         fetchStockData,
         fetchWatchListData,
         handleIsPageExt,
-        setCurrentOption,
         setCurrentNearPrice,
+        setCurrentOption,
+        setCurrentOptionOrder,
         setModalView,
         setTotalStrikesToDisplay
     }), [
+        currentExpirationDate,
         currentNearPrice,
         currentOption,
-        currentExpirationDate,
+        currentOptionOrder,
         currentStock,
         modalView,
         indexesList,

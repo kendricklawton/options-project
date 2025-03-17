@@ -30,6 +30,7 @@ export default function Home() {
     totalStrikesToDisplay,
     fetchStockData,
     setCurrentOption,
+    setCurrentOptionOrder,
     setModalView } = useAppContext();
   const { setInfo } = useAuthContext();
 
@@ -54,7 +55,12 @@ export default function Home() {
   //   console.log('Add to watch list');
   // };
 
-  const handleDisplayOptionAnalytics = (option: OptionType) => {
+  const handleDisplayOptionAnalytics = (option: OptionType, action?: 'Buy' | 'Sell',) => {
+      setCurrentOptionOrder({
+        action: action || 'Buy',
+        option: option,
+        quantity: 10,
+      });
     setCurrentOption(option);
     setModalView('analytics');
   };
@@ -106,6 +112,7 @@ export default function Home() {
     try {
       await fetchStockData(symbol, expirationDate, undefined, totalStrikes);
       setIsStrikesMenuOpen(false);
+      setIsStrikesMobileMenuOpen(false);
     }
     catch (error) {
       console.error(error);
@@ -137,7 +144,6 @@ export default function Home() {
       </div>
     )
   }
-
 
   useEffect(() => {
     const callTable = callTableRef.current;
@@ -451,8 +457,8 @@ export default function Home() {
                   data?.strike < currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
               } onClick={() => handleDisplayOptionAnalytics(data)}>
                 <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p 
-                        className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>
+                <div className={styles.elementTd}><p
+                  className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>
                   {data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
                 <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p></div>
                 <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p></div>
@@ -474,7 +480,7 @@ export default function Home() {
             <p>Strikes</p>
           </div>
           <div className={styles.elementsHeaderThStrikes}>
-            <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)} ({calculateDaysRemaining(currentExpirationDate)} days)</p></div>
+            <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)}</p><p>({calculateDaysRemaining(currentExpirationDate)} days)</p></div>
           </div>
           {optionChain?.strikes.map((data: number, index: React.Key | null | undefined) => (
             <div key={index} className={styles.elementsHeaderTdStrikes}>

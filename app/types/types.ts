@@ -1,10 +1,11 @@
 import { User } from "firebase/auth";
 
 export interface AppContextType {
-    currentNearPrice?: number;
-    currentStock?: StockType;
-    currentOption?: OptionType;
     currentExpirationDate?: string;
+    currentNearPrice?: number;
+    currentOption?: OptionType;
+    currentOptionOrder?: OptionOrderType;
+    currentStock?: StockType;
     indexesList: StockType[];
     modalView: string;
     optionChain?: OptionChainType;
@@ -17,6 +18,7 @@ export interface AppContextType {
     fetchWatchListData: () => Promise<void>;
     setCurrentNearPrice: (price: number) => void;
     setCurrentOption: (option: OptionType) => void;
+    setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
     setModalView: (view: string) => void;
     setTotalStrikesToDisplay: (totalStrikesToDisplay: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => void;
 }
@@ -61,6 +63,12 @@ export interface OptionChainType {
     calls: OptionType[]; 
     puts: OptionType[];
     strikes: number[];
+}
+
+export interface OptionOrderType {
+    action?: 'Buy' | 'Sell';
+    option?: OptionType;
+    quantity?: number;
 }
 
 export interface StockType {

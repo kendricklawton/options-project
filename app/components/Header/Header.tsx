@@ -73,6 +73,11 @@ export default function Header() {
         }
     };
 
+    const handleOnChange = ( value: string) => {
+        value = value.toUpperCase();
+        setInputValue(value);
+    };
+
     const handleRefreshStockData = async () => {
         if (currentStock?.symbol == null) return;
         const expirationDate = currentExpirationDate;
@@ -190,8 +195,8 @@ export default function Header() {
                             margin: '0',
                             padding: '0',
                         }}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        value={inputValue.toUpperCase()}
+                        onChange={(e) => handleOnChange(e.target.value)}
+                        value={inputValue}
                         placeholder={currentStock?.symbol ? currentStock.symbol : 'SYMBOL'}
                         autoComplete="off"
                         slotProps={{

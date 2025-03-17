@@ -23,26 +23,62 @@ const holidays = [
 ];
 
 
+// export const convertUnixTimestamp = (timestamp: number | undefined): string => {
+//     if (timestamp == null) return '';
+
+//     const dateObj = new Date(timestamp * 1000);
+//     const hours = dateObj.getUTCHours();
+//     const minutes = dateObj.getUTCMinutes();
+//     const day = dateObj.getUTCDay();
+
+//     // Convert UTC time to Eastern Time (ET)
+//     const easternHours = (hours - 5 + 24) % 24; // ET is UTC-5
+
+//     // Check if it's a weekend (Saturday or Sunday) or a holiday
+//     if (day === 0 || day === 6 || isHoliday(dateObj)) {
+//         return 'US Market Closed';
+//     }
+
+//     // Check if the market is open (9:30 AM ET to 4:00 PM ET)
+//     if (easternHours < 9 || (easternHours === 9 && minutes < 30) || easternHours >= 16) {
+//         return 'US Market Closed';
+//     }
+
+//     // Format the time as "as of 12:50 PM ET"
+//     const options: Intl.DateTimeFormatOptions = {
+//         hour: 'numeric',
+//         minute: 'numeric',
+//         hour12: true,
+//         timeZone: 'America/New_York'
+//     };
+//     const formattedTime = dateObj.toLocaleTimeString('en-US', options);
+
+//     return `as of ${formattedTime} ET`;
+// };
+
 export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     if (timestamp == null) return '';
 
-    const dateObj = new Date(timestamp * 1000);
-    const hours = dateObj.getUTCHours();
-    const minutes = dateObj.getUTCMinutes();
-    const day = dateObj.getUTCDay();
 
-    // Convert UTC time to Eastern Time (ET)
-    const easternHours = (hours - 5 + 24) % 24; // ET is UTC-5
+    const dateObj = new Date(timestamp * 1000);
+    // const day = dateObj.getUTCDay();
 
     // Check if it's a weekend (Saturday or Sunday) or a holiday
-    if (day === 0 || day === 6 || isHoliday(dateObj)) {
-        return 'US Market Closed';
-    }
+    // if (day === 0 || day === 6 || isHoliday(dateObj)) {
+    //     return 'US Market Closed';
+    // }
+
+    // Convert local time to Eastern Time (ET)
+    // const easternOffset = -5 * 60; // ET is UTC-5
+    // const localOffset = dateObj.getTimezoneOffset(); // Local time zone offset in minutes
+    // const easternTime = new Date(dateObj.getTime() + (localOffset - easternOffset) * 60000);
+    // const easternHours = easternTime.getHours();
+    // const easternMinutes = easternTime.getMinutes();
 
     // Check if the market is open (9:30 AM ET to 4:00 PM ET)
-    if (easternHours < 9 || (easternHours === 9 && minutes < 30) || easternHours >= 16) {
-        return 'US Market Closed';
-    }
+    // if (easternHours < 9 || (easternHours === 9 && easternMinutes < 30) || easternHours >= 16) {
+    //     return 'US Market Closed';
+    // }
 
     // Format the time as "as of 12:50 PM ET"
     const options: Intl.DateTimeFormatOptions = {

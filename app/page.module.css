@@ -150,18 +150,9 @@
     overflow: auto;
 }
 
-
 .tableCalls,
 .tablePuts {
     width: 100%;
-}
-
-.tableCalls {
-    border-right: 1px solid gray;
-}
-
-.tablePuts {
-    border-left: 1px solid gray;
 }
 
 .tableStrikes {
