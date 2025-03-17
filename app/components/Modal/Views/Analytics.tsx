@@ -4,68 +4,41 @@ import { useAppContext } from "@/app/providers/AppProvider";
 import { SearchOutlined } from "@mui/icons-material";
 import styles from './Analytics.module.css';
 import { StyledTextField } from '@/app/components/Styled';
-import { blackScholesCall, convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
 import { InputAdornment } from "@mui/material";
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+    //  TooltipProps 
+    } from 'recharts';
+import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
 
-
-
-
-
-// const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
-//     if (active && payload && payload.length) {
-
-
-//         return (
-//             <div style={{
-//                 top: '0',
-//                 position: 'absolute',
-//             }}>
-//                 <p>{`Price: ${label}`}</p>
-//                 <p>{`Current: ${payload[0]?.value && payload[0].value.toFixed(2)}`}</p>
-//                 <p>{`Expiration: ${payload[1]?.value && payload[1].value.toFixed(2)}`}</p>
-
-//             </div>
-//         );
-//     }
-
-//     return null;
-// };
 
 export default function Analytics() {
-    const { currentStock, currentOption, fetchStockData } = useAppContext();
+    const {
+        //  currentExpirationDate,
+          currentStock, currentOption, fetchStockData } = useAppContext();
     const [inputValue, setInputValue] = useState('');
 
-    const strikePrice = currentOption?.strike || 0; // Example strike price for AAPL call option
-    const volatility = currentOption?.impliedVolatility || 0; // Implied volatility (26.64%)
-    const riskFreeRate = 0.05; // Risk-free rate (5%)
-    const timeToExpiration = 0.25; // Time to expiration in years (3 months)
-    const optionCost = currentOption?.ask || 0; // Mark price of the option (midpoint between bid/ask)
 
-    // Generate stock prices from 200 to 289 in increments of 1
     const stockPrices = [];
-    
-    for (let price = 200; price <= 260; price += 0.01) {
+    const currentStockPrice = currentStock?.regularMarketPrice || 0;
+    const roundedStockPrice = Math.round(currentStockPrice);
+    const priceBottom = currentOption?.strike || 0;
+    const priceTop = roundedStockPrice + 40;
+
+    for (let price = priceBottom; price <= priceTop; price += 0.01) {
         stockPrices.push(parseFloat(price.toFixed(2)));
     }
 
-    const optionsQuantity = 10; // Number of options (100 options)
-    const maxLoss = optionCost * optionsQuantity; // Maximum loss is the premium paid for the options
+    let breakEvenPrice;
+    const maxLoss = currentOption?.ask ? currentOption?.ask * 100 : 0;
 
-    const currentExpirationData = stockPrices.map(price => {
-        const optionValue = blackScholesCall(price, strikePrice, timeToExpiration, riskFreeRate, volatility);
-        const profitLoss = optionValue * optionsQuantity - maxLoss;
-        return { price, profitLossOne: profitLoss };
-    });
-
-    // Profit/Loss calculation at expiration date (American-style approximation)
-    const expirationDateData = stockPrices.map(price => {
-        const intrinsicValue = Math.max(0, price - strikePrice);
-        const profitLoss = intrinsicValue * optionsQuantity - maxLoss;
-        // if (profitLoss > 20000) {
-        //     profitLoss = 20000;
-        // }
+    if(currentOption?.strike && currentOption?.ask) {
+        breakEvenPrice = currentOption?.strike + currentOption?.ask;
+    }
+    
+    const profitAtExpirationData = stockPrices.map(price => {
+        const intrinsicValue = Math.max(0, price - (currentOption?.strike || 0));
+        const profitLoss = intrinsicValue * 100 - maxLoss;
         return { price, profitLossTwo: profitLoss };
     });
 
@@ -79,57 +52,7 @@ export default function Analytics() {
             console.log(error);
         }
     };
-    // const convertExpiry = (date: number) => {
-    //     const expiry = new Date(date * 1000);
-    //     // const timeToExpiration = 0.25; // Time to expiration in years (3 months)
-    //     const currentDate = new Date();
-    //     const timeToExpiration = (expiry.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-    //     return timeToExpiration;
-    // };
 
-
-    const CustomTooltip = ({ label }: TooltipProps<number, string>) => {
-        // console.log(
-        //     'Strike Price: ', currentOption?.strike,
-        //     'Implied Volatility: ', currentOption?.impliedVolatility,
-        //     'Risk-Free Rate: ', 0.05,
-        //     'Time to Expiration: ', convertExpiry(currentOption?.expiration || 0),
-        //     'Option Cost: ', currentOption?.ask,
-        //     'Options Quantity: ', 1000,
-        //     'Price: ', label
-        // )
-
-        // const strikePrice = currentOption?.strike || 0; // Example strike price for AAPL call option
-        // const volatility = currentOption?.impliedVolatility || 0; // Implied volatility (26.64%)
-        // const riskFreeRate = 0.05; // Risk-free rate (5%)
-
-        // // Time to expiration in years (3 months)
-        // const timeToExpiration = 0.25; // Time to expiration in years (3 months)
-        // const optionCost = currentOption?.ask; // Mark price of the option (midpoint between bid/ask)
-        // const optionsQuantity = 1000; // Number of options (100 options)
-        // const maxLoss = optionCost || 0 * optionsQuantity; // Maximum loss is the premium paid for the options
-
-        // const price = parseFloat(label);
-        // const optionValueCurrent = blackScholesCall(price, strikePrice, timeToExpiration, riskFreeRate, volatility);
-        // const profitLossCurrent = optionValueCurrent * optionsQuantity - maxLoss;
-        // // setProfitLossCurrent(profitLossCurrent);
-
-        // const intrinsicValue = Math.max(0, price - strikePrice);
-        // const profitLossExpiration = intrinsicValue * optionsQuantity - maxLoss;
-        // setProfitLossExpiration(profitLossExpiration);
-
-        return (
-            <div style={{
-                top: '0',
-                width: '300px',
-                position: 'absolute',
-            }}>
-                <p>{`Price: ${label}`}</p>
-                {/* <p>{`Current: ${profitLossCurrent.toFixed(2)}`}</p>
-                <p>{`Expiration: ${profitLossExpiration.toFixed(2)}`}</p> */}
-            </div>
-        );
-    };
     return (
         <>
             <div className={styles.headerElement}>
@@ -196,36 +119,24 @@ export default function Analytics() {
                     </div>
                 )}
             </div>
-            <ResponsiveContainer  width="100%" height={300}>
-                <LineChart>
-                    <XAxis dataKey="price" tickLine={false} minTickGap={5} type="number" domain={['dataMin', 'dataMax']} />
 
-                    <YAxis orientation="right" tickLine={false} interval={0}
-                    // domain={[-1950, 'dataMax - 10000']}
-                    />
-                    <Tooltip
-                        isAnimationActive={true}
-                        content={<CustomTooltip />}
-                    /> {/* Use custom tooltip */}
-                    {/* <Legend /> */}
-                    <Line
-                        dot={false}
-                        type="monotone"
-                        dataKey="profitLossOne"
-                        stroke="#82ca9d"
-                        activeDot={{ r: 8 }}
-                        data={currentExpirationData}
-                    />
+            <p>Max Loss: {maxLoss}</p>
+            <p>Break-even Price: {breakEvenPrice}</p>
+            
+            <ResponsiveContainer width={400} height={300}>
+                <LineChart>
+                    <XAxis dataKey="price" tickLine={false} type="number" domain={[currentOption?.strike || 0, priceTop]} />
+                    <YAxis orientation="right" tickLine={false} type="number" domain={[-maxLoss, 'maxData']} />
+                    <Tooltip/>
                     <Line
                         dot={false}
                         type="monotone"
                         dataKey="profitLossTwo"
                         stroke="#8884d8"
                         activeDot={{ r: 8 }}
-                        data={expirationDateData}
+                        data={profitAtExpirationData}
                     />
                 </LineChart>
-
             </ResponsiveContainer>
         </>
 

@@ -171,6 +171,12 @@ export default function Home() {
           setIsStrikesMenuOpen(false);
         }
       }
+
+      if (strikesMobileMenuRef.current && !strikesMobileMenuRef.current.contains(event.target as Node)) {
+        if (!strikesMobileMenuButtonRef.current?.contains(event.target as Node)) {
+          setIsStrikesMobileMenuOpen(false);
+        }
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
