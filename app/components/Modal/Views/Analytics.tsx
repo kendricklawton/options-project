@@ -1,63 +1,40 @@
 'use client'
 
 import { useAppContext } from "@/app/providers/AppProvider";
-import { SearchOutlined } from "@mui/icons-material";
+// import { SearchOutlined } from "@mui/icons-material";
 import styles from './Analytics.module.css';
-import { StyledTextField } from '@/app/components/Styled';
-import { InputAdornment } from "@mui/material";
-import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
+// import { StyledTextField } from '@/app/components/Styled';
+// import { InputAdornment } from "@mui/material";
+import React, {} from 'react';
+import {
+    //  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
     //  TooltipProps 
     } from 'recharts';
 import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
 
 
+
 export default function Analytics() {
     const {
         //  currentExpirationDate,
-          currentStock, currentOption, fetchStockData } = useAppContext();
-    const [inputValue, setInputValue] = useState('');
-
-
-    const stockPrices = [];
-    const currentStockPrice = currentStock?.regularMarketPrice || 0;
-    const roundedStockPrice = Math.round(currentStockPrice);
-    const priceBottom = roundedStockPrice - (roundedStockPrice / 2);
-    const priceTop = roundedStockPrice + 40;
-
-    for (let price = priceBottom; price <= priceTop; price += 0.01) {
-        stockPrices.push(parseFloat(price.toFixed(2)));
-    }
-
+          currentStock, currentOption} = useAppContext();
+    // const [inputValue, setInputValue] = useState('');
+    // const [quantity, setQuantity] = useState(10);
+    const quantity = 10;
+    
+    // const cost = currentOption?.ask ? currentOption?.ask * 100 * quantity : 0;
     let breakEvenPrice;
     const maxLoss = currentOption?.ask ? currentOption?.ask * 100 : 0;
 
     if(currentOption?.strike && currentOption?.ask) {
         breakEvenPrice = currentOption?.strike + currentOption?.ask;
     }
-    
-    const profitAtExpirationData = stockPrices.map(price => {
-        const intrinsicValue = Math.max(0, price - (currentOption?.strike || 0));
-        const profitLoss = intrinsicValue * 100 - maxLoss;
-        return { price, profitLossTwo: profitLoss };
-    });
-
-    const handleFetchStockData = async () => {
-        if (inputValue.length === 0) return;
-        if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
-        try {
-            await fetchStockData(inputValue);
-            setInputValue('');
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     return (
         <>
             <div className={styles.headerElement}>
                 <div>
-                    <StyledTextField
+                    {/* <StyledTextField
                         sx={{
                             maxWidth: '7.6rem',
                             margin: '0',
@@ -84,9 +61,9 @@ export default function Analytics() {
                                 )
                             }
                         }}>
-                    </StyledTextField>
+                    </StyledTextField> */}
                     {currentStock && (
-                        <p>{currentStock.shortName}</p>
+                        <p>{currentStock.symbol} | {currentStock.shortName}</p>
                     )}
                 </div>
             </div>
@@ -120,25 +97,30 @@ export default function Analytics() {
                 )}
             </div>
 
-            <p>Max Loss: {maxLoss}</p>
-            <p>Break-even Price: {breakEvenPrice}</p>
+            <div className={styles.headerElement}>
+                <p>Buy {quantity} Calls ----- {currentOption?.ask} * 100</p>
+            </div>
+            <div className={styles.headerElement}>
+                <p>Max Profit: {Infinity}</p>
+            </div>
+            <div className={styles.headerElement}>
+                <p>Max Loss: {maxLoss}</p>
+            </div>
+            <div className={styles.headerElement}>
+                <p>Break Even: {breakEvenPrice}</p>
+            </div> 
             
-            <ResponsiveContainer width={400} height={300}>
-                <LineChart>
-                    <XAxis dataKey="price" tickLine={false} type="number" domain={[currentOption?.strike || 0, priceTop]} />
-                    <YAxis orientation="right" tickLine={false} type="number" domain={[-maxLoss, 'maxData']} />
-                    <Tooltip/>
-                    <Line
-                        dot={false}
-                        type="monotone"
-                        dataKey="profitLossTwo"
-                        stroke="#8884d8"
-                        activeDot={{ r: 8 }}
-                        data={profitAtExpirationData}
-                    />
-                </LineChart>
-            </ResponsiveContainer>
-        </>
 
+
+
+            
+        
+  
+            {/* <p>Quantity: {quantity}</p> */}
+            {/* <p>Option Ask Price: {currentOption?.ask}</p> */}
+            {/* <p>Option Total Cost: {cost}</p> */}
+           
+ 
+        </>
     );
 }
