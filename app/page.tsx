@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDropDownOutlined, ArrowLeftOutlined, ArrowRightOutlined, CheckOutlined, PlaylistAdd } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowLeftOutlined, ArrowRightOutlined, CheckOutlined } from '@mui/icons-material';
 import styles from './page.module.css';
 import { IconButton } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
@@ -50,9 +50,9 @@ export default function Home() {
   const strikeTableRef = useRef<HTMLDivElement>(null);
   const putTableRef = useRef<HTMLDivElement>(null);
 
-  const handleAddToWatchList = () => {
-    console.log('Add to watch list');
-  };
+  // const handleAddToWatchList = () => {
+  //   console.log('Add to watch list');
+  // };
 
   const handleDisplayOptionAnalytics = (option: OptionType) => {
     setCurrentOption(option);
@@ -205,10 +205,11 @@ export default function Home() {
         <>
           <div className={styles.details}>
             <div className={styles.detailsLeading}>
+              <p>{currentStock.symbol?.toLocaleUpperCase()}</p> |
               <p>{currentStock.shortName?.toLocaleUpperCase()}</p>
-              <StyledIconButton onClick={handleAddToWatchList} size='small'>
+              {/* <StyledIconButton onClick={handleAddToWatchList} size='small'>
                 <PlaylistAdd />
-              </StyledIconButton>
+              </StyledIconButton> */}
             </div>
           </div >
           <div className={styles.details}>

@@ -46,7 +46,9 @@ export default function Modal() {
                             </h1>
                         </div>
                         <div className={styles.headerTrailing}>
-                            <IconButton onClick={onClose}><Close /></IconButton>
+                            <IconButton sx={{
+                                color: 'gray'
+                            }}onClick={onClose}><Close /></IconButton>
                         </div>
                     </div>
                     {renderView()}
