@@ -3,7 +3,7 @@
     background-color: inherit;
     display: flex;
     flex-direction: column;
-    padding: 0 8svw;
+    padding: 0 4svw;
     position: sticky;
     top: 0;
     width: 100%;
@@ -59,6 +59,10 @@
 .indexes,
 .leading {
     gap: 0.5rem;
+}
+
+.indexes {
+    cursor: pointer;
 }
 
 .symbol {

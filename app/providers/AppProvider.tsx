@@ -150,11 +150,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }, 12000);
 
         try {
-            console.log('Total Strikes:', totalStrikes);
             const response = await axios.get(`${url}stock-data`, {
                 params: { expirationDate, symbol },
                 cancelToken: source.token
             });
+            console.log('response', response);
 
             clearTimeout(timeout);
 

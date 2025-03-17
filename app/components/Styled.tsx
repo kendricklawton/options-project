@@ -5,7 +5,7 @@ export const StyledButton = styled(Button)({
     color: 'white',
     '& .MuiButton-label': {
         color: 'white',
-    },    
+    },
 });
 
 export const StyledButtonTwo = styled(Button)({
@@ -22,7 +22,7 @@ export const StyledTextField = styled(TextField)(({ }) => ({
     '& .MuiOutlinedInput-root': {
         fontFamily: 'inherit',
         borderRadius: '0',
-        height: '2rem',
+        height: '1.5rem',
         fontSize: 'inherit',
         backgroundColor: 'lightgray',
         '& fieldset': {

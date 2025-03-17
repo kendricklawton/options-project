@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { AccountTreeOutlined, CropOutlined, Menu, RefreshOutlined, SearchOutlined, StackedBarChartOutlined } from '@mui/icons-material';
+import {
+    // AccountTreeOutlined,
+    CropOutlined, Menu, RefreshOutlined, SearchOutlined, 
+    // StackedBarChartOutlined
+} from '@mui/icons-material';
 import { CircularProgress, InputAdornment } from '@mui/material';
 import {
     usePathname
@@ -209,8 +213,8 @@ export default function Header() {
                         }}>
                     </StyledTextField>
                     <Link className={styles.linkDesktop} href={'/'}><CropOutlined />Options</Link>
-                    <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link>
-                    <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link>
+                    {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link>
+                    <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
                 </div>
                 <div className={styles.trailing}>
                     <StyledIconButton ref={menuButtonRef}

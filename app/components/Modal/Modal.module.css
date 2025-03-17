@@ -17,9 +17,7 @@
 .wrapper {
     display: flex;
     flex-direction: column;
-    /* max-height: calc(100svh - 10rem); */
-    max-width: calc(100vw - 8vw);
-    /* width: calc(100% - 8vw); */
+    max-width: calc(100vw - 4svw);
     border-radius: 0px;
     padding: 1rem;
     overflow: auto;

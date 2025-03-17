@@ -17,7 +17,7 @@ const menuButtonStyle = {
   borderBottom: 'none',
   border: 'none',
   justifyContent: 'space-between',
-  height: '2rem',
+  height: '1.5rem',
 }
 
 export default function Home() {
@@ -248,7 +248,6 @@ export default function Home() {
           </div >
         </>
       )}
-
       {/* Details Extended Element */}
       {(isBottomElementOpen && currentStock) && (
         <div className={styles.detailsExt}>
@@ -313,7 +312,7 @@ export default function Home() {
             sx={{
               borderRadius: '0px',
               width: 'fit-content',
-              height: '2rem',
+              height: '1.5rem',
               whiteSpace:
                 'nowrap',
             }}>CALL / PUT</StyledButton>
@@ -329,7 +328,7 @@ export default function Home() {
                 borderRadius: '0px',
                 backgroundColor: 'fff',
                 justifyContent: 'space-between',
-                height: '2rem',
+                height: '1.5rem',
                 minWidth: '6rem',
                 whiteSpace:
                   'nowrap',

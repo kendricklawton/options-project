@@ -1,8 +1,8 @@
 .page {
     display: flex;
     flex-direction: column;
-    padding-left: 8vw;
-    padding-right: 8vw;
+    padding-left: 4vw;
+    padding-right: 4vw;
     padding-bottom: 0.5rem;
 }
 
@@ -42,7 +42,7 @@
 
 .details {
     justify-content: space-between;
-    min-height: fit-content;
+    min-height: 3rem;
     min-width: fit-content;
 }
 
@@ -138,6 +138,7 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
+    cursor: default;
 }
 
 .tableCalls,
@@ -169,6 +170,7 @@
     flex-direction: row;
     width: 100%;
     min-height: 3rem;
+    
     background-color: #fff;
 }
 
@@ -364,7 +366,7 @@
     background: transparent;
 }
 
-@media screen and (max-width: 536px) {
+@media screen and (max-width: 580px) {
     .controlsElementTwo {
         display: none;
     }

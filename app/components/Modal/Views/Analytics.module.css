@@ -1,13 +1,41 @@
-.headerElement {
+
+.controls,
+.element {
+        min-height: 3rem;
     align-items: center;
     display: flex;
     flex-direction: row;
-    min-height: 3rem;
     justify-content: space-between;
     width: 100%;
 }
 
-.headerElement div {
+.controls {
+    gap: 1rem;
+    /* background-color: blue; */
+}
+
+.element {
+
+    background-color: aquamarine;
+}
+
+.controlsElement {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    /* gap: 0.5rem; */
+}
+.top,
+.bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+}
+
+.element div {
     align-items: center;
     display: flex;
     flex-direction: row;
