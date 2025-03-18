@@ -20,7 +20,8 @@ export interface AppContextType {
     setCurrentOption: (option: OptionType) => void;
     setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
     setModalView: (view: string) => void;
-    setOptionOrderByStrike: (strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put') => void;
+    updateOptionOrderByQuantity: (quantity: number, optionOrder: OptionOrderType ) => void;
+    updateOptionOrderByStrike: (strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put') => void;
     setTotalStrikesToDisplay: (totalStrikesToDisplay: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => void;
 }
 

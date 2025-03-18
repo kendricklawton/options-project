@@ -29,11 +29,12 @@ export default function Analytics() {
     const {
         currentExpirationDate,
         optionChain,
-        // currentOption,
         currentOptionOrder,
-        setOptionOrderByStrike } = useAppContext();
-    const [inputValue, setInputValue] = useState<number>(currentOptionOrder?.quantity || 0);
-    // const [quantity, setQuantity] = useState(10);
+        updateOptionOrderByQuantity,
+        updateOptionOrderByStrike } = useAppContext();
+    const quantity = currentOptionOrder?.quantity || 0;
+
+    const [inputValue, setInputValue] = useState<number | ''>(quantity);
 
     const strikesMenuButtonRef = React.useRef<HTMLButtonElement>(null);
     const strikesMenuRef = React.useRef<HTMLDivElement>(null);
@@ -64,7 +65,6 @@ export default function Analytics() {
     };
 
     const optionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
-    const quantity = 10;
     const maxLoss = currentOptionOrder?.option?.ask ? currentOptionOrder?.option?.ask * 100 * quantity : 0;
     const contractSymbol = currentOptionOrder?.option?.contractSymbol;
 
@@ -80,7 +80,7 @@ export default function Analytics() {
         }
     }
 
-    const handleSetStrike = (strike: number) => {
+    const handleUpdateStrike = (strike: number) => {
         console.log('strike', strike);
         if (!currentOptionOrder) {
             return;
@@ -88,9 +88,34 @@ export default function Analytics() {
         if (strike === currentOptionOrder.option?.strike) {
             return;
         }
-        setOptionOrderByStrike(strike, currentOptionOrder, optionType as 'Call' | 'Put');
+        updateOptionOrderByStrike(strike, currentOptionOrder, optionType as 'Call' | 'Put');
     };
 
+    const handleUpdateQuantity = (quantity: number) => {
+
+        // if(quantity < 1) {
+        //     setInputValue(1);
+        //     return;
+        // }
+
+        setInputValue(quantity);
+
+       
+        if (!currentOptionOrder) {
+            return;
+        }
+        if (quantity === currentOptionOrder.quantity) {
+            return;
+        }       
+
+        if(!quantity) {
+            const prevQuantity = currentOptionOrder.quantity || 0;
+            updateOptionOrderByQuantity(prevQuantity, currentOptionOrder);
+            return;
+        }
+
+        updateOptionOrderByQuantity(quantity, currentOptionOrder);
+    };
 
 
     return (
@@ -144,7 +169,16 @@ export default function Analytics() {
                         value={inputValue}
                         onChange={(e) => {
                             const value = e.target.value;
-                            setInputValue(parseInt(value));
+                            if (!value ) {
+                                // setInputValue('');
+                                return;
+                            } else {
+                                if(parseInt(value) < 1) {
+                                    return;
+                                }
+                                handleUpdateQuantity(parseInt(value));
+                            }
+                         
                         }}
                     ></StyledTextField>
                 </div>
@@ -175,7 +209,7 @@ export default function Analytics() {
                             isStrikesMenuOpen && (
                                 <div className={styles.menu} ref={strikesMenuRef}>
                                     {strikes.map((strike, index) => (
-                                        <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleSetStrike(strike)}>{strike}</StyledButtonTwo>
+                                        <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</StyledButtonTwo>
                                     ))}
                                 </div >
                             )}

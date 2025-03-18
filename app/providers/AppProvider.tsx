@@ -80,7 +80,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }, [recentSearches]);
 
     // Handle Set Option By Strike
-    const setOptionOrderByStrike = useCallback((strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put'): void => {
+    const updateOptionOrderByStrike = useCallback((strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put'): void => {
         if (!optionChain) {
             return;
         }
@@ -108,6 +108,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             }
         }
     }, [optionChain]);
+
+    const updateOptionOrderByQuantity = useCallback((quantity: number, optionOrder: OptionOrderType): void => {
+        if(quantity < 1) {
+            return;
+        }
+
+        if (!optionOrder.option) {
+            return;
+        }
+        const newOptionOrder = { ...optionOrder, quantity };
+        setCurrentOptionOrder(newOptionOrder);
+    }, []);
 
     // Clear Stock Data & Option Chain
     const clearStockData = useCallback((): void => {
@@ -283,7 +295,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setCurrentOption,
         setCurrentOptionOrder,
         setModalView,
-        setOptionOrderByStrike,
+        updateOptionOrderByStrike,
+        updateOptionOrderByQuantity,
         setTotalStrikesToDisplay
     }), [
         currentExpirationDate,
@@ -301,7 +314,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         watchList,
         clearStockData,
         fetchData, 
-        setOptionOrderByStrike,
+        updateOptionOrderByStrike,
+        updateOptionOrderByQuantity,
     ]);
 
     return (
