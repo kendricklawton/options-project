@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppContext } from "@/app/providers/AppProvider";
 // import { SearchOutlined } from "@mui/icons-material";
 import styles from './Analytics.module.css';
@@ -79,6 +79,20 @@ export default function Analytics() {
             maxProfit = (currentOptionOrder?.option?.strike - currentOptionOrder?.option?.ask) * 100 * quantity;
         }
     }
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (strikesMenuRef.current && !strikesMenuRef.current.contains(event.target as Node)) {
+                if (!strikesMenuButtonRef.current?.contains(event.target as Node)) {
+                    setIsStrikesMenuOpen(false);
+                }
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleUpdateStrike = (strike: number) => {
         console.log('strike', strike);
@@ -210,6 +224,14 @@ export default function Analytics() {
                                 <div className={styles.menu} ref={strikesMenuRef}>
                                     {strikes.map((strike, index) => (
                                         <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</StyledButtonTwo>
+                                        // <div style={{
+                                        //     width: '7rem',
+                                        //     minHeight: '2rem',
+                                        //     display: 'flex',
+                                        //     flexDirection: 'column',
+                                        //     justifyContent: 'center',
+                                        //     alignItems: 'flex-start',
+                                        // }} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</div>
                                     ))}
                                 </div >
                             )}
