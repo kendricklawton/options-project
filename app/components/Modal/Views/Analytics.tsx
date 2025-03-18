@@ -223,15 +223,17 @@ export default function Analytics() {
                             isStrikesMenuOpen && (
                                 <div className={styles.menu} ref={strikesMenuRef}>
                                     {strikes.map((strike, index) => (
-                                        <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</StyledButtonTwo>
-                                        // <div style={{
-                                        //     width: '7rem',
-                                        //     minHeight: '2rem',
-                                        //     display: 'flex',
-                                        //     flexDirection: 'column',
-                                        //     justifyContent: 'center',
-                                        //     alignItems: 'flex-start',
-                                        // }} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</div>
+                                        // <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</StyledButtonTwo>
+                                        <div style={{
+                                            paddingLeft: '1rem',
+                                            width: '7rem',
+                                            minHeight: '2rem',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            alignItems: 'flex-start',
+                                            cursor: 'pointer',
+                                        }} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</div>
                                     ))}
                                 </div >
                             )}
