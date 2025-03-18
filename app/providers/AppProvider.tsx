@@ -5,7 +5,8 @@ import { FirebaseError } from 'firebase/app';
 import axios from 'axios';
 
 import { useAuthContext } from './AuthProvider';
-import { AppContextType, OptionChainType, OptionOrderType, OptionType, StockType, 
+import {
+    AppContextType, OptionChainType, OptionOrderType, OptionType, StockType,
     // StrikeType 
 } from '../types/types';
 // import { loadCSVFiles } from '../utils/utils';
@@ -24,12 +25,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const [currentStock, setCurrentStock] = useState<StockType>();
     const [totalStrikesToDisplay, setTotalStrikesToDisplay] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
     const [currentExpirationDate, setCurrentExpirationDate] = useState<string>();
-    const [isPageExt, setIsPageExt] = useState<boolean>(false);
     const [optionExpirationDates, setOptionExpirationDates] = useState<string[]>([]);
     const [modalView, setModalView] = useState<string>('');
     const [optionChain, setOptionChain] = useState<OptionChainType>();
-    const [watchList, setWatchList] = useState<StockType[]>([]);
     const [indexesList, setIndexesList] = useState<StockType[]>([]);
+    const [popularList, setPopularList] = useState<StockType[]>([]);
+    const [watchList, setWatchList] = useState<StockType[]>([]);
 
     // Error Handling
     const handleError = useCallback((error: unknown) => {
@@ -78,9 +79,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setRecentSearches(updatedSearches);
     }, [recentSearches]);
 
-    const handleIsPageExt = useCallback(() => {
-        setIsPageExt(prev => !prev);
-    }, [setIsPageExt]);
+    // Handle Set Option By Strike
+    const setOptionOrderByStrike = useCallback((strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put'): void => {
+        if (!optionChain) {
+            return;
+        }
+        if (optionOrder.option?.strike === strike) {
+            return;
+        }
+        console.log('strike', strike);
+        if (optionType === 'Call') {
+            const call = optionChain.calls.find(call => call.strike === strike);
+            if (call) {
+                const newOptionOrder = { ...optionOrder, option: call };
+                console.log('newOptionOrder', newOptionOrder);
+                setCurrentOptionOrder(newOptionOrder);
+            } else {
+                throw new Error('Call not found');
+            }
+        } else {
+            const put = optionChain.puts.find(put => put.strike === strike);
+            if (put) {
+                const newOptionOrder = { ...optionOrder, option: put };
+                console.log('newOptionOrder', newOptionOrder);
+                setCurrentOptionOrder(newOptionOrder);
+            } else {
+                throw new Error('Put not found');
+            }
+        }
+    }, [optionChain]);
 
     // Clear Stock Data & Option Chain
     const clearStockData = useCallback((): void => {
@@ -89,34 +116,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setOptionChain(undefined);
     }, []);
 
-    // Fetch News Data
-    // const fetchNewsData = useCallback(async (): Promise<void> => {
-    //     setIsLoading(true);
-    //     const source = axios.CancelToken.source();
-    //     const timeout = setTimeout(() => {
-    //         source.cancel('Request Timed Out');
-    //     }, 12000);
-
-    //     try {
-    //         const response = await axios.get(`${url}news-data`, {
-    //             cancelToken: source.token
-    //         });
-
-    //         clearTimeout(timeout);
-    //     } catch (error) {
-    //         if (axios.isCancel(error)) {
-    //             setInfo('Request timed out');
-    //         } else {
-    //             handleError(error);
-    //         }
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-
-    // }, [handleError, setInfo, setIsLoading, url]);
-
-    // Fetch Indexes Data
-    const fetchIndexesData = useCallback(async (): Promise<void> => {
+    // Fetch Data
+    const fetchData = useCallback(async (listOnly: boolean, symbol?: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40): Promise<void> => {
         setIsLoading(true);
         const source = axios.CancelToken.source();
         const timeout = setTimeout(() => {
@@ -124,44 +125,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }, 12000);
 
         try {
-            const response = await axios.get(`${url}indexes-data`, {
-                cancelToken: source.token
-            });
-
-            clearTimeout(timeout);
-            const indexesData: StockType[] = Object.values(response.data);
-            setIndexesList(indexesData);
-        } catch (error) {
-            if (axios.isCancel(error)) {
-                setInfo('Request timed out');
-            } else {
-                handleError(error);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError, setInfo, setIsLoading, url]);
-
-    // Fetch Stock Data
-    const fetchStockData = useCallback(async (symbol: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40): Promise<void> => {
-        setIsLoading(true);
-        const source = axios.CancelToken.source();
-        const timeout = setTimeout(() => {
-            source.cancel('Request Timed Out');
-        }, 12000);
-
-        try {
-            const response = await axios.get(`${url}stock-data`, {
+            const response = await axios.get(`${url}data`, {
                 params: { expirationDate, symbol },
                 cancelToken: source.token
             });
-            console.log('response', response);
 
             clearTimeout(timeout);
+            const indexesData: StockType[] = Object.values(response.data.indexes);
+            // const popularData: StockType[] = Object.values(response.data.popular);
+            // const watchData: StockType[] = Object.values(response.data.popular);
+            setIndexesList(indexesData);
+            setPopularList([]);
+            setWatchList([]);
 
-            // Check if response data is valid
-            if (response.data == undefined || response.data.info == undefined || response.data.calls == undefined || response.data.puts == undefined) {
-                setInfo('Error fetching data, please try again later');
+            if (listOnly) {
                 return;
             }
 
@@ -208,7 +185,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             } else {
                 // Don't Set Total Strikes To Display, Here We Set The Default Value
                 displayStrikes = totalStrikesToDisplay;
-            } 
+            }
 
             // Set Option Chain Data
             const optionChainData = {
@@ -254,58 +231,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             }
 
             // Handle Recent Searches
-            handleRecentSearches(symbol);
+            handleRecentSearches(symbol || '');
         } catch (error) {
             if (axios.isCancel(error)) {
                 setInfo('Request timed out');
             } else {
-                handleError("Could not fetch stock data for " + symbol.toUpperCase() + ". Please check the symbol and try again");
+                handleError("Could not fetch stock data. Please check the symbol and try again");
             }
         } finally {
             setIsLoading(false);
         }
     }, [setIsLoading, url, handleRecentSearches, setInfo, totalStrikesToDisplay, handleError]);
 
-    // Fetch Watch List Data
-    const fetchWatchListData = useCallback(async (): Promise<void> => {
-        if (watchList.length === 0) {
-            return;
-        }
-
-        setIsLoading(true);
-
-        const source = axios.CancelToken.source();
-        const timeout = setTimeout(() => {
-            source.cancel('Request Timed Out');
-        }, 12000);
-        try {
-            const response = await axios.get(`${url}watch-list-data`, {
-                params: { watchList },
-                cancelToken: source.token
-            });
-            clearTimeout(timeout);
-            const watchListData: StockType[] = response.data.watchList;
-            setWatchList(watchListData);
-        } catch (error) {
-            if (axios.isCancel(error)) {
-                setInfo('Request timed out');
-            } else {
-                handleError("Could not fetch watch list data");
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError, setInfo, setIsLoading, url, watchList]);
-
     // Load CSV files when the component mounts
     useEffect(() => {
         const loadData = async () => {
             try {
                 setIsLoading(true);
-                await fetchIndexesData();
+                await fetchData(true);
                 // await fetchNewsData();
                 // await loadCSVFiles();
-                await fetchWatchListData();
             } catch (error) {
                 handleError(error);
                 setIsLoading(false);
@@ -316,8 +261,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
         loadData();
     }, [
-        // fetchNewsData, 
-        fetchIndexesData, fetchWatchListData, handleError, setIsLoading,]);
+        fetchData, handleError, setIsLoading,]);
 
     const contextValue = useMemo(() => ({
         currentNearPrice,
@@ -327,20 +271,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         currentStock,
         modalView,
         indexesList,
-        isPageExt,
+        popularList,
         optionChain,
         optionExpirationDates,
         recentSearches,
         totalStrikesToDisplay,
         watchList,
         clearStockData,
-        fetchStockData,
-        fetchWatchListData,
-        handleIsPageExt,
+        fetchData,
         setCurrentNearPrice,
         setCurrentOption,
         setCurrentOptionOrder,
         setModalView,
+        setOptionOrderByStrike,
         setTotalStrikesToDisplay
     }), [
         currentExpirationDate,
@@ -350,16 +293,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         currentStock,
         modalView,
         indexesList,
-        isPageExt,
+        popularList,
         optionChain,
         optionExpirationDates,
         recentSearches,
         totalStrikesToDisplay,
         watchList,
         clearStockData,
-        fetchStockData,
-        fetchWatchListData,
-        handleIsPageExt,
+        fetchData, 
+        setOptionOrderByStrike,
     ]);
 
     return (

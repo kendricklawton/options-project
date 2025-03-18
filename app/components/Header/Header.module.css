@@ -42,8 +42,8 @@
     overflow-x: auto;
 }
 
-.indexes,
-.indexesList,
+.stock,
+.stockList,
 .leading,
 .trailing {
     align-items: center;
@@ -51,28 +51,23 @@
     flex-direction: row;
 }
 
-.indexesList {
+.stockList {
     width: 100%;
     justify-content: space-between;
 }
 
-.indexes,
+.stock,
 .leading {
     gap: 0.5rem;
 }
 
-.indexes {
+.stock {
     cursor: pointer;
-}
-
-.symbol {
-    cursor: pointer;
+    white-space: nowrap;
 }
 
 .leading a,
-.leading p,
-.negative,
-.positive {
+.leading p {
     white-space: nowrap;
 }
 

@@ -3,12 +3,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
     // AccountTreeOutlined,
-    CropOutlined, Menu, RefreshOutlined, SearchOutlined, 
+    CropOutlined, 
+    // Menu, 
+    RefreshOutlined, SearchOutlined,
     // StackedBarChartOutlined
 } from '@mui/icons-material';
 import { CircularProgress, InputAdornment } from '@mui/material';
 import {
-    usePathname
+    usePathname,
+    useRouter
 } from 'next/navigation';
 import { useAppContext } from '@/app/providers/AppProvider';
 import { useAuthContext } from '@/app/providers/AuthProvider';
@@ -18,18 +21,21 @@ import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
 import { formatPlusMinus } from '@/app/utils/utils';
 
 export default function Header() {
-    const { currentExpirationDate, currentStock, indexesList, fetchStockData, fetchWatchListData } = useAppContext();
+    const { currentExpirationDate, currentStock, indexesList, fetchData } = useAppContext();
     const { isLoading } = useAuthContext();
 
     const [inputValue, setInputValue] = useState('');
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
+    // const [isMenuOpen, setIsMenuOpen] = useState(false);
+    // const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
     const [headerScrolled, setHeaderScrolled] = useState(false);
 
-    const menuRef = useRef<HTMLDivElement>(null);
-    const menuButtonRef = useRef<HTMLButtonElement>(null);
-    const deviceMenuRef = useRef<HTMLDivElement>(null);
+    // const deviceMenuRef = useRef<HTMLDivElement>(null);
+    // const menuRef = useRef<HTMLDivElement>(null);
+    // const menuButtonRef = useRef<HTMLButtonElement>(null);
+    const refreshButtonRef = useRef<HTMLButtonElement>(null);
+
     const pathname = usePathname();
+    const router = useRouter();
 
     // const handleAccount = () => {
     //     setModalView('account');
@@ -40,40 +46,44 @@ export default function Header() {
         return num > 0;
     };
 
-    const handleDeviceMenuOpen = () => {
-        setIsDeviceMenuOpen(true);
-    };
+    // const handleDeviceMenuOpen = () => {
+    //     setIsDeviceMenuOpen(true);
+    // };
 
-    const handleDeviceMenuClose = () => {
-        setIsDeviceMenuOpen(false);
-    };
+    // const handleDeviceMenuClose = () => {
+    //     setIsDeviceMenuOpen(false);
+    // };
 
-    const handleMenuToggle = () => {
-        setIsMenuOpen(prev => !prev);
-    };
+    // const handleMenuToggle = () => {
+    //     setIsMenuOpen(prev => !prev);
+    // };
 
     const handleFetchStockData = async () => {
         if (inputValue.length === 0) return;
-        if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
+        // if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
         try {
-            await fetchStockData(inputValue);
+            await fetchData(false, inputValue);
+            if(pathname === '/'){
+                router.push('/options');
+            }
             setInputValue('');
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleFetchStockDataSymbol = async (symbol: string) => {
-        if (symbol.length === 0) return;
+    const handleFetchStockDataIndex = async (symbol: string) => {
         try {
-            await fetchStockData(symbol);
-            setInputValue('');
+            await fetchData(false, symbol);
+            if (pathname === '/') {
+                router.push('/options');
+            }
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleOnChange = ( value: string) => {
+    const handleOnChange = (value: string) => {
         value = value.toUpperCase();
         setInputValue(value);
     };
@@ -83,8 +93,7 @@ export default function Header() {
         const expirationDate = currentExpirationDate;
         const symbol = currentStock.symbol;
         try {
-            fetchStockData(symbol, expirationDate);
-            fetchWatchListData();
+            fetchData(false, symbol, expirationDate);            
         }
         catch (error) {
             console.error(error);
@@ -104,20 +113,20 @@ export default function Header() {
     //     }
     // };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                if (!menuButtonRef.current?.contains(event.target as Node)) {
-                    setIsMenuOpen(false);
-                    setIsDeviceMenuOpen(false);
-                }
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    // useEffect(() => {
+    //     const handleClickOutside = (event: MouseEvent) => {
+    //         if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    //             if (!menuButtonRef.current?.contains(event.target as Node)) {
+    //                 setIsMenuOpen(false);
+    //                 setIsDeviceMenuOpen(false);
+    //             }
+    //         }
+    //     };
+    //     document.addEventListener('mousedown', handleClickOutside);
+    //     return () => {
+    //         document.removeEventListener('mousedown', handleClickOutside);
+    //     };
+    // }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -141,10 +150,10 @@ export default function Header() {
         <header className={headerScrolled ? styles.headerScrolling : styles.header}>
             {/* Top Element Desktop */}
             <div className={styles.headerElementSmallDesktop}>
-                <div className={styles.indexesList}>
+                <div className={styles.stockList}>
                     {
                         indexesList.map((data, index) => (
-                            <div className={styles.indexes} key={index} onClick={() => handleFetchStockDataSymbol(
+                            <div className={styles.stock} key={index} onClick={() => handleFetchStockDataIndex(
                                 data?.symbol ? data?.symbol : ''
                             )}>
                                 <p className={styles.symbol}>{data.symbol}</p>
@@ -158,7 +167,7 @@ export default function Header() {
                                     )
                                 }
                                 <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                    {`(${formatPlusMinus(data.regularMarketChangePercent)})%`}
+                                    {`(${formatPlusMinus(data.regularMarketChangePercent)}%)`}
                                 </p>
                             </div>
                         ))
@@ -168,7 +177,7 @@ export default function Header() {
 
             {/* Top Element Mobile */}
             <div className={styles.headerElementSmallMobile}>
-                <div className={styles.indexes} onClick={() => handleFetchStockDataSymbol(
+                <div className={styles.stock} onClick={() => handleFetchStockDataIndex(
                     indexesList[2]?.symbol ? indexesList[2]?.symbol : ''
                 )}>
                     <p>{indexesList[2]?.symbol}</p>
@@ -179,7 +188,7 @@ export default function Header() {
                         {(indexesList[2]?.regularMarketChange && formatPlusMinus(indexesList[2]?.regularMarketChange))}
                     </p>
                     <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                        {indexesList[2]?.regularMarketChangePercent && `(${formatPlusMinus(indexesList[2].regularMarketChangePercent)})%`}
+                        {indexesList[2]?.regularMarketChangePercent && `(${formatPlusMinus(indexesList[2].regularMarketChangePercent)}%)`}
                     </p>
                 </div>
             </div>
@@ -190,11 +199,7 @@ export default function Header() {
                     <Link href={'/'}
                     >OPTIONS PROJECT</Link>
                     <StyledTextField
-                        sx={{
-                            maxWidth: '7.6rem',
-                            margin: '0',
-                            padding: '0',
-                        }}
+                        sx={{ maxWidth: '7.6rem' }}
                         onChange={(e) => handleOnChange(e.target.value)}
                         value={inputValue}
                         placeholder={currentStock?.symbol ? currentStock.symbol : 'SYMBOL'}
@@ -217,12 +222,12 @@ export default function Header() {
                             }
                         }}>
                     </StyledTextField>
-                    <Link className={styles.linkDesktop} href={'/'}><CropOutlined />Options</Link>
+                    <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />Options</Link>
                     {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link>
                     <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
                 </div>
                 <div className={styles.trailing}>
-                    <StyledIconButton ref={menuButtonRef}
+                    <StyledIconButton ref={refreshButtonRef}
                         size='small'
                         onClick={handleRefreshStockData}>
                         {
@@ -233,8 +238,7 @@ export default function Header() {
                                 <RefreshOutlined />
                         }
                     </StyledIconButton>
-                    <div className={styles.anchor}>
-                        {/* // onClick={handleClearStockData} */}
+                    {/* <div className={styles.anchor}>
                         <StyledIconButton ref={menuButtonRef}
                             size='small'
                             onClick={handleMenuToggle}>
@@ -263,18 +267,17 @@ export default function Header() {
                                                 <div className={styles.link}><p>Light Mode</p></div>
                                                 <div className={styles.link}><p>Dark Mode</p></div>
                                                 <div className={styles.link}><p>System</p></div>
-                                                {/* <div className={styles.link}><LightModeOutlined /><p>Light Mode</p></div>
-                                                <div className={styles.link}><DarkModeOutlined /><p>Dark Mode</p></div>
-                                                <div className={styles.link}><SettingsSystemDaydreamOutlined /><p>System</p></div> */}
+
                                             </div>
                                         )}
                                     </div>
-                                    {/* <div className={styles.menuItem} onMouseEnter={handleDeviceMenuClose}><p>Logout</p></div> */}
+                                    <div className={styles.menuItem} onMouseEnter={handleDeviceMenuClose}><p>Logout</p></div>
                                 </div>
                             )}
-                    </div>
+                    </div> */}
                 </div>
             </div >
         </header>
     );
 };
+

@@ -11,20 +11,34 @@ import {
     //  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
     //  TooltipProps 
 } from 'recharts';
-import { CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
-import { StyledButton, StyledTextField } from "../../Styled";
+import { ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
+import { StyledButton, StyledButtonTwo, StyledTextField } from "../../Styled";
 // import { StyledButton } from "../../Styled";
 // import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
 
-
+const menuButtonStyle = {
+    borderRadius: '0px',
+    borderTop: 'none',
+    borderBottom: 'none',
+    border: 'none',
+    justifyContent: 'flex-start',
+    width: '7rem',
+}
 
 export default function Analytics() {
     const {
         currentExpirationDate,
+        optionChain,
         // currentOption,
-        currentOptionOrder } = useAppContext();
+        currentOptionOrder,
+        setOptionOrderByStrike } = useAppContext();
     const [inputValue, setInputValue] = useState<number>(currentOptionOrder?.quantity || 0);
     // const [quantity, setQuantity] = useState(10);
+
+    const strikesMenuButtonRef = React.useRef<HTMLButtonElement>(null);
+    const strikesMenuRef = React.useRef<HTMLDivElement>(null);
+    const [isStrikesMenuOpen, setIsStrikesMenuOpen] = React.useState(false);
+    const strikes = optionChain?.strikes || [];
 
     const determineOptionType = (symbol: string): string => {
         // Traverse the symbol from right to left
@@ -33,9 +47,9 @@ export default function Analytics() {
 
             // Check if the character is a non-numeric character (either 'C' or 'P')
             if (char === 'C') {
-                return 'Calls';
+                return 'Call';
             } else if (char === 'P') {
-                return 'Puts';
+                return 'Put';
             }
 
             // If it's a number, continue to the next character
@@ -45,12 +59,14 @@ export default function Analytics() {
         }
 
         // If no 'C' or 'P' found, throw an error
-        throw new Error('Invalid option contract symbol');
+        // throw new Error('Invalid option contract symbol');
+        return 'N/A';
     };
 
     const optionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
     const quantity = 10;
     const maxLoss = currentOptionOrder?.option?.ask ? currentOptionOrder?.option?.ask * 100 * quantity : 0;
+    const contractSymbol = currentOptionOrder?.option?.contractSymbol;
 
     let breakEvenPrice;
     let maxProfit;
@@ -64,6 +80,19 @@ export default function Analytics() {
         }
     }
 
+    const handleSetStrike = (strike: number) => {
+        console.log('strike', strike);
+        if (!currentOptionOrder) {
+            return;
+        }
+        if (strike === currentOptionOrder.option?.strike) {
+            return;
+        }
+        setOptionOrderByStrike(strike, currentOptionOrder, optionType as 'Call' | 'Put');
+    };
+
+
+
     return (
         <>
             {/* <div className={styles.element}>
@@ -76,53 +105,97 @@ export default function Analytics() {
             <div className={styles.element}>
                 <p>Risk Reward at Expiration</p>
             </div>
-      
-
-                        <div className={styles.elementTwo}>
-                            <div>
-                                <p>Action </p>
-                                <StyledButton   endIcon={<CachedOutlined />} 
-                                >{currentOptionOrder?.action ? currentOptionOrder.action : 'Action'}</StyledButton>
-                            </div>
-                            <div>
-                                <p>Quantity</p>
-                                <StyledTextField
-                                    className={styles.numberInput}
-                                    type="number"   
-                                    value={inputValue}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        setInputValue(parseInt(value));
-                                    }}
-                                ></StyledTextField>
-                                {/* <StyledButton endIcon={<CachedOutlined />}
-                                >{currentOptionOrder?.quantity ? currentOptionOrder.quantity : 'Quantity'}</StyledButton> */}
-                            </div>
+            {
+                contractSymbol == '0' ?
+                    (
+                        <div className={styles.elementText}>
+                            <p>
+                                Option data not available for this strike. Please select another option. We are in early development and are using a limited dataset. Thank you for your patience.
+                            </p>
                         </div>
-                        <div className={styles.elementTwo}>
-                            <div>
-                                <p>Expiration: {currentExpirationDate}</p>
-                            </div>
-                            <div>
-                                <p>Strike: {currentOptionOrder?.option?.strike}</p>
-                            </div>
+                    )
+                    :
+                    <div className={styles.elementTwo}>
+                        <div className={styles.elementTwoItem}>
+                            <p>Ask:</p>
+                            {currentOptionOrder?.option?.ask}
                         </div>
-                    
-           
+                        <div className={styles.elementTwoItem}>
+                            <p>Bid:</p>
+                            {currentOptionOrder?.option?.bid}
+                        </div>
+                        <div className={styles.elementTwoItem}>
+                            <p>Type:</p>
+                            {determineOptionType(currentOptionOrder?.option?.contractSymbol || '')}
+                        </div>
+                    </div>
+            }
+            <div className={styles.elementTwo}>
+                <div className={styles.elementTwoItem}>
+                    <p>Action </p>
+                    <StyledButton endIcon={<CachedOutlined />}
+                    >{currentOptionOrder?.action ? currentOptionOrder.action : 'Action'}</StyledButton>
+                </div>
+                <div className={styles.elementTwoItem}>
+                    <p>Quantity</p>
+                    <StyledTextField
+                        sx={{ maxWidth: '7.6rem' }}
+                        type="number"
+                        value={inputValue}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setInputValue(parseInt(value));
+                        }}
+                    ></StyledTextField>
+                </div>
+            </div>
+            <div className={styles.elementTwo}>
+                <div className={styles.elementTwoItem}>
+                    <p>Expiration</p>
+                    <StyledButton endIcon={<ArrowDropDownOutlined />}
+                    >{currentExpirationDate}</StyledButton>
+                </div>
+                <div className={styles.elementTwoItem}>
+                    <p>Strike</p>
+                    {/* <StyledButton endIcon={<ArrowDropDownOutlined />}
+                    >{currentOptionOrder?.option?.strike}</StyledButton> */}
+                    <div className={styles.anchor}>
+                        <StyledButton variant="contained"
+                            onClick={() => setIsStrikesMenuOpen(prev => !prev)}
+                            endIcon={<ArrowDropDownOutlined />}
+                            ref={strikesMenuButtonRef}
+                            sx={{
+                                borderRadius: '0px',
+                                backgroundColor: 'fff',
+                                justifyContent: 'space-between',
+                                minWidth: '7rem',
+                                whiteSpace: 'nowrap',
+                            }}>{currentOptionOrder?.option?.strike}</StyledButton>
+                        {
+                            isStrikesMenuOpen && (
+                                <div className={styles.menu} ref={strikesMenuRef}>
+                                    {strikes.map((strike, index) => (
+                                        <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleSetStrike(strike)}>{strike}</StyledButtonTwo>
+                                    ))}
+                                </div >
+                            )}
+                    </div>
+                </div>
+            </div>
             <div className={styles.element}>
-                <div>
+                <div className={styles.elementItem}>
                     <SentimentVerySatisfied sx={{ color: 'green' }} fontSize="large" /> <p>Max Profit: {maxProfit?.toFixed(2)}</p>
                 </div>
             </div>
             <div className={styles.element}>
-                <div>
+                <div className={styles.elementItem}>
                     <SentimentVeryDissatisfied sx={{
                         color: 'red',
                     }} fontSize="large" /> <p>Max Loss: {maxLoss.toFixed(2)}</p>
                 </div>
             </div>
             <div className={styles.element}>
-                <div>
+                <div className={styles.elementItem}>
                     <SentimentSatisfied sx={{
                         color: 'grey',
                     }} fontSize="large" /> <p>Break Even: {breakEvenPrice?.toFixed(2)}</p>
