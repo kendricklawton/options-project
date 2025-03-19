@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
     // AccountTreeOutlined,
-    CropOutlined, 
+    CropOutlined,
     // Menu, 
     RefreshOutlined, SearchOutlined,
     // StackedBarChartOutlined
@@ -21,7 +21,7 @@ import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
 import { formatPlusMinus } from '@/app/utils/utils';
 
 export default function Header() {
-    const { currentExpirationDate, currentStock, indexesList, fetchData } = useAppContext();
+    const { currentExpirationDate, currentStock, indexesList, fetchStockData } = useAppContext();
     const { isLoading } = useAuthContext();
 
     const [inputValue, setInputValue] = useState('');
@@ -62,8 +62,8 @@ export default function Header() {
         if (inputValue.length === 0) return;
         // if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
         try {
-            await fetchData(false, inputValue);
-            if(pathname === '/'){
+            await fetchStockData(inputValue);
+            if (pathname === '/') {
                 router.push('/options');
             }
             setInputValue('');
@@ -74,7 +74,7 @@ export default function Header() {
 
     const handleFetchStockDataIndex = async (symbol: string) => {
         try {
-            await fetchData(false, symbol);
+            await fetchStockData(symbol);
             if (pathname === '/') {
                 router.push('/options');
             }
@@ -93,7 +93,7 @@ export default function Header() {
         const expirationDate = currentExpirationDate;
         const symbol = currentStock.symbol;
         try {
-            fetchData(false, symbol, expirationDate);            
+            fetchStockData(symbol, expirationDate);
         }
         catch (error) {
             console.error(error);

@@ -6,19 +6,10 @@ import { IconButton } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '@/app/providers/AppProvider';
 import { useAuthContext } from '@/app/providers/AuthProvider';
-import { StyledButton, StyledButtonTwo, StyledIconButton, StyledTextField } from '@/app/components/Styled';
+import { StyledButton, StyledIconButton, StyledTextField } from '@/app/components/Styled';
 import { calculateDaysRemaining, convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus, isNumPositive } from '@/app/utils/utils';
 import { OptionType } from '@/app/types/types';
 import React from 'react';
-
-const menuButtonStyle = {
-  borderRadius: '0px',
-  borderTop: 'none',
-  borderBottom: 'none',
-  border: 'none',
-  justifyContent: 'flex-start',
-  width: '6rem',
-}
 
 export default function Home() {
   const {
@@ -28,7 +19,7 @@ export default function Home() {
     optionChain,
     optionExpirationDates,
     totalStrikesToDisplay,
-    fetchData,
+    fetchStockData,
     setCurrentOption,
     setCurrentOptionOrder,
     setModalView } = useAppContext();
@@ -56,11 +47,11 @@ export default function Home() {
   // };
 
   const handleDisplayOptionAnalytics = (option: OptionType, action?: 'Buy' | 'Sell',) => {
-      setCurrentOptionOrder({
-        action: action || 'Buy',
-        option: option,
-        quantity: 10,
-      });
+    setCurrentOptionOrder({
+      action: action || 'Buy',
+      option: option,
+      quantity: 10,
+    });
     setCurrentOption(option);
     setModalView('analytics');
   };
@@ -70,7 +61,7 @@ export default function Home() {
     if (currentStock?.symbol == null) return;
     const symbol = currentStock.symbol;
     try {
-      await fetchData(false, symbol, expirationDate);
+      await fetchStockData(symbol, expirationDate);
     }
     catch (error) {
       console.error(error);
@@ -110,7 +101,7 @@ export default function Home() {
     const symbol = currentStock.symbol;
     const expirationDate = currentExpirationDate;
     try {
-      await fetchData(false, symbol, expirationDate, undefined, totalStrikes);
+      await fetchStockData(symbol, expirationDate, undefined, totalStrikes);
       setIsStrikesMenuOpen(false);
       setIsStrikesMobileMenuOpen(false);
     }
@@ -195,9 +186,8 @@ export default function Home() {
     return (
       <div className={styles.page}>
         <div className={styles.pageHeader}>
-          <h1>Welcome to Options Project</h1>
-          <h2>An easy to use options analytical tool.</h2>
-          <h2>Search a symbol to get started.</h2>
+          <h1>Options Chain</h1>
+          <h2>Search a symbol to view option chain.</h2>
         </div>
       </div>
     );
@@ -278,7 +268,7 @@ export default function Home() {
             <p>{
               currentStock.forwardPE ?
                 currentStock.forwardPE?.toFixed(2) :
-                'N/A'
+                '-'
             }</p>
           </div>
           <div className={styles.elementThTwo}>
@@ -287,7 +277,7 @@ export default function Home() {
               {
                 (currentStock.dividendYield != null && currentStock.dividendYield != 0)
                   ? `${(currentStock.dividendYield).toFixed(2)}%`
-                  : '0.00%'
+                  : '-%'
               }
             </p>
           </div>
@@ -297,7 +287,7 @@ export default function Home() {
               {
                 (currentStock.dividendDate)
                   ? convertUnixTimestampTwo(currentStock.dividendDate)
-                  : 'N/A'
+                  : '-'
               }
             </p>
           </div>
@@ -339,15 +329,15 @@ export default function Home() {
             {
               isStrikesMenuOpen && (
                 <div className={styles.menu} ref={strikesMenuRef}>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(4)}>4</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(6)}>6</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(8)}>8</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(10)}>10</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(12)}>12</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(16)}>16</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(20)}>20</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(40)}>40</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div>
                 </div >
               )}
           </div>
@@ -385,15 +375,15 @@ export default function Home() {
             {
               isStrikesMobileMenuOpen && (
                 <div className={styles.menu} ref={strikesMobileMenuRef}>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
-                  <StyledButtonTwo variant="outlined" sx={menuButtonStyle} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(4)}>4</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(6)}>6</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(8)}>8</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(10)}>10</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(12)}>12</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(16)}>16</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(20)}>20</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(40)}>40</div>
+                  <div className={styles.menuItem}onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div>
                 </div >
               )}
           </div>
@@ -456,18 +446,18 @@ export default function Home() {
                 (data?.strike && currentNearPrice) &&
                   data?.strike < currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
               } onClick={() => handleDisplayOptionAnalytics(data)}>
-                <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p></div>
+                <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '-'}</p></div>
                 <div className={styles.elementTd}><p
                   className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>
-                  {data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.change ? formatPlusMinus(data.change) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '0.00%'}</p></div>
-                <div className={styles.elementTd}><p>{data?.volume ? data.volume : '0'}</p></div>
-                <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '0.00%'}</p></div>
-                <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : 'N/A'}</p></div>
-                <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '0'}</p></div>
+                  {data?.mark ? data.mark.toFixed(2) : '-'}</p></div>
+                <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '-'}</p></div>
+                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '-'}</p></div>
+                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.change ? formatPlusMinus(data.change) : '-'}</p></div>
+                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.volume ? data.volume : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '-'}</p></div>
                 {/* <div className={styles.elementTd}><p>{data?.strike ? data.strike : '0'}</p></div> */}
               </div>
             ))}
@@ -519,18 +509,18 @@ export default function Home() {
                 (data?.strike && currentNearPrice) &&
                   data?.strike > currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
               } onClick={() => handleDisplayOptionAnalytics(data)}>
-                <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '0.00'}</p></div>
+                <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '-'}</p></div>
                 <div className={styles.elementTd}><p
                   className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>
-                  {data?.mark ? data.mark.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.change ? formatPlusMinus(data.change) : '0.00'}</p></div>
-                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '0.00%'}</p></div>
-                <div className={styles.elementTd}><p>{data?.volume ? data.volume : '0'}</p></div>
-                <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '0.00%'}</p></div>
-                <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : 'N/A'}</p></div>
-                <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '0'}</p></div>
+                  {data?.mark ? data.mark.toFixed(2) : '-'}</p></div>
+                <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '-'}</p></div>
+                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '-'}</p></div>
+                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.change ? formatPlusMinus(data.change) : '-'}</p></div>
+                <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.volume ? data.volume : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.impliedVolatility ? `${(data.impliedVolatility * 100).toFixed(2)}%` : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.contractSize ? data.contractSize : '-'}</p></div>
+                <div className={styles.elementTd}><p>{data?.openInterest ? data.openInterest : '-'}</p></div>
                 {/* <div className={styles.elementTd}><p>{data?.strike ? data.strike : '0'}</p></div> */}
               </div>
             ))}

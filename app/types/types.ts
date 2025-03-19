@@ -12,10 +12,9 @@ export interface AppContextType {
     optionExpirationDates: string[];
     recentSearches: string[];
     totalStrikesToDisplay: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40;
-    watchList: StockType[];
-    popularList: StockType[];
     clearStockData: () => void;
-    fetchData: (listOnly: boolean, symbol?: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => Promise<void>;
+    fetchIndexesData: () => Promise<void>;
+    fetchStockData: (symbol: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => Promise<void>;
     setCurrentNearPrice: (price: number) => void;
     setCurrentOption: (option: OptionType) => void;
     setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;

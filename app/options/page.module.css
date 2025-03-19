@@ -87,7 +87,6 @@
 .date {
     align-items: center;
     box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
-    /* border: 1px solid gray; */
     border-radius: 18px;
     cursor: pointer;
     display: flex;
@@ -123,13 +122,27 @@
 .menu {
     background-color: #fff;
     box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
-    /* border: 1px solid gray; */
     border-radius: 0px;
     display: flex;
     flex-direction: column;
     position: absolute;
     width: 100%;
     z-index: 11;
+}
+
+.menuItem {
+    padding-left: 1rem;
+    width: "fit-content";
+    min-height: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.menuItem:hover {
+    background-color: lightgray;
 }
 
 .optionChainWrapper {
@@ -181,7 +194,6 @@
 .tableHeaderCalls {
     right: 0;
     left: 0;
-    /* min-width: 50rem; */
     justify-content: flex-end;
     padding-right: 0.5rem;
 }
@@ -201,12 +213,9 @@
 .tableHeaderPuts {
     right: 0;
     left: 0;
-    /* min-width: 50rem; */
     justify-content: flex-start;
     padding-left: 0.5rem;
 }
-
-
 
 .elementsHeaderTd,
 .elementsHeaderTdTwo,
@@ -218,7 +227,6 @@
     min-width: fit-content;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    /* padding-bottom: 0.5rem; */
 }
 
 .elementsHeaderThStrikes {
@@ -226,7 +234,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    /* padding-bottom: 0.5rem; */
 }
 
 .elementsHeaderTh,
@@ -263,7 +270,6 @@
 
 .elementsHeadersTdStrikes {
     padding: 0.5rem;
-    /* justify-content: center; */
 }
 
 .elementTh,
@@ -277,17 +283,9 @@
     min-height: 2rem;
 }
 
-
-
-/* .elementTdStrikes {
-    border-left: 0.25px solid gray;
-    border-right: 0.25px solid gray;
-} */
-
 .elementTh,
 .elementThStrikes {
     z-index: 6;
-    /* padding: 0.5rem; */
 }
 
 .elementTh,
@@ -295,14 +293,7 @@
 .elementTdLink {
     align-items: flex-start;
     min-width: 6rem;
-    /* justify-content: center; */
     white-space: nowrap;
-    /* padding: 0.5rem; */
-}
-
-.elementTdStrikes {
-    /* border-left: 0.5px solid lightgray;
-    border-right: 0.5px solid lightgray; */
 }
 
 .elementThTwo {
@@ -319,22 +310,7 @@
 .elementTdStrikes,
 .elementThStrikes {
     align-items: center;
-    /* justify-content: center; */
-
 }
-
-/* .elementTdStrikes,
-.elementThStrikes {
-
-} */
-
-
-
-/* .tableHeaderStrikes p,
-.elementTdStrikes p,
-.elementThStrikes p {
-    color: gray;
-} */
 
 /* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
 .dates::-webkit-scrollbar,
@@ -407,8 +383,7 @@
     }
 
     .elementsHeaderTdTwo {
-        background-color: #2a3b4c;
-        /* Dark blue color for dark mode */
+        background-color: #a8b7c7;
     }
 
     .menu {
