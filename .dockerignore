@@ -3,6 +3,9 @@ __pycache__
 *.pyc
 *.pyo
 
+# Ignore appTwo.py
+appTwo.py
+
 # Ignore virtual environment folder
 venv/
 env/
