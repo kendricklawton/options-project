@@ -9,6 +9,7 @@ import pandas as pd
 import pytz
 import signal
 import sys
+import traceback
 import yfinance as yf
 from cachetools import TTLCache, cached
 from collections import defaultdict
@@ -16,7 +17,7 @@ from datetime import date, datetime
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, disconnect, emit
+from flask_socketio import SocketIO, emit
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -354,9 +355,18 @@ def stock_unsubscribe():
     logging.info(f"Client {sid} unsubscribed from stock namespace")
 
 
-def handle_shutdown():
-    logging.info("Received shutdown signal. Closing all market tasks...")
-    close_market_tasks()
+import signal
+
+
+def handle_shutdown(signal_number, frame):
+    logging.info(f"Received shutdown signal: {signal_number}")
+    logging.info("Stack trace at the time of shutdown:")
+    # Log the stack trace for debugging purposes
+    stack_trace = "".join(traceback.format_stack(frame))
+    logging.debug(f"Stack trace:\n{stack_trace}")
+
+    close_market_tasks()  # Call your cleanup function
+    logging.info("Server shutdown complete.")
     sys.exit(0)
 
 

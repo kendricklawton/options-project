@@ -1,6 +1,9 @@
-Flask
-Flask-Cors
+cachetools
+flask
+flask-cors
+flask-socketio
+gevent
+pandas
 python-dotenv
-gunicorn
-requests
+pytz
 yfinance
