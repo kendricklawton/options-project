@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     // AccountTreeOutlined,
     CropOutlined,
-    Menu, 
+    Menu,
     // RefreshOutlined, 
     SearchOutlined,
     // StackedBarChartOutlined
@@ -159,22 +159,32 @@ export default function Header() {
                 <div className={styles.stockList}>
                     {
                         indexesList.map((data, index) => (
+
                             <div className={styles.stock} key={index} onClick={() => handleFetchStockDataIndex(
                                 data?.symbol ? data?.symbol : ''
                             )}>
-                                <p className={styles.symbol}>{data.symbol}</p>
-                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                    {data.regularMarketPrice?.toFixed(2)}</p>
                                 {
-                                    data.regularMarketPrice && (
+                                    (data.symbol && data.regularMarketPrice && data.regularMarketChangePercent) &&
+                                    <>
+                                        <p className={styles.symbol}>{data.symbol}</p>
                                         <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                            {`${formatPlusMinus(data.regularMarketChange)}`}
-                                        </p>
-                                    )
+                                            {data.regularMarketPrice ? data.regularMarketPrice.toFixed(2) : ''}</p>
+                                        {
+                                            data.regularMarketPrice && (
+                                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
+                                                    {`${formatPlusMinus(data.regularMarketChange)}`}
+                                                </p>
+                                            )
+                                        }
+                                        {
+                                            data.regularMarketPrice && (
+                                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
+                                                    {`(${formatPlusMinus(data.regularMarketChangePercent)}%)`}
+                                                </p>
+                                            )}
+                                    </>
+
                                 }
-                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                    {`(${formatPlusMinus(data.regularMarketChangePercent)}%)`}
-                                </p>
                             </div>
                         ))
                     }

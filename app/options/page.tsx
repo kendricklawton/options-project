@@ -6,7 +6,7 @@ import styles from './page.module.css';
 import { IconButton } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '@/app/providers/AppProvider';
-import { StyledButton, StyledIconButton, StyledTextField } from '@/app/components/Styled';
+import { StyledButton, StyledButtonTwo, StyledIconButton, StyledTextField } from '@/app/components/Styled';
 import {
   calculateDaysRemaining, convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus,
   getFilteredOptionChain,
@@ -15,6 +15,14 @@ import {
 import { OptionType } from '@/app/types/types';
 import React from 'react';
 import { useAuthContext } from '../providers/AuthProvider';
+
+const styledButtonStyles = {
+  borderRadius: '0px',
+  backgroundColor: 'fff',
+  justifyContent: 'space-between',
+  minWidth: '6rem',
+  whiteSpace: 'nowrap',
+};
 
 export default function Home() {
   const {
@@ -245,7 +253,6 @@ export default function Home() {
                   : styles.negative
                 : ''
               }>({formatPlusMinus(currentStock?.regularMarketChangePercent)}%)</p>
-              <p>{convertUnixTimestamp(currentStock?.regularMarketTime)}</p>
             </div>
             <div className={styles.detailsTrailing}>
               <StyledIconButton onClick={handleSetIsBottomElementOpen} size='small'>
@@ -343,17 +350,11 @@ export default function Home() {
                   onClick={() => setIsStrikesMenuOpen(prev => !prev)}
                   endIcon={<ArrowDropDownOutlined />}
                   ref={strikesMenuButtonRef}
-                  sx={{
-                    borderRadius: '0px',
-                    backgroundColor: 'fff',
-                    justifyContent: 'space-between',
-                    minWidth: '6rem',
-                    whiteSpace: 'nowrap',
-                  }}>{displayStrikes === 1 ? "ALL" : displayStrikes}</StyledButton>
+                  sx={styledButtonStyles}>{displayStrikes === 1 ? "ALL" : displayStrikes}</StyledButton>
                 {
                   isStrikesMenuOpen && (
                     <div className={styles.menu} ref={strikesMenuRef}>
-                      <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</div>
+                      {/* <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</div>
@@ -361,7 +362,16 @@ export default function Home() {
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</div>
-                      <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div>
+                      <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div> */}
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo>
                     </div >
                   )}
               </div>

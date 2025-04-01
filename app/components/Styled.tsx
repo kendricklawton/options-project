@@ -14,8 +14,26 @@ export const StyledButton = styled(Button)({
 });
 
 export const StyledButtonTwo = styled(Button)({
-    width: '100%',
-    color: 'inherit',
+    fontFamily: 'inherit',
+    backgroundColor: 'inherit',
+    height: '2rem',
+    color: 'black',
+    width: 'fit-content',
+    borderRadius: '0',
+    whiteSpace: 'nowrap',
+    '&:hover': {
+        boxShadow: 'none', // Ensure no shadow on hover
+    },
+    '&:focus': {
+        outline: 'none', // Ensure no outline when focused
+        boxShadow: 'none', // Ensure no shadow when focused
+    },
+    border: 'none', // Remove border
+    outline: 'none', // Remove outline
+    boxShadow: 'none', 
+    '& .MuiButton-label': {
+        color: 'black',
+    },
 });
 
 export const StyledIconButton = styled(IconButton)({

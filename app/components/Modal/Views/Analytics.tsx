@@ -14,31 +14,15 @@ import {
 import { ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
 import {
     StyledButton,
+    StyledButtonTwo,
     // StyledButtonTwo,
     StyledTextField
 } from "../../Styled";
-import { determineOptionExpirationDate, determineOptionType, formatDate } from '@/app/utils/utils';
-import { Button } from '@mui/material';
+import { determineOptionExpirationDate, determineOptionType, 
+    // formatDate
+ } from '@/app/utils/utils';
 // import { StyledButton } from "../../Styled";
 // import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
-
-const menuItemStrikes = {
-    borderRadius: '0px',
-    borderTop: 'none',
-    borderBottom: 'none',
-    border: 'none',
-    justifyContent: 'flex-start',
-    width: '6rem',
-}
-
-const menuItemExpirationDates = {
-    borderRadius: '0px',
-    borderTop: 'none',
-    borderBottom: 'none',
-    border: 'none',
-    justifyContent: 'flex-start',
-    width: '8rem',
-};
 
 export default function Analytics() {
     const {
@@ -229,18 +213,22 @@ export default function Analytics() {
                             endIcon={<ArrowDropDownOutlined />}
                             ref={expirationMenuButtonRef}
                             sx={{
-                                borderRadius: '0px',
-                                backgroundColor: 'fff',
                                 justifyContent: 'space-between',
-                                width: '8rem',
+                                width: '9rem',
                                 whiteSpace: 'nowrap',
                             }}>{expirationDate}</StyledButton>
                         {isExpirationMenuOpen && (
                             <div className={styles.menu} ref={expirationMenuRef}>
                                 {expirationDates.map((date, index) => (
-                                    <Button component="div" variant="outlined" sx={menuItemExpirationDates} key={index} onClick={
+                                    <StyledButtonTwo
+                                    variant='contained'
+                                    sx={{
+                                        justifyContent: 'space-between',
+                                        width: '9rem',
+                                        whiteSpace: 'nowrap',
+                                    }} key={index}  onClick={
                                         () => handleUpdateDate(date)
-                                    }>{formatDate(date).toLocaleUpperCase()}</Button>
+                                    }>{date}</StyledButtonTwo>
                                     // <div className={styles.menuItemDates} key={index} onClick={() => handleUpdateDate(date)}>{formatDate(date).toLocaleUpperCase()}</div>
                                 ))}
                             </div >
@@ -266,7 +254,15 @@ export default function Analytics() {
                         {isStrikesMenuOpen && (
                             <div className={styles.menu} ref={strikesMenuRef}>
                                 {strikes.map((strike, index) => (
-                                    <Button component="div" variant="outlined" sx={menuItemStrikes} key={index} onClick={() => handleUpdateOrder(strike)}>{strike}</Button>
+                                    <StyledButtonTwo 
+                                    sx={{
+                                        justifyContent: 'space-between',
+                                        width: '6rem',
+                                        whiteSpace: 'nowrap',
+                                    }}  
+                                        variant="contained" key={index} onClick={() => handleUpdateOrder(strike)}
+                        
+                                    >{strike}</StyledButtonTwo>
                                     // <div className={styles.menuItemStrikes}  // style={{ backgroundColor: 'red' }}
                                     //     key={index} onClick={() => handleUpdateOrder(strike)}>{strike}
                                     // </div>

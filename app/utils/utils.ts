@@ -60,37 +60,27 @@ const holidays = [
 export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     if (timestamp == null) return '';
 
-
     const dateObj = new Date(timestamp * 1000);
-    // const day = dateObj.getUTCDay();
 
-    // Check if it's a weekend (Saturday or Sunday) or a holiday
-    // if (day === 0 || day === 6 || isHoliday(dateObj)) {
-    //     return 'US Market Closed';
-    // }
+    // Format the date as "Apr 1"
+    const dateOptions: Intl.DateTimeFormatOptions = {
+        month: 'short', // Abbreviated month (e.g., "Apr")
+        day: 'numeric', // Day of the month (e.g., "1")
+        timeZone: 'America/New_York', // Eastern Time Zone
+    };
+    const formattedDate = dateObj.toLocaleDateString('en-US', dateOptions);
 
-    // Convert local time to Eastern Time (ET)
-    // const easternOffset = -5 * 60; // ET is UTC-5
-    // const localOffset = dateObj.getTimezoneOffset(); // Local time zone offset in minutes
-    // const easternTime = new Date(dateObj.getTime() + (localOffset - easternOffset) * 60000);
-    // const easternHours = easternTime.getHours();
-    // const easternMinutes = easternTime.getMinutes();
-
-    // Check if the market is open (9:30 AM ET to 4:00 PM ET)
-    // if (easternHours < 9 || (easternHours === 9 && easternMinutes < 30) || easternHours >= 16) {
-    //     return 'US Market Closed';
-    // }
-
-    // Format the time as "as of 12:50 PM ET"
-    const options: Intl.DateTimeFormatOptions = {
+    // Format the time as "4:00 PM"
+    const timeOptions: Intl.DateTimeFormatOptions = {
         hour: 'numeric',
         minute: 'numeric',
         hour12: true,
-        timeZone: 'America/New_York'
+        timeZone: 'America/New_York', // Eastern Time Zone
     };
-    const formattedTime = dateObj.toLocaleTimeString('en-US', options);
+    const formattedTime = dateObj.toLocaleTimeString('en-US', timeOptions);
 
-    return `as of ${formattedTime} ET`;
+    // Combine the date and time
+    return `${formattedDate}, ${formattedTime} ET`;
 };
 
 export const convertUnixTimestampTwo = (timestamp: number | undefined): string => {
@@ -353,6 +343,7 @@ export const determineOptionExpirationDate = (symbol: string): string => {
     const day = numericPart.slice(4, 6);
 
     // Return the formatted expiration date
-    const formattedDate = formatDate(`${year}-${month}-${day}`);
-    return formattedDate;
+    return `${year}-${month}-${day}`;
+    // const formattedDate = formatDate(`${year}-${month}-${day}`);
+    // return formattedDate;
 };
