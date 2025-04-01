@@ -1,322 +1,153 @@
 'use client'
 
-import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from 'react';
-import { FirebaseError } from 'firebase/app';
+import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect, useRef } from 'react';
 import { useAuthContext } from './AuthProvider';
-import { AppContextType, OptionChainType, OptionOrderType, OptionType, StockType } from '../types/types';
-import { indexesDataService, stockDataService } from '../services/services';
+import { AppContextType,  OptionChainType, OptionOrderType, OptionType, StockType } from '../types/types';
+import {
+    indexesDataREST,
+    indexesDataWebSocket,
+    stockDataREST,
+    stockDataWebSocket,
+} from '../services/services';
+import { stockMarketOpen } from '../utils/utils';
+// import { isStockMarketOpen } from '../utils/utils';
 // import { loadCSVFiles } from '../utils/utils';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { setIsLoading, setInfo } = useAuthContext();
-    const [recentSearches, setRecentSearches] = useState<string[]>([]);
+    const { setIsLoading, handleSetInfo } = useAuthContext();
+    const [currentDisplayStrikes, setCurrentDisplayStrikes] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
     const [currentExpirationDate, setCurrentExpirationDate] = useState<string>();
     const [currentNearPrice, setCurrentNearPrice] = useState<number>();
     const [currentOption, setCurrentOption] = useState<OptionType>();
     const [currentOptionOrder, setCurrentOptionOrder] = useState<OptionOrderType>();
     const [currentStock, setCurrentStock] = useState<StockType>();
     const [indexesList, setIndexesList] = useState<StockType[]>([]);
-    const [modalView, setModalView] = useState<string>('');
-    const [optionExpirationDates, setOptionExpirationDates] = useState<string[]>([]);
+    const [modalView, setModalView] = useState<string>();
+    const [expirationDates, setExpirationDates] = useState<string[]>([]);
     const [optionChain, setOptionChain] = useState<OptionChainType>();
+    // const [recentSearches, setRecentSearches] = useState<string[]>([]);
     const [totalStrikesToDisplay, setTotalStrikesToDisplay] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
+    const indexesWebSocketRef = useRef<{
+        unsubscribe: () => void;
+        onEvent: (callback: (data: Record<string, unknown>) => void) => void;
+    } | null>(null);
+    const stockWebSocketRef = useRef<{
+        unsubscribe: () => void;
+        onEvent: (callback: (data: Record<string, unknown>) => void) => void;
+    } | null>(null);
 
     // Clear Stock Data & Option Chain
     const clearStockData = useCallback((): void => {
         setCurrentStock(undefined);
-        setOptionExpirationDates([]);
+        setExpirationDates([]);
         setOptionChain(undefined);
     }, []);
 
-    // Error Handling
-    const handleError = useCallback((error: unknown) => {
-        if (error instanceof FirebaseError) {
-            switch (error.code) {
-                case 'App/invalid-credential':
-                    setInfo('Invalid credentials provided');
-                    break;
-                case 'App/email-already-in-use':
-                    setInfo('Email already in use');
-                    break;
-                case 'App/invalid-email':
-                    setInfo('Invalid email address');
-                    break;
-                case 'App/operation-not-allowed':
-                    setInfo('Operation not allowed');
-                    break;
-                case 'App/weak-password':
-                    setInfo('The password is too weak');
-                    break;
-                case 'App/too-many-requests':
-                    setInfo('Access temporarily disabled due to many failed attempts');
-                    break;
-                default:
-                    setInfo('Unknown FirebaseError, error.code: ' + error.code);
-            }
-        }
-
-        else {
-            setInfo('' + error);
-        }
-        throw error;
-    }, [setInfo]);
-
     // Handle Search History
-    const handleRecentSearches = useCallback((symbol: string) => {
-        if (recentSearches.includes(symbol.toLocaleUpperCase())) {
-            return;
-        }
-
-        const updatedSearches = [symbol.toLocaleUpperCase(), ...recentSearches];
-        if (updatedSearches.length > 5) {
-            updatedSearches.pop();
-        }
-
-        setRecentSearches(updatedSearches);
-    }, [recentSearches]);
-
-    // IN THE FUTURE, WE WILL USE WEB SOCKETS TO UPDATE THE DATA IN REAL TIME INSTEAD OF MAKING A NEW REQUEST
-
-    // Fetch Data
-    // const fetchData = useCallback(async (listOnly: boolean, symbol?: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40): Promise<void> => {
-    //     setIsLoading(true);
-    //     const source = axios.CancelToken.source();
-    //     const timeout = setTimeout(() => {
-    //         source.cancel('Request Timed Out');
-    //     }, 12000);
-
-    //     try {
-    //         const response = await axios.get(`${url}stock-data`, {
-    //             params: { expirationDate, symbol },
-    //             cancelToken: source.token
-    //         });
-
-    //         clearTimeout(timeout);
-    //         const indexesData: StockType[] = Object.values(response.data.indexes);
-    //         setIndexesList(indexesData);
-
-    //         if (listOnly) {
-    //             return;
-    //         }
-
-    //         const optionDates: string[] = response.data.dates;
-    //         const calls: OptionType[] = response.data.calls;
-    //         let puts: OptionType[] = response.data.puts;
-    //         const strikes: number[] = response.data.strikes;
-
-    //         let displayStrikes;
-    //         let price;
-
-    //         // Ensure puts array is of the same length as calls
-    //         if (puts.length > calls.length) {
-    //             puts = puts.slice(0, calls.length);
-    //         } else if (puts.length < calls.length) {
-    //             puts = [...puts, ...Array(calls.length - puts.length).fill(null)];
-    //         }
-
-    //         // Set Current Stock Data
-    //         setCurrentStock(response.data.info);
-    //         // Set Option Expiration Dates
-    //         setOptionExpirationDates(optionDates);
-
-    //         // Set Current Expiration Date
-    //         if (expirationDate) {
-    //             setCurrentExpirationDate(expirationDate);
-    //         } else {
-    //             setCurrentExpirationDate(response.data.dates[0] || '');
-    //         }
-
-    //         // Set Current Near Price
-    //         if (nearPrice) {
-    //             setCurrentNearPrice(nearPrice);
-    //             price = nearPrice;
-    //         } else {
-    //             setCurrentNearPrice(response.data.info.regularMarketPrice || 0);
-    //             price = response.data.info.regularMarketPrice || 0;
-    //         }
-
-    //         // Set Total Strikes To Display
-    //         if (totalStrikes) {
-    //             setTotalStrikesToDisplay(totalStrikes);
-    //             displayStrikes = totalStrikes;
-    //         } else {
-    //             // Don't Set Total Strikes To Display, Here We Set The Default Value
-    //             displayStrikes = totalStrikesToDisplay;
-    //         }
-
-    //         // Set Option Chain Data
-    //         const optionChainData = {
-    //             calls,
-    //             puts,
-    //             strikes,
-    //         };
-
-    //         if (displayStrikes === 1) {
-    //             // Display All Strikes
-    //             setOptionChain(optionChainData);
-    //         } else {
-    //             let endIndex;
-    //             let startIndex;
-    //             // let closestIndex = strikes.findIndex(strike => strike.strike >= price);
-    //             let closestIndex = strikes.findIndex(strike => strike >= price);
-
-    //             if (closestIndex === -1) {
-    //                 closestIndex = strikes.length - 1;
-    //             }
-
-    //             const halfDisplay = Math.floor(displayStrikes / 2);
-    //             const indexesElementsAbove = (strikes.length - 1) - closestIndex;
-    //             const indexesElementsBelow = (strikes.length - 1) - indexesElementsAbove;
-
-    //             if (indexesElementsAbove < halfDisplay) {
-    //                 startIndex = strikes.length - displayStrikes;
-    //                 endIndex = strikes.length;
-    //             } else if (indexesElementsBelow < halfDisplay) {
-    //                 startIndex = 0;
-    //                 endIndex = displayStrikes;
-    //             } else {
-    //                 startIndex = closestIndex - halfDisplay;
-    //                 endIndex = closestIndex + halfDisplay;
-    //             }
-
-    //             const filteredOptionChainData = {
-    //                 calls: calls.slice(startIndex, endIndex),
-    //                 puts: puts.slice(startIndex, endIndex),
-    //                 strikes: strikes.slice(startIndex, endIndex),
-    //             };
-    //             setOptionChain(filteredOptionChainData);
-    //         }
-
-    //         // Handle Recent Searches
-    //         handleRecentSearches(symbol || '');
-    //     } catch (error) {
-    //         if (axios.isCancel(error)) {
-    //             setInfo('Request timed out');
-    //         } else {
-    //             handleError("Could not fetch stock data. Please check the symbol and try again");
-    //         }
-    //     } finally {
-    //         setIsLoading(false);
+    // const handleRecentSearches = useCallback((symbol: string) => {
+    //     if (recentSearches.includes(symbol.toLocaleUpperCase())) {
+    //         return;
     //     }
-    // }, [setIsLoading, url, handleRecentSearches, setInfo, totalStrikesToDisplay, handleError]);
+    //     const updatedSearches = [symbol.toLocaleUpperCase(), ...recentSearches];
+    //     if (updatedSearches.length > 5) {
+    //         updatedSearches.pop();
+    //     }
+    //     setRecentSearches(updatedSearches);
+    // }, [recentSearches]);
 
-    // Fetch Indexes Data
+    // Fetch Indexes Data uses both WebSocket and REST API, If the market is open
+    // this method will use WebSocket to get real-time data
+    // and if the market is closed it will use REST API to get the data.
     const fetchIndexesData = useCallback(async (): Promise<void> => {
-        setIsLoading(true);
+        // setIsLoading(true); // Need To Handle In Header
         try {
-            const data = await indexesDataService();
-            const indexesListData: StockType[] = Object.values(data);
+            if (indexesWebSocketRef.current) {
+                indexesWebSocketRef.current.unsubscribe();
+                indexesWebSocketRef.current = null;
+            }
+
+            // Fetch initial indexes data
+            const data = await indexesDataREST();
+
+            // Parse the data to get the indexes list
+            const indexesListData: StockType[] = Object.values(data) as StockType[];
+
+            // Update state with the received data
             setIndexesList(indexesListData);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [handleError, setIsLoading]);
 
-    // Fetch Stock Data
-    const fetchStockData = useCallback(async (symbol: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40): Promise<void> => {
+            // If the market is open, create a new WebSocket connection
+            // and listen for data updates
+            if (stockMarketOpen()) {
+                indexesWebSocketRef.current = indexesDataWebSocket();
+                // Listen for data updates
+                indexesWebSocketRef.current.onEvent((data) => {
+                    const indexesListData: StockType[] = Object.values(data) as StockType[];
+                    // Update state with the received data
+                    setIndexesList(indexesListData);
+                });
+  
+            }
+        } catch (error) {
+            handleSetInfo('' + error);
+        } finally {
+            // setIsLoading(false); // Need To Handle In Header
+        }
+    }, [handleSetInfo]);
+
+    // Fetch Stock Data also uses both WebSocket and REST API, If the market is open
+    // this method will use WebSocket to get real-time data
+    // and if the market is closed it will use REST API to get the data. It also calls
+    // the REST API to get the initial for a better user experience
+    // and to avoid the WebSocket connection delay
+    const fetchStockData = useCallback(async (symbol: string): Promise<void> => {
         setIsLoading(true);
         try {
-            const data = await stockDataService(symbol, expirationDate, nearPrice, totalStrikes);
-            console.log('stockData', data);
-            const optionDates: string[] = data.dates;
-            const calls: OptionType[] = data.calls;
-            let puts: OptionType[] = data.puts;
-            const strikes: number[] = data.strikes;
-
-            let displayStrikes;
-            let price;
-
-            // Ensure puts array is of the same length as calls
-            if (puts.length > calls.length) {
-                puts = puts.slice(0, calls.length);
-            } else if (puts.length < calls.length) {
-                puts = [...puts, ...Array(calls.length - puts.length).fill(null)];
+            if (stockWebSocketRef.current) {
+                stockWebSocketRef.current.unsubscribe();
+                stockWebSocketRef.current = null;
             }
 
-            // Set Current Stock Data
-            setCurrentStock(data.info);
-            // Set Option Expiration Dates
-            setOptionExpirationDates(optionDates);
+            // Fetch initial stock data
+            const data =  await stockDataREST(symbol);
+            // Parse the data to get the option chain and expiration dates
+            const optionChainData: OptionChainType = data.option_chain as OptionChainType;
+            const expirationDatesData = Object.keys(optionChainData) as string[];
+            const stockData = data?.info as StockType | undefined;
 
-            // Set Current Expiration Date
-            if (expirationDate) {
-                setCurrentExpirationDate(expirationDate);
-            } else {
-                setCurrentExpirationDate(data.dates[0] || '');
+            // Update state with the received data
+            setCurrentStock(stockData);
+            setExpirationDates(expirationDatesData);
+            setOptionChain(optionChainData);
+            setCurrentNearPrice(stockData?.regularMarketPrice || 0);
+            if(stockData?.symbol?.toLowerCase() !== currentStock?.symbol?.toLowerCase()) {
+                setCurrentExpirationDate(expirationDatesData[0]);
             }
 
-            // Set Current Near Price
-            if (nearPrice) {
-                setCurrentNearPrice(nearPrice);
-                price = nearPrice;
-            } else {
-                setCurrentNearPrice(data.info.regularMarketPrice || 0);
-                price = data.info.regularMarketPrice || 0;
+            // If the market is open, create a new WebSocket connection
+            // and listen for data updates
+            if (stockMarketOpen()) {
+                stockWebSocketRef.current = stockDataWebSocket(symbol);
+
+                // Listen for data updates
+                stockWebSocketRef.current.onEvent((data) => {
+                    const optionChainData: OptionChainType = data.option_chain as OptionChainType;
+                    const expirationDatesData = Object.keys(optionChainData) as string[];
+                    const stockData = data?.info as StockType | undefined;
+                    // Update state with the received data
+                    setCurrentStock(stockData);
+                    setExpirationDates(expirationDatesData);
+                    setOptionChain(optionChainData);
+                });
             }
-
-            // Set Total Strikes To Display
-            if (totalStrikes) {
-                setTotalStrikesToDisplay(totalStrikes);
-                displayStrikes = totalStrikes;
-            } else {
-                // Don't Set Total Strikes To Display, Here We Set The Default Value
-                displayStrikes = totalStrikesToDisplay;
-            }
-
-            // Set Option Chain Data
-            const optionChainData = {
-                calls,
-                puts,
-                strikes,
-            };
-
-            if (displayStrikes === 1) {
-                // Display All Strikes
-                setOptionChain(optionChainData);
-            } else {
-                let endIndex;
-                let startIndex;
-                let closestIndex = strikes.findIndex(strike => strike >= price);
-
-                if (closestIndex === -1) {
-                    closestIndex = strikes.length - 1;
-                }
-
-                const halfDisplay = Math.floor(displayStrikes / 2);
-                const indexesElementsAbove = (strikes.length - 1) - closestIndex;
-                const indexesElementsBelow = (strikes.length - 1) - indexesElementsAbove;
-
-                if (indexesElementsAbove < halfDisplay) {
-                    startIndex = strikes.length - displayStrikes;
-                    endIndex = strikes.length;
-                } else if (indexesElementsBelow < halfDisplay) {
-                    startIndex = 0;
-                    endIndex = displayStrikes;
-                } else {
-                    startIndex = closestIndex - halfDisplay;
-                    endIndex = closestIndex + halfDisplay;
-                }
-
-                const filteredOptionChainData = {
-                    calls: calls.slice(startIndex, endIndex),
-                    puts: puts.slice(startIndex, endIndex),
-                    strikes: strikes.slice(startIndex, endIndex),
-                };
-                setOptionChain(filteredOptionChainData);
-            }
-
-            // Handle Recent Searches
-            handleRecentSearches(symbol || '');
         } catch (error) {
-            handleError(error);
+            handleSetInfo('Server Issues, Please Try Again Later');
+            throw error;
         } finally {
             setIsLoading(false);
         }
-    }, [handleError, handleRecentSearches, setIsLoading, totalStrikesToDisplay]);
+    }, [currentStock, handleSetInfo, setIsLoading]);
 
     // Handle Set Option Order By Strike
     const updateOptionOrderByStrike = useCallback((strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put'): void => {
@@ -326,25 +157,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (optionOrder.option?.strike === strike) {
             return;
         }
-        console.log('strike', strike);
         if (optionType === 'Call') {
-            const call = optionChain.calls.find(call => call.strike === strike);
-            if (call) {
-                const newOptionOrder = { ...optionOrder, option: call };
-                console.log('newOptionOrder', newOptionOrder);
-                setCurrentOptionOrder(newOptionOrder);
-            } else {
-                throw new Error('Call not found');
-            }
+            // const call = optionChain.calls.find(call => call.strike === strike);
+            // if (call) {
+            //     const newOptionOrder = { ...optionOrder, option: call };
+            //     setCurrentOptionOrder(newOptionOrder);
+            // } else {
+            //     throw new Error('Call not found');
+            // }
         } else {
-            const put = optionChain.puts.find(put => put.strike === strike);
-            if (put) {
-                const newOptionOrder = { ...optionOrder, option: put };
-                console.log('newOptionOrder', newOptionOrder);
-                setCurrentOptionOrder(newOptionOrder);
-            } else {
-                throw new Error('Put not found');
-            }
+            // const put = optionChain.puts.find(put => put.strike === strike);
+            // if (put) {
+            //     const newOptionOrder = { ...optionOrder, option: put };
+            //     setCurrentOptionOrder(newOptionOrder);
+            // } else {
+            //     throw new Error('Put not found');
+            // }
         }
     }, [optionChain]);
 
@@ -353,7 +181,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (quantity < 1) {
             return;
         }
-
         if (!optionOrder.option) {
             return;
         }
@@ -361,47 +188,52 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setCurrentOptionOrder(newOptionOrder);
     }, []);
 
+    // Fetch Indexes Data on Component Mount
     useEffect(() => {
-        const loadData = async () => {
-            await fetchIndexesData();
+        const awaitData = async () => {
+                await fetchIndexesData();
         };
 
-        loadData();
+        awaitData();
     }, [fetchIndexesData]);
 
     const contextValue = useMemo(() => ({
-        currentNearPrice,
+        currentExpirationDate,
         currentOption,
         currentOptionOrder,
-        currentExpirationDate,
         currentStock,
+        currentNearPrice,
+        currentDisplayStrikes,
         modalView,
         indexesList,
         optionChain,
-        optionExpirationDates,
-        recentSearches,
+        expirationDates,
+        // recentSearches,
         totalStrikesToDisplay,
         clearStockData,
         fetchIndexesData,
         fetchStockData,
+        setCurrentExpirationDate,
         setCurrentNearPrice,
         setCurrentOption,
         setCurrentOptionOrder,
+        setCurrentDisplayStrikes,
+        setTotalStrikesToDisplay,
         setModalView,
         updateOptionOrderByStrike,
         updateOptionOrderByQuantity,
-        setTotalStrikesToDisplay
     }), [
         currentExpirationDate,
         currentNearPrice,
         currentOption,
         currentOptionOrder,
         currentStock,
+        currentDisplayStrikes,
         modalView,
         indexesList,
         optionChain,
-        optionExpirationDates,
-        recentSearches,
+        expirationDates,
+        // recentSearches,
         totalStrikesToDisplay,
         clearStockData,
         fetchIndexesData,

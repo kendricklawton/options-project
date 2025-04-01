@@ -1,0 +1,101 @@
+/* Wrapper for the chatbox */
+.wrapper {
+    position: fixed;
+    bottom: 3rem;
+    right: 4svw;
+
+    width: 350px;
+    height: 500px;
+    border: 1px solid #ddd;
+    /* border-radius: 8px; */
+    overflow: hidden;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+}
+
+.buttonWrapper {
+        position: fixed;
+        bottom: 0.5rem;
+        right: 4svw;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+}
+
+/* Chatbox header */
+.header {
+    background-color: #007bff;
+    color: white;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Messages area */
+.messages {
+    flex: 1;
+    padding: 0.5rem;
+    overflow-y: auto;
+    background-color: #ffffff;
+}
+
+/* User message */
+.userMessage {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    align-self: flex-end;
+    max-width: 70%;
+}
+
+/* AI message */
+.aiMessage {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #e9ecef;
+    color: #333;
+    border-radius: 8px;
+    align-self: flex-start;
+    max-width: 70%;
+}
+
+/* Input area */
+.inputArea {
+    display: flex;
+    padding: 0.5rem;
+    border-top: 1px solid #ddd;
+    background-color: #f1f1f1;
+}
+
+/* Input field */
+.input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Send button */
+.sendButton {
+    margin-left: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.sendButton:hover {
+    background-color: #0056b3;
+}

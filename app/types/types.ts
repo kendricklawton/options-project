@@ -7,14 +7,14 @@ export interface AppContextType {
     currentOptionOrder?: OptionOrderType;
     currentStock?: StockType;
     indexesList: StockType[];
-    modalView: string;
+    modalView?: string;
     optionChain?: OptionChainType;
-    optionExpirationDates: string[];
-    recentSearches: string[];
+    expirationDates: string[];
     totalStrikesToDisplay: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40;
     clearStockData: () => void;
     fetchIndexesData: () => Promise<void>;
-    fetchStockData: (symbol: string, expirationDate?: string, nearPrice?: number, totalStrikes?: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => Promise<void>;
+    fetchStockData: (symbol: string ) => Promise<void>;
+    setCurrentExpirationDate: (expirationDate: string) => void;
     setCurrentNearPrice: (price: number) => void;
     setCurrentOption: (option: OptionType) => void;
     setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
@@ -33,6 +33,7 @@ export interface AuthContextType {
     logIn: (email: string, password: string) => Promise<void>;
     logInWithGoogle: () => Promise<void>;
     logOut: () => Promise<void>;
+    handleSetInfo: (info: string) => void;
     setInfo: (info: string) => void;
     setIsLoading: (isLoading: boolean) => void;
     sendPasswordReset: (email: string) => Promise<void>;
@@ -61,9 +62,11 @@ export interface OptionType {
 }
 
 export interface OptionChainType {
-    calls: OptionType[]; 
-    puts: OptionType[];
-    strikes: number[];
+    [date: string]: {
+        calls: OptionType[];
+        puts: OptionType[];
+        strikes: number[];
+    }
 }
 
 export interface OptionOrderType {
@@ -71,6 +74,11 @@ export interface OptionOrderType {
     option?: OptionType;
     quantity?: number;
 }
+
+// export interface YFinanceResponse {
+//     stock: StockType;
+//     optionChain: OptionChainType;
+// };
 
 export interface StockType {
     ask?: number;

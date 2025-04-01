@@ -41,7 +41,10 @@ export default function Analytics() {
     const strikesMenuButtonRef = React.useRef<HTMLButtonElement>(null);
     const strikesMenuRef = React.useRef<HTMLDivElement>(null);
     const [isStrikesMenuOpen, setIsStrikesMenuOpen] = React.useState(false);
+    // const strikes = optionChain?[currentExpirationDate]
     const strikes = optionChain?.strikes || [];
+
+    console.log('Option Chain', optionChain);
 
     const determineOptionType = (symbol: string): string => {
         // Traverse the symbol from right to left

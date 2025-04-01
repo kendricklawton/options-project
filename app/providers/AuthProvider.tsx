@@ -61,6 +61,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw error;
     }, []);
 
+    const handleSetInfo = useCallback((info: string) => {
+        setInfo(info);
+    }, []);
+
     // Auth Methods
     const createUserAccount = useCallback(async (email: string, password: string): Promise<void> => {
         setIsLoading(true);
@@ -213,6 +217,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         logIn,
         logInWithGoogle,
         logOut,
+        handleSetInfo,
         sendPasswordReset,
         sendUserVerification,
         setInfo,
@@ -228,6 +233,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         logIn,
         logInWithGoogle,
         logOut,
+        handleSetInfo,
         sendPasswordReset,
         sendUserVerification,
         updateUserDisplayName,

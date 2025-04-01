@@ -1,4 +1,5 @@
 import Papa, { ParseResult } from 'papaparse';
+import { OptionChainType } from '@/app/types/types';
 
 
 // Store the symbols from both CSV files
@@ -242,4 +243,70 @@ export const calculateDaysRemaining = (expirationDate: string | undefined) => {
     const timeDiff = expiration.getTime() - today.getTime();
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
     return daysDiff;
+};
+
+export const stockMarketOpen = (): boolean => {
+    return true;
+};
+
+
+export const getFilteredOptionChain = (
+    optionChain: OptionChainType | undefined,
+    currentExpirationDate: string | undefined,
+    displayStrikes: number,
+    nearPriceInputValue: number
+) => {
+    // console.log('Option Chain:', optionChain);
+    // console.log('Current Expiration Date:', currentExpirationDate);
+    // console.log('Display Strikes:', displayStrikes);
+    // console.log('Near Price Input Value:', nearPriceInputValue);
+    if (!currentExpirationDate || !optionChain) {
+        return null;
+    }
+
+    const currentOptionChain = optionChain[currentExpirationDate];
+    if (!currentOptionChain) {
+        return null;
+    }
+
+    const strikes = currentOptionChain.strikes ?? [];
+    if (strikes.length < displayStrikes || displayStrikes === 1) {
+        return {
+            calls: currentOptionChain.calls,
+            puts: currentOptionChain.puts,
+            strikes: currentOptionChain.strikes,
+        };
+    }
+
+    const nearPrice = nearPriceInputValue;
+    let closestIndex = currentOptionChain.strikes.findIndex((strike) => strike >= nearPrice);
+
+    if (closestIndex === -1) {
+        closestIndex = currentOptionChain.strikes.length - 1;
+    }
+
+    const halfDisplay = Math.floor(displayStrikes / 2);
+    const indexesElementsAbove = strikes.length - 1 - closestIndex;
+    const indexesElementsBelow = strikes.length - 1 - indexesElementsAbove;
+
+    let startIndex, endIndex;
+
+    if (indexesElementsAbove < halfDisplay) {
+        startIndex = strikes.length - displayStrikes;
+        endIndex = strikes.length;
+    } else if (indexesElementsBelow < halfDisplay) {
+        startIndex = 0;
+        endIndex = displayStrikes;
+    } else {
+        startIndex = closestIndex - halfDisplay;
+        endIndex = closestIndex + halfDisplay;
+    }
+
+    const filteredOptionChain = {
+        calls: currentOptionChain.calls.slice(startIndex, endIndex),
+        puts: currentOptionChain.puts.slice(startIndex, endIndex),
+        strikes: strikes.slice(startIndex, endIndex),
+    };
+
+    return filteredOptionChain;
 };

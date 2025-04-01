@@ -4,6 +4,8 @@ import Header from "./components/Header/Header";
 import Info from "./components/Info/Info";
 import Modal from "./components/Modal/Modal";
 import ProviderWrapper from "./providers/ProviderWrapper";
+import Loading from "./components/Loading/Loading";
+// import Alpha from "./components/Alpha/Alpha";
 
 export const metadata: Metadata = {
   authors: {
@@ -48,6 +50,8 @@ export default function RootLayout({
           {children}
           <Info />
           <Modal />
+          <Loading />
+          {/* <Alpha /> */}
         </ProviderWrapper>
       </body>
     </html>
