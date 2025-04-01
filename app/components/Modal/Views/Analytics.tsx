@@ -227,7 +227,7 @@ export default function Analytics() {
                         {
                             isStrikesMenuOpen && (
                                 <div className={styles.menu} ref={strikesMenuRef}>
-                                    {strikes.map((strike, index) => (
+                                    {Array.isArray(strikes) && strikes.map((strike, index) => (
                                         // <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</StyledButtonTwo>
                                         <div style={{
                                             paddingLeft: '1rem',
