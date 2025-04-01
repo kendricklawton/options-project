@@ -83,20 +83,3 @@
     background: transparent;
 }
 
-
-.menuItemDates,
-.menuItemStrikes {
-        cursor: pointer;
-        display: flex;
-        font-size: 0.9rem;
-        justify-content: flex-start;
-        padding: 0.5rem 1rem;
-        text-align: left;
-}
-.menuItemDates {
-    width: 9rem;
-}
-
-.menuItemStrikes {
-    width: 7rem;
-}

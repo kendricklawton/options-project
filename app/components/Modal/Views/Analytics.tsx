@@ -28,7 +28,7 @@ const menuItemStrikes = {
     borderBottom: 'none',
     border: 'none',
     justifyContent: 'flex-start',
-    width: '7rem',
+    width: '6rem',
 }
 
 const menuItemExpirationDates = {
@@ -37,7 +37,7 @@ const menuItemExpirationDates = {
     borderBottom: 'none',
     border: 'none',
     justifyContent: 'flex-start',
-    width: '9rem',
+    width: '8rem',
 };
 
 export default function Analytics() {
@@ -232,7 +232,7 @@ export default function Analytics() {
                                 borderRadius: '0px',
                                 backgroundColor: 'fff',
                                 justifyContent: 'space-between',
-                                width: '9rem',
+                                width: '8rem',
                                 whiteSpace: 'nowrap',
                             }}>{expirationDate}</StyledButton>
                         {isExpirationMenuOpen && (
@@ -260,7 +260,7 @@ export default function Analytics() {
                                 borderRadius: '0px',
                                 backgroundColor: 'fff',
                                 justifyContent: 'space-between',
-                                minWidth: '7rem',
+                                minWidth: '6rem',
                                 whiteSpace: 'nowrap',
                             }}>{currentOptionOrder?.option?.strike}</StyledButton>
                         {isStrikesMenuOpen && (
