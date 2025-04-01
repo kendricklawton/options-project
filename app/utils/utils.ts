@@ -207,8 +207,6 @@ export const loadCSVFiles = async () => {
     });
 };
 
-
-
 const erf = (x: number) => {
     const sign = x >= 0 ? 1 : -1;
     x = Math.abs(x);
@@ -309,4 +307,52 @@ export const getFilteredOptionChain = (
     };
 
     return filteredOptionChain;
+};
+
+
+export const determineOptionType = (symbol: string): string => {
+    // Traverse the symbol from right to left
+    for (let i = symbol.length - 1; i >= 0; i--) {
+        const char = symbol.charAt(i);
+
+        // Check if the character is a non-numeric character (either 'C' or 'P')
+        if (char === 'C') {
+            return 'Call';
+        } else if (char === 'P') {
+            return 'Put';
+        }
+
+        // If it's a number, continue to the next character
+        if (!/\d/.test(char)) {
+            continue;
+        }
+    }
+
+    // If no 'C' or 'P' found, throw an error
+    // throw new Error('Invalid option contract symbol');
+    return 'N/A';
+};
+
+export const determineOptionExpirationDate = (symbol: string): string => {
+    // Find the first numeric sequence in the symbol
+    const match = symbol.match(/\d+/);
+    if (!match) {
+        return 'Invalid Symbol';
+    }
+
+    const numericPart = match[0];
+
+    // Ensure the numeric part has at least 6 characters (YYMMDD format)
+    if (numericPart.length < 6) {
+        return 'Invalid Symbol';
+    }
+
+    // Extract year, month, and day
+    const year = `20${numericPart.slice(0, 2)}`; // Add "20" to the year to make it 4 digits
+    const month = numericPart.slice(2, 4);
+    const day = numericPart.slice(4, 6);
+
+    // Return the formatted expiration date
+    const formattedDate = formatDate(`${year}-${month}-${day}`);
+    return formattedDate;
 };

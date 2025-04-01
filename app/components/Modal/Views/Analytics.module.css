@@ -62,6 +62,7 @@
     position: fixed;
     z-index: 999;
     overflow-y: auto;
+    width: fit-content;
 }
 
 
@@ -80,4 +81,22 @@
 
 .menu::-webkit-scrollbar-thumb:hover {
     background: transparent;
+}
+
+
+.menuItemDates,
+.menuItemStrikes {
+        cursor: pointer;
+        display: flex;
+        font-size: 0.9rem;
+        justify-content: flex-start;
+        padding: 0.5rem 1rem;
+        text-align: left;
+}
+.menuItemDates {
+    width: 9rem;
+}
+
+.menuItemStrikes {
+    width: 7rem;
 }

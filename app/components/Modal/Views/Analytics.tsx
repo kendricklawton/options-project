@@ -12,66 +12,69 @@ import {
     //  TooltipProps 
 } from 'recharts';
 import { ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
-import { StyledButton, 
+import {
+    StyledButton,
     // StyledButtonTwo,
-     StyledTextField } from "../../Styled";
+    StyledTextField
+} from "../../Styled";
+import { determineOptionExpirationDate, determineOptionType, formatDate } from '@/app/utils/utils';
+import { Button } from '@mui/material';
 // import { StyledButton } from "../../Styled";
 // import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
 
-// const menuButtonStyle = {
-//     borderRadius: '0px',
-//     borderTop: 'none',
-//     borderBottom: 'none',
-//     border: 'none',
-//     justifyContent: 'flex-start',
-//     width: '7rem',
-// }
+const menuItemStrikes = {
+    borderRadius: '0px',
+    borderTop: 'none',
+    borderBottom: 'none',
+    border: 'none',
+    justifyContent: 'flex-start',
+    width: '7rem',
+}
+
+const menuItemExpirationDates = {
+    borderRadius: '0px',
+    borderTop: 'none',
+    borderBottom: 'none',
+    border: 'none',
+    justifyContent: 'flex-start',
+    width: '9rem',
+};
 
 export default function Analytics() {
     const {
         currentExpirationDate,
-        optionChain,
         currentOptionOrder,
-        updateOptionOrderByQuantity,
-        updateOptionOrderByStrike } = useAppContext();
-    const quantity = currentOptionOrder?.quantity || 0;
+        expirationDates,
+        optionChain } = useAppContext();
 
+    const quantity = currentOptionOrder?.quantity || 0;
     const [inputValue, setInputValue] = useState<number | ''>(quantity);
 
     const strikesMenuButtonRef = React.useRef<HTMLButtonElement>(null);
     const strikesMenuRef = React.useRef<HTMLDivElement>(null);
+    const expirationMenuButtonRef = React.useRef<HTMLButtonElement>(null);
+    const expirationMenuRef = React.useRef<HTMLDivElement>(null);
+    const [isExpirationMenuOpen, setIsExpirationMenuOpen] = React.useState(false);
     const [isStrikesMenuOpen, setIsStrikesMenuOpen] = React.useState(false);
-    // const strikes = optionChain?[currentExpirationDate]
-    const strikes = optionChain?.strikes || [];
 
-    console.log('Option Chain', optionChain);
+    let strikes: number[] = [];
 
-    const determineOptionType = (symbol: string): string => {
-        // Traverse the symbol from right to left
-        for (let i = symbol.length - 1; i >= 0; i--) {
-            const char = symbol.charAt(i);
+    if (currentExpirationDate && optionChain) {
+        strikes = optionChain[currentExpirationDate]?.strikes || [];
+    }
 
-            // Check if the character is a non-numeric character (either 'C' or 'P')
-            if (char === 'C') {
-                return 'Call';
-            } else if (char === 'P') {
-                return 'Put';
-            }
 
-            // If it's a number, continue to the next character
-            if (!/\d/.test(char)) {
-                continue;
-            }
-        }
-
-        // If no 'C' or 'P' found, throw an error
-        // throw new Error('Invalid option contract symbol');
-        return 'N/A';
-    };
-
+    console.log('currentOptionOrder', currentOptionOrder);
     const optionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
+    console.log('optionType', optionType);
     const maxLoss = currentOptionOrder?.option?.ask ? currentOptionOrder?.option?.ask * 100 * quantity : 0;
+    console.log('maxLoss', maxLoss);
     const contractSymbol = currentOptionOrder?.option?.contractSymbol;
+    console.log('contractSymbol', contractSymbol);
+    const expirationDate = determineOptionExpirationDate(currentOptionOrder?.option?.contractSymbol || '');
+
+    ;
+
 
     let breakEvenPrice;
     let maxProfit;
@@ -92,6 +95,11 @@ export default function Analytics() {
                     setIsStrikesMenuOpen(false);
                 }
             }
+            if (expirationMenuRef.current && !expirationMenuRef.current.contains(event.target as Node)) {
+                if (!expirationMenuButtonRef.current?.contains(event.target as Node)) {
+                    setIsExpirationMenuOpen(false);
+                }
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -99,7 +107,7 @@ export default function Analytics() {
         };
     }, []);
 
-    const handleUpdateStrike = (strike: number) => {
+    const handleUpdateOrder = (strike: number) => {
         console.log('strike', strike);
         if (!currentOptionOrder) {
             return;
@@ -107,33 +115,41 @@ export default function Analytics() {
         if (strike === currentOptionOrder.option?.strike) {
             return;
         }
-        updateOptionOrderByStrike(strike, currentOptionOrder, optionType as 'Call' | 'Put');
+
+    };
+
+    const handleUpdateDate = (date: string) => {
+        if (!currentOptionOrder) {
+            return;
+        }
+        if (date === currentExpirationDate) {
+            return;
+        }
+
     };
 
     const handleUpdateQuantity = (quantity: number) => {
-
         // if(quantity < 1) {
         //     setInputValue(1);
         //     return;
         // }
-
         setInputValue(quantity);
 
-       
+
         if (!currentOptionOrder) {
             return;
         }
         if (quantity === currentOptionOrder.quantity) {
             return;
-        }       
+        }
 
-        if(!quantity) {
-            const prevQuantity = currentOptionOrder.quantity || 0;
-            updateOptionOrderByQuantity(prevQuantity, currentOptionOrder);
+        if (!quantity) {
+            // const prevQuantity = currentOptionOrder.quantity || 0;
+            // updateOptionOrderByQuantity(prevQuantity, currentOptionOrder);
             return;
         }
 
-        updateOptionOrderByQuantity(quantity, currentOptionOrder);
+        // updateOptionOrderByQuantity(quantity, currentOptionOrder);
     };
 
 
@@ -188,16 +204,16 @@ export default function Analytics() {
                         value={inputValue}
                         onChange={(e) => {
                             const value = e.target.value;
-                            if (!value ) {
+                            if (!value) {
                                 // setInputValue('');
                                 return;
                             } else {
-                                if(parseInt(value) < 1) {
+                                if (parseInt(value) < 1) {
                                     return;
                                 }
                                 handleUpdateQuantity(parseInt(value));
                             }
-                         
+
                         }}
                     ></StyledTextField>
                 </div>
@@ -205,8 +221,31 @@ export default function Analytics() {
             <div className={styles.elementTwo}>
                 <div className={styles.elementTwoItem}>
                     <p>Expiration</p>
-                    <StyledButton endIcon={<ArrowDropDownOutlined />}
-                    >{currentExpirationDate}</StyledButton>
+                    {/* <StyledButton endIcon={<ArrowDropDownOutlined />}
+                    >{currentExpirationDate}</StyledButton> */}
+                    <div className={styles.anchor}>
+                        <StyledButton variant="contained"
+                            onClick={() => setIsExpirationMenuOpen(prev => !prev)}
+                            endIcon={<ArrowDropDownOutlined />}
+                            ref={expirationMenuButtonRef}
+                            sx={{
+                                borderRadius: '0px',
+                                backgroundColor: 'fff',
+                                justifyContent: 'space-between',
+                                width: '9rem',
+                                whiteSpace: 'nowrap',
+                            }}>{expirationDate}</StyledButton>
+                        {isExpirationMenuOpen && (
+                            <div className={styles.menu} ref={expirationMenuRef}>
+                                {expirationDates.map((date, index) => (
+                                    <Button component="div" variant="outlined" sx={menuItemExpirationDates} key={index} onClick={
+                                        () => handleUpdateDate(date)
+                                    }>{formatDate(date).toLocaleUpperCase()}</Button>
+                                    // <div className={styles.menuItemDates} key={index} onClick={() => handleUpdateDate(date)}>{formatDate(date).toLocaleUpperCase()}</div>
+                                ))}
+                            </div >
+                        )}
+                    </div>
                 </div>
                 <div className={styles.elementTwoItem}>
                     <p>Strike</p>
@@ -224,24 +263,16 @@ export default function Analytics() {
                                 minWidth: '7rem',
                                 whiteSpace: 'nowrap',
                             }}>{currentOptionOrder?.option?.strike}</StyledButton>
-                        {
-                            isStrikesMenuOpen && (
-                                <div className={styles.menu} ref={strikesMenuRef}>
-                                    {Array.isArray(strikes) && strikes.map((strike, index) => (
-                                        // <StyledButtonTwo variant="outlined" sx={menuButtonStyle} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</StyledButtonTwo>
-                                        <div style={{
-                                            paddingLeft: '1rem',
-                                            width: '7rem',
-                                            minHeight: '2rem',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'center',
-                                            alignItems: 'flex-start',
-                                            cursor: 'pointer',
-                                        }} key={index} onClick={() => handleUpdateStrike(strike)}>{strike}</div>
-                                    ))}
-                                </div >
-                            )}
+                        {isStrikesMenuOpen && (
+                            <div className={styles.menu} ref={strikesMenuRef}>
+                                {strikes.map((strike, index) => (
+                                    <Button component="div" variant="outlined" sx={menuItemStrikes} key={index} onClick={() => handleUpdateOrder(strike)}>{strike}</Button>
+                                    // <div className={styles.menuItemStrikes}  // style={{ backgroundColor: 'red' }}
+                                    //     key={index} onClick={() => handleUpdateOrder(strike)}>{strike}
+                                    // </div>
+                                ))}
+                            </div >
+                        )}
                     </div>
                 </div>
             </div>
