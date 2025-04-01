@@ -12,6 +12,7 @@ export default function Modal() {
     const {  modalView, setModalView } = useAppContext();
 
     const renderView = () => {
+        if (!modalView) return null;
         switch (modalView.toLowerCase()) {
             case 'account':
                 return <Account />;
