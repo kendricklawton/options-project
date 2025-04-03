@@ -108,6 +108,12 @@ export default function Analytics() {
     const expirationDate = determineOptionExpirationDate(currentOptionOrder?.option?.contractSymbol || '');
     console.log('expirationDate', expirationDate);
 
+    if(contractSymbol == '0') {
+        maxLoss = 0;
+        maxProfit = 0;
+        breakEvenPrice = 0;
+    }
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (strikesMenuRef.current && !strikesMenuRef.current.contains(event.target as Node)) {
