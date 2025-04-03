@@ -8,7 +8,7 @@ const restAPIService = async (endpoint: string, params?: object) => {
     const source = axios.CancelToken.source();
     const timeout = setTimeout(() => {
         source.cancel('Request Timed Out');
-    }, 8000);
+    }, 20000);
 
     try {
         const response = await axios.get(`${url}/${endpoint}`, {
@@ -16,11 +16,6 @@ const restAPIService = async (endpoint: string, params?: object) => {
             cancelToken: source.token,
         });
         clearTimeout(timeout);
-        if(endpoint === 'stock-data') {
-            console.log('Stock REST Data Received: ', response.data);
-        } else {
-            console.log('Indexes REST Data Received: ', response.data);
-        }
         return response.data;
     } catch (error) {
         clearTimeout(timeout);
