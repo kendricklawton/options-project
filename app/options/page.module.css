@@ -12,14 +12,24 @@
     min-width: fit-content;
 }
 
+.detailsLeadingColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .detailsLeading,
-.detailsTrailing {
+.detailsTrailing,
+.detailsLeadingTop,
+.detailsLeadingBottom {
     display: flex;
     align-items: center;
     flex-direction: row;
 }
 
-.detailsLeading {
+.detailsLeading,
+.detailsLeadingTop,
+.detailsLeadingBottom {
     gap: 0.5rem;
 }
 
@@ -115,7 +125,18 @@
     background-color: lightgray;
 }
 
+.nearInput {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0rem 1rem;
+    background-color: lightgray;
+    color: #0a0a0a;
+}
+
 .optionChainWrapper {
+    background-color: inherit;
     display: flex;
     flex-direction: row;
     height: 100%;
@@ -157,9 +178,8 @@
     flex-direction: row;
     width: 100%;
     min-height: 3rem;
-    background-color: #fff;
+    /* background-color: #fff; */
 }
-
 
 .tableHeaderCalls {
     right: 0;

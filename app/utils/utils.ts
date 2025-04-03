@@ -1,7 +1,6 @@
 import Papa, { ParseResult } from 'papaparse';
 import { OptionChainType } from '@/app/types/types';
 
-
 // Store the symbols from both CSV files
 let file1Symbols: Set<string> = new Set();
 let file2Symbols: Set<string> = new Set();
@@ -22,7 +21,6 @@ const holidays = [
     '2025-11-27', // Thanksgiving Day
     '2025-12-25', // Christmas Day
 ];
-
 
 // export const convertUnixTimestamp = (timestamp: number | undefined): string => {
 //     if (timestamp == null) return '';
@@ -66,6 +64,7 @@ export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     const dateOptions: Intl.DateTimeFormatOptions = {
         month: 'short', // Abbreviated month (e.g., "Apr")
         day: 'numeric', // Day of the month (e.g., "1")
+        year: 'numeric', // Full year (e.g., "2025")
         timeZone: 'America/New_York', // Eastern Time Zone
     };
     const formattedDate = dateObj.toLocaleDateString('en-US', dateOptions);
@@ -80,7 +79,7 @@ export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     const formattedTime = dateObj.toLocaleTimeString('en-US', timeOptions);
 
     // Combine the date and time
-    return `${formattedDate}, ${formattedTime} ET`;
+    return `Data as of ${formattedDate}, ${formattedTime} ET`;
 };
 
 export const convertUnixTimestampTwo = (timestamp: number | undefined): string => {
@@ -105,10 +104,11 @@ export const convertUnixTimestampTwo = (timestamp: number | undefined): string =
 
     return `${formattedTime}`;
 };
+
 export const formatDate = (date: string | undefined) => {
     if (date == null) return '';
     const dateObj = new Date(date + 'T00:00:00Z');
-    const currentYear = new Date().getFullYear();
+    // const currentYear = new Date().getFullYear();
 
     const options: Intl.DateTimeFormatOptions = {
         month: "short",
@@ -116,9 +116,9 @@ export const formatDate = (date: string | undefined) => {
         timeZone: "UTC"
     };
 
-    if (dateObj.getFullYear() !== currentYear) {
-        options.year = "2-digit";
-    }
+    // if (dateObj.getFullYear() !== currentYear) {
+    options.year = "2-digit";
+    // }
 
     return dateObj.toLocaleDateString("en-US", options);
 };
@@ -237,17 +237,16 @@ export const stockMarketOpen = (): boolean => {
     return true;
 };
 
-
 export const getFilteredOptionChain = (
     optionChain: OptionChainType | undefined,
     currentExpirationDate: string | undefined,
     displayStrikes: number,
-    nearPriceInputValue: number
+    regularMarketPrice: number
 ) => {
     // console.log('Option Chain:', optionChain);
     // console.log('Current Expiration Date:', currentExpirationDate);
     // console.log('Display Strikes:', displayStrikes);
-    // console.log('Near Price Input Value:', nearPriceInputValue);
+    // console.log('Near Price Input Value:', regularMarketPrice);
     if (!currentExpirationDate || !optionChain) {
         return null;
     }
@@ -266,7 +265,7 @@ export const getFilteredOptionChain = (
         };
     }
 
-    const nearPrice = nearPriceInputValue;
+    const nearPrice = regularMarketPrice;
     let closestIndex = currentOptionChain.strikes.findIndex((strike) => strike >= nearPrice);
 
     if (closestIndex === -1) {
@@ -299,7 +298,6 @@ export const getFilteredOptionChain = (
     return filteredOptionChain;
 };
 
-
 export const determineOptionType = (symbol: string): string => {
     // Traverse the symbol from right to left
     for (let i = symbol.length - 1; i >= 0; i--) {
@@ -327,14 +325,14 @@ export const determineOptionExpirationDate = (symbol: string): string => {
     // Find the first numeric sequence in the symbol
     const match = symbol.match(/\d+/);
     if (!match) {
-        return 'Invalid Symbol';
+        return 'N/A';
     }
 
     const numericPart = match[0];
 
     // Ensure the numeric part has at least 6 characters (YYMMDD format)
     if (numericPart.length < 6) {
-        return 'Invalid Symbol';
+        return 'N/A';
     }
 
     // Extract year, month, and day

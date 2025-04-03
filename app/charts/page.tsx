@@ -1,26 +1,14 @@
 'use client'
 
 import React from "react";
-import styles from "../page.module.css";
-import { useAppContext } from "../providers/AppProvider";
+import pageStyles from "../page.module.css";
 
 export default function Charts() {
-    const { currentStock } = useAppContext();
-
-    if (currentStock == null)
-        return (
-            <div className={styles.page}>
-                <div className={styles.pageHeader}>
-                    <h1>Charts</h1>
-                    <h2>Search for a symbol to view charts</h2>
-                </div>
-            </div>
-        );
-
     return (
-        <div className={styles.page}>
-            <div className={styles.pageHeader}>
-                <h1>Charts Development In Progress</h1>
+        <div className={pageStyles.page}>
+            <div className={pageStyles.wrapper}>
+                <h1>Charts</h1>
+                <h2>Development In Progress</h2>
             </div>
         </div>
     );

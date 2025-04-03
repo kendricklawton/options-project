@@ -90,7 +90,7 @@ export default function Alpha() {
                             </div>
                         </div>
                     </div>
-                ) 
+                )
             }
 
             <div className={styles.buttonWrapper}>

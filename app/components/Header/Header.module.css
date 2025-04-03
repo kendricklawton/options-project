@@ -3,11 +3,12 @@
     background-color: inherit;
     display: flex;
     flex-direction: column;
-    padding: 0 4svw;
+    padding: 0 2svw;
     position: sticky;
     top: 0;
     width: 100%;
     z-index: 9;
+    /* border-bottom: 0.5px solid gray; */
 }
 
 .headerScrolled {
@@ -15,8 +16,7 @@
 }
 
 .headerElement,
-.headerElementSmallDesktop,
-.headerElementScroll {
+.headerElementSmall {
     align-items: center;
     display: flex;
     flex-direction: row;
@@ -33,17 +33,13 @@
     min-height: 3rem;
 }
 
-.headerElementSmallDesktop,
-.headerElementSmallMobile {
+.headerElementSmall {
     min-height: 2rem;
 }
 
-.headerElementScroll {
-    overflow-x: auto;
-}
 
+.links,
 .stock,
-.stockList,
 .leading,
 .trailing {
     align-items: center;
@@ -56,6 +52,7 @@
     justify-content: space-between;
 }
 
+.links,
 .stock,
 .leading {
     gap: 0.5rem;
@@ -92,7 +89,7 @@
     flex-direction: column;
     padding: 0.5rem;
     z-index: 7;
-    /* width: 10rem; */
+    /* width: 7rem; */
 }
 
 .menu {
@@ -103,6 +100,7 @@
 
 .modeMenu {
     position: absolute;
+    /* right: 5rem; */
     right: 4.5rem;
     bottom: -0.525rem;
     /* top: -2.525rem; */
@@ -119,6 +117,7 @@
     white-space: nowrap;
 }
 
+
 .link {
     height: 2rem;
     padding: 0.5rem 0.5rem;
@@ -129,26 +128,13 @@
     background-color: lightgray;
 }
 
-@media screen and (max-width: 668px) {
-    .headerElementSmallDesktop {
-        display: none;
-    }
-
-    .headerElementSmallMobile {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        width: 100%;
-    }
-
-    .linkDesktop {
+@media screen and (max-width: 618px) {
+    .links {
         display: none;
     }
 }
 
 @media (prefers-color-scheme: dark) {
-
     .linkActive,
     .link:hover {
         background-color: #424242;
@@ -159,6 +145,4 @@
         border: 1px solid gray;
         background-color: #0a0a0a;
     }
-
-    
 }

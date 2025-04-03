@@ -45,9 +45,18 @@
     color: red
 }
 
+.expirationInput {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0rem 1rem;
+    background-color: lightgray;
+    color: #0a0a0a;
+}
+
 .anchor {
     position: relative;
-    background-color: aqua;
     z-index: 999;
 }
 
@@ -59,10 +68,26 @@
     height: 10rem;
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: absolute;
     z-index: 999;
     overflow-y: auto;
-    width: fit-content;
+    width: 100%;
+}
+
+.menuItem {
+    padding-left: 1rem;
+    width: "fit-content";
+    min-height: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.menuItem:hover {
+    background-color: lightgray;
 }
 
 

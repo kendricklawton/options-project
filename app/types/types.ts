@@ -2,26 +2,19 @@ import { User } from "firebase/auth";
 
 export interface AppContextType {
     currentExpirationDate?: string;
-    currentNearPrice?: number;
     currentOption?: OptionType;
     currentOptionOrder?: OptionOrderType;
     currentStock?: StockType;
-    indexesList: StockType[];
     modalView?: string;
     optionChain?: OptionChainType;
     expirationDates: string[];
-    totalStrikesToDisplay: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40;
     clearStockData: () => void;
-    fetchIndexesData: () => Promise<void>;
     fetchStockData: (symbol: string ) => Promise<void>;
     setCurrentExpirationDate: (expirationDate: string) => void;
     setCurrentNearPrice: (price: number) => void;
     setCurrentOption: (option: OptionType) => void;
     setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
     setModalView: (view: string) => void;
-    updateOptionOrderByQuantity: (quantity: number, optionOrder: OptionOrderType ) => void;
-    updateOptionOrderByStrike: (strike: number, optionOrder: OptionOrderType, optionType: 'Call' | 'Put') => void;
-    setTotalStrikesToDisplay: (totalStrikesToDisplay: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => void;
 }
 
 export interface AuthContextType {
@@ -74,11 +67,6 @@ export interface OptionOrderType {
     option?: OptionType;
     quantity?: number;
 }
-
-// export interface YFinanceResponse {
-//     stock: StockType;
-//     optionChain: OptionChainType;
-// };
 
 export interface StockType {
     ask?: number;

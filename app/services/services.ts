@@ -45,7 +45,7 @@ export const indexesDataWebSocket = () => {
     const onEvent = (callback: (data: Record<string, unknown>) => void) => {
         socket.on('data', (data) => {
             callback(data);
-            console.log('Indexes WebSocket Data received: ', data);
+  
         });
     };
 

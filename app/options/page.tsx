@@ -6,7 +6,10 @@ import styles from './page.module.css';
 import { IconButton } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '@/app/providers/AppProvider';
-import { StyledButton, StyledButtonTwo, StyledIconButton, StyledTextField } from '@/app/components/Styled';
+import { StyledButton, StyledIconButton, 
+  // StyledTextField, 
+
+} from '@/app/components/Styled';
 import {
   calculateDaysRemaining, convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus,
   getFilteredOptionChain,
@@ -25,44 +28,42 @@ const styledButtonStyles = {
 };
 
 export default function Home() {
+  // App context
   const {
     currentStock,
     currentExpirationDate,
     optionChain,
     expirationDates,
-    currentNearPrice,
     setCurrentOption,
     setCurrentOptionOrder,
     setCurrentExpirationDate,
     setModalView,
   } = useAppContext();
 
+  // Auth context
   const {
     handleSetInfo,
   } = useAuthContext();
 
+  // State variables
   const [displayStrikes, setDisplayStrikes] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
-  const [nearPriceInputValue, setNearInputValue] = useState<number>(0);
+  // const [nearInputValue, setNearInputValue] = useState<string>('');
   const [isStrikesMenuOpen, setIsStrikesMenuOpen] = useState(false);
   const [isStrikesMobileMenuOpen, setIsStrikesMobileMenuOpen] = useState(false);
   const [isCallTableOpen, setIsCallTableOpen] = useState(true);
   const [isPutTableOpen, setIsPutTableOpen] = useState(true);
   const [isBottomElementOpen, setIsBottomElementOpen] = useState(true);
 
+  // Refs for DOM elements
   const strikesMenuRef = useRef<HTMLDivElement>(null);
-  const strikesMenuButtonRef = useRef<HTMLButtonElement>(null);
   const strikesMobileMenuRef = useRef<HTMLDivElement>(null);
+  const strikesMenuButtonRef = useRef<HTMLButtonElement>(null);
   const strikesMobileMenuButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Refs for the three scrollable elements
   const callTableRef = useRef<HTMLDivElement>(null);
   const strikeTableRef = useRef<HTMLDivElement>(null);
   const putTableRef = useRef<HTMLDivElement>(null);
 
-  // const handleAddToWatchList = () => {
-  //   console.log('Add to watch list');
-  // };
-
+  // Function to handle the display of option analytics
   const handleDisplayOptionAnalytics = (option: OptionType, action?: 'Buy' | 'Sell',) => {
     setCurrentOptionOrder({
       action: action || 'Buy',
@@ -109,12 +110,11 @@ export default function Home() {
   }
 
   // Function to set the total strikes to display
-  const handleSetTotalStrikesToDisplay = async (value: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => {
+  const handleSetTotalStrikesToDisplay = (value: 1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40) => {
     setDisplayStrikes(value);
     setIsStrikesMenuOpen(false);
     setIsStrikesMobileMenuOpen(false);
   };
-
 
   // Function to sync the scroll position of multiple elements
   const syncScroll = (source: HTMLElement, targets: HTMLElement[]) => {
@@ -125,6 +125,7 @@ export default function Home() {
     });
   };
 
+  // Function to format the plus/minus sign
   const ElementsHeaderTh = () => {
     return (
       <div className={styles.elementsHeaderTh}>
@@ -165,9 +166,14 @@ export default function Home() {
   }, [optionChain, isCallTableOpen, isPutTableOpen, callTableRef, strikeTableRef, putTableRef]);
 
   // useEffect to set the near price input value
-  useEffect(() => {
-    setNearInputValue(currentNearPrice ?? 0);
-  }, [currentNearPrice]);
+  // useEffect(() => {
+  //   if (currentStock) {
+  //     const nearValue = currentStock?.regularMarketPrice;
+  //     if (nearValue) {
+  //       setNearInputValue(nearValue.toFixed(2));
+  //     }
+  //   }
+  // }, [currentStock]);
 
   // useEffect to close the strikes menu when clicking outside
   useEffect(() => {
@@ -191,17 +197,18 @@ export default function Home() {
     };
   }, []);
 
+  const regularMarketPrice = currentStock?.regularMarketPrice || 0;
   const filteredOptionChain = getFilteredOptionChain(
     optionChain,
     currentExpirationDate,
     displayStrikes,
-    nearPriceInputValue
+    regularMarketPrice,
   );
 
-  if (!filteredOptionChain) {
+  if (!currentStock) {
     return (
       <div className={pageStyles.page}>
-        <div className={pageStyles.pageHeader}>
+        <div className={pageStyles.wrapper}>
           <h1>Options</h1>
           <h2>Search for a stock symbol to view options</h2>
         </div>
@@ -214,26 +221,14 @@ export default function Home() {
       {/* Details Element */}
       {
         (currentStock != null) && (
-          <div className={styles.details}>
-            <div className={styles.detailsLeading}>
-              <p>{currentStock?.symbol?.toLocaleUpperCase()}</p>
-              <p>|</p>
-              <p>{currentStock?.shortName?.toLocaleUpperCase()}</p>
-              {/* <StyledIconButton onClick={handleAddToWatchList} size='small'>
-                <PlaylistAdd />
-              </StyledIconButton> */}
-            </div>
-            <p>{convertUnixTimestamp(currentStock?.regularMarketTime)}</p>
-          </div >
-        )
-      }
-
-      {/* Details Element */}
-      {
-        (currentStock != null) && (
           // (filteredOptionChain != null && currentStock != null) && (
           <div className={styles.details}>
-            <div className={styles.detailsLeading}>
+            <div className={styles.detailsLeadingColumn}>
+              <div className={styles.detailsLeadingTop}>
+              <p>{currentStock.symbol?.startsWith('^') ? currentStock.symbol.slice(1).toLocaleUpperCase() : currentStock.symbol?.toLocaleUpperCase() ?? ''}</p>
+              <p>|</p>
+              <p>{currentStock?.shortName}</p>
+
               <p className={currentStock?.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
                 ? currentStock.regularMarketChangePercent > 0
                   ? styles.positive
@@ -253,6 +248,10 @@ export default function Home() {
                   : styles.negative
                 : ''
               }>({formatPlusMinus(currentStock?.regularMarketChangePercent)}%)</p>
+              </div>
+              <div className={styles.detailsLeadingBottom}>
+                  <p>{convertUnixTimestamp(currentStock?.regularMarketTime)}</p>
+              </div>
             </div>
             <div className={styles.detailsTrailing}>
               <StyledIconButton onClick={handleSetIsBottomElementOpen} size='small'>
@@ -266,13 +265,11 @@ export default function Home() {
             </div>
           </div >
         )
-        // )
       }
 
       {/* Details Extended Element */}
       {
-        // (filteredOptionChain != null && currentStock != null) && (
-        (isBottomElementOpen && currentStock) && (
+        (currentStock && isBottomElementOpen) && (
           <div className={styles.detailsExt}>
             <div className={styles.elementThTwo}>
               <p>Open</p>
@@ -288,7 +285,11 @@ export default function Home() {
             </div>
             <div className={styles.elementThTwo}>
               <p>Market Cap</p>
-              <p>{formatMarketCap(currentStock.marketCap)}</p>
+              <p>{
+                currentStock.marketCap != null && currentStock.marketCap != 0
+                  ?
+                  formatMarketCap(currentStock.marketCap) : '--'
+              }</p>
             </div>
             <div className={styles.elementThTwo}>
               <p>P/E Ratio</p>
@@ -324,12 +325,22 @@ export default function Home() {
             </div>
           </div>
         )
-        // )
+      }
+
+      {/* Indexes Element */}
+      {
+        (currentStock?.symbol?.startsWith('^')) && (
+          <div className={styles.details}>
+            <div className={styles.detailsLeading}>
+              <p>{currentStock.symbol?.startsWith('^') ? currentStock.symbol.slice(1) : currentStock.symbol ?? ''} Does Not Offer Options</p>
+            </div>
+          </div >
+        )
       }
 
       {/* Controls Element */}
       {
-        (currentStock != null) && (
+        (filteredOptionChain != null) && (
           <div className={styles.controls}>
             <div className={styles.controlsElement}>
               <p>Strategies</p>
@@ -354,7 +365,7 @@ export default function Home() {
                 {
                   isStrikesMenuOpen && (
                     <div className={styles.menu} ref={strikesMenuRef}>
-                      {/* <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</div>
+                      <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</div>
@@ -362,8 +373,8 @@ export default function Home() {
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</div>
-                      <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div> */}
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
+                      <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div>
+                      {/* <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
                       <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
                       <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
                       <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
@@ -371,22 +382,28 @@ export default function Home() {
                       <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
                       <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
                       <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo>
+                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo> */}
                     </div >
                   )}
               </div>
             </div>
             <div className={styles.controlsElementTwo}>
               <p>Near</p>
+              <div className={styles.nearInput}>{
+                currentStock?.regularMarketPrice?.toFixed(2)
+              }</div>
+              {/* <p>Near</p>
               <StyledTextField
                 id="nearPriceDesktop"
+                disabled={true}
                 variant="outlined"
-                value={nearPriceInputValue}
-                onChange={(event) => setNearInputValue(Number(event.target.value))}
+                // type='number'
+                value={nearInputValue}
+                // onChange={(event) => setNearInputValue(Number(event.target.value))}
                 sx={{
-                  width: '5rem',
+                  // width: '8.0rem',
                 }}
-                autoComplete="off"></StyledTextField>
+                autoComplete="off"></StyledTextField> */}
             </div>
           </div>
         )
@@ -394,7 +411,7 @@ export default function Home() {
 
       {/* Controls Mobile Element */}
       {
-        (currentStock != null) && (
+        (filteredOptionChain != null) && (
           <div className={styles.controlsMobile}>
             <div className={styles.controlsElement}>
               <p>Strikes</p>
@@ -428,15 +445,20 @@ export default function Home() {
             </div>
             <div className={styles.controlsElement}>
               <p>Near</p>
-              <StyledTextField
-                type='number'
+              <div className={styles.nearInput}>{
+                currentStock?.regularMarketPrice?.toFixed(2)
+                }</div>
+              {/* <StyledTextField
                 id="nearPriceMobile"
                 variant="outlined"
-                value={nearPriceInputValue}
-                onChange={(event) => setNearInputValue(Number(event.target.value))}
-                sx={{ width: '5rem' }}
+                value={nearInputValue}
+                onChange={(event) => handleSetNearInputValue(Number(event.target.value))}
+                sx={{ 
+                  // width: '5rem' 
+                  width: '100%',
+                }}
                 autoComplete="off">
-              </StyledTextField>
+              </StyledTextField> */}
             </div>
           </div>
         )
@@ -444,27 +466,26 @@ export default function Home() {
 
       {/* Dates Element */}
       {
-        // (filteredOptionChain != null && currentStock != null) && (
-        <div className={styles.dates}>
-          {expirationDates.map((date: string, index) => (
-            <div className={styles.date} key={index} onClick={
-              () => changeExpirationDate(date)
-            }>{
-                date == currentExpirationDate
-                  ? <CheckOutlined style={{
-                    color: 'gray'
-                  }} />
-                  : null
-              }{formatDate(date)}</div>
-          ))}
-        </div>
-        // )
+        (filteredOptionChain != null) && (
+          <div className={styles.dates}>
+            {expirationDates.map((date: string, index) => (
+              <div className={styles.date} key={index} onClick={
+                () => changeExpirationDate(date)
+              }>{
+                  date == currentExpirationDate
+                    ? <CheckOutlined style={{
+                      color: 'gray'
+                    }} />
+                    : null
+                }{formatDate(date)}</div>
+            ))}
+          </div>
+        )
       }
 
       {/* Option Chain Element */}
       {
-
-        optionChain != null && (
+        (filteredOptionChain != null) && (
           <div className={styles.optionChainWrapper}>
             {/* Calls Table */}
             {isCallTableOpen && (
@@ -493,8 +514,8 @@ export default function Home() {
                 <ElementsHeaderTh />
                 {(filteredOptionChain?.calls ?? []).map((data: OptionType, index: React.Key | null | undefined) => (
                   <div key={index} className={
-                    (data?.strike && currentNearPrice) &&
-                      data?.strike < currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
+                    (data?.strike && currentStock?.regularMarketPrice ) &&
+                      data?.strike < currentStock.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
                   } onClick={() => handleDisplayOptionAnalytics(data)}>
                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p
@@ -520,12 +541,10 @@ export default function Home() {
                 <p>Strikes</p>
               </div>
 
-
               <div className={styles.elementsHeaderThStrikes}>
                 <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)}</p><p>({calculateDaysRemaining(currentExpirationDate)} days)</p></div>
               </div>
-
-
+ 
               {filteredOptionChain?.strikes && filteredOptionChain.strikes.map((data: number, index: React.Key | null | undefined) => (
                 <div key={index} className={styles.elementsHeaderTdStrikes}>
                   <div className={styles.elementTdStrikes}><p>{data.toString()}</p></div>
@@ -560,8 +579,8 @@ export default function Home() {
                 <ElementsHeaderTh />
                 {(filteredOptionChain?.puts ?? []).map((data: OptionType, index: React.Key | null | undefined) => (
                   <div key={index} className={
-                    (data?.strike && currentNearPrice) &&
-                      data?.strike > currentNearPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
+                    (data?.strike && currentStock?.regularMarketPrice) &&
+                      data?.strike > currentStock.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
                   } onClick={() => handleDisplayOptionAnalytics(data)}>
                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p

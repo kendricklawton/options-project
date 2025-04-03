@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
     // AccountTreeOutlined,
+    CloseOutlined,
     CropOutlined,
     Menu,
     // RefreshOutlined, 
@@ -10,7 +11,7 @@ import {
     // StackedBarChartOutlined
 } from '@mui/icons-material';
 import {
-    // CircularProgress,
+    CircularProgress,
     InputAdornment
 } from '@mui/material';
 import {
@@ -18,15 +19,16 @@ import {
     useRouter
 } from 'next/navigation';
 import { useAppContext } from '@/app/providers/AppProvider';
-// import { useAuthContext } from '@/app/providers/AuthProvider';
+import { useAuthContext } from '@/app/providers/AuthProvider';
 import styles from "./Header.module.css";
 import Link from 'next/link';
 import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
-import { formatPlusMinus } from '@/app/utils/utils';
 
 export default function Header() {
-    const { currentStock, indexesList, fetchStockData } = useAppContext();
-    // const { isLoading, logIn, logOut } = useAuthContext();
+    const { currentStock, fetchStockData } = useAppContext();
+    const { isLoading,
+        // logIn, logOut
+    } = useAuthContext();
 
     const [inputValue, setInputValue] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,10 +48,6 @@ export default function Header() {
     //     setIsMenuOpen(false);
     // };
 
-    const isNumPositive = (num: number) => {
-        return num > 0;
-    };
-
     const handleDeviceMenuOpen = () => {
         setIsDeviceMenuOpen(true);
     };
@@ -64,7 +62,14 @@ export default function Header() {
 
     const handleFetchStockData = async () => {
         if (inputValue.length === 0) return;
-        // if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) return;
+        if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) {
+            if (pathname === '/') {
+                router.push('/options');
+            } else {
+                return;
+            }
+        }
+
         try {
             console.log('inputValue', inputValue);
             await fetchStockData(inputValue);
@@ -77,47 +82,10 @@ export default function Header() {
         }
     };
 
-    const handleFetchStockDataIndex = async (symbol: string) => {
-        try {
-            await fetchStockData(symbol);
-            if (pathname === '/') {
-                router.push('/options');
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     const handleOnChange = (value: string) => {
         value = value.toUpperCase();
         setInputValue(value);
     };
-
-    // const handleRefreshStockData = async () => {
-    //     if (currentStock?.symbol == null) return;
-    //     const symbol = currentStock.symbol;
-    //     try {
-    //         await fetchStockData(symbol);
-    //         await fetchIndexesData();
-
-    //     }
-    //     catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
-    // const handleLogIn = () => {
-    //     router.push('/login');
-    // };
-
-    // const handleLogOut = async () => {
-    //     try {
-    //         await logOut();
-    //         setIsMenuOpen(false);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -154,64 +122,10 @@ export default function Header() {
 
     return (
         <header className={headerScrolled ? styles.headerScrolling : styles.header}>
-            {/* Top Element Desktop */}
-            <div className={styles.headerElementSmallDesktop}>
-                <div className={styles.stockList}>
-                    {
-                        indexesList.map((data, index) => (
-
-                            <div className={styles.stock} key={index} onClick={() => handleFetchStockDataIndex(
-                                data?.symbol ? data?.symbol : ''
-                            )}>
-                                {
-                                    (data.symbol && data.regularMarketPrice && data.regularMarketChangePercent) &&
-                                    <>
-                                        <p className={styles.symbol}>{data.symbol}</p>
-                                        <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                            {data.regularMarketPrice ? data.regularMarketPrice.toFixed(2) : ''}</p>
-                                        {
-                                            data.regularMarketPrice && (
-                                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                                    {`${formatPlusMinus(data.regularMarketChange)}`}
-                                                </p>
-                                            )
-                                        }
-                                        {
-                                            data.regularMarketPrice && (
-                                                <p className={isNumPositive(data.regularMarketChangePercent ? data.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                                                    {`(${formatPlusMinus(data.regularMarketChangePercent)}%)`}
-                                                </p>
-                                            )}
-                                    </>
-
-                                }
-                            </div>
-                        ))
-                    }
-                </div>
-            </div>
-
-            {/* Top Element Mobile */}
-            <div className={styles.headerElementSmallMobile}>
-                <div className={styles.stock} onClick={() => handleFetchStockDataIndex(indexesList[2]?.symbol ? indexesList[2]?.symbol : '')}>
-                    <p>{indexesList[2]?.symbol}</p>
-                    <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                        {indexesList[2]?.regularMarketPrice && indexesList[2].regularMarketPrice.toFixed(2)}
-                    </p>
-                    <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                        {(indexesList[2]?.regularMarketChange && formatPlusMinus(indexesList[2]?.regularMarketChange))}
-                    </p>
-                    <p className={isNumPositive(indexesList[2]?.regularMarketChangePercent ? indexesList[2]?.regularMarketChangePercent : 0) ? styles.positive : styles.negative} >
-                        {indexesList[2]?.regularMarketChangePercent && `(${formatPlusMinus(indexesList[2].regularMarketChangePercent)}%)`}
-                    </p>
-                </div>
-            </div>
-
-            {/* Bottom Element */}
+            {/* Main Element */}
             <div className={styles.headerElement}>
                 <div className={styles.leading}>
-                    <Link href={'/'}
-                    >OPTIONS PROJECT</Link>
+                    <Link className={styles.linkDesktop} href={'/'}>Options Project</Link>
                     <StyledTextField
                         sx={{ maxWidth: '7.6rem' }}
                         onChange={(e) => handleOnChange(e.target.value)}
@@ -236,38 +150,44 @@ export default function Header() {
                             }
                         }}>
                     </StyledTextField>
-                    <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />Options</Link>
-                    {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link>
-                    <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
+                    <div className={styles.links}>
+                        {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link> */}
+                        <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />Options</Link>
+                        {/* <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
+                    </div>
                 </div>
                 <div className={styles.trailing}>
-                    {/* <StyledIconButton ref={refreshButtonRef}
-                        size='small'
-                        onClick={handleRefreshStockData}>
-                        {
-                            isLoading
-                                ?
-                                <CircularProgress size={24} />
-                                :
-                        <RefreshOutlined />
-                        }
-                    </StyledIconButton> */}
+                    {
+                        isLoading && (
+                            <StyledIconButton size='small' disabled>
+                                <CircularProgress size={20} />
+                            </StyledIconButton>
+                        )
+                    }
                     <div className={styles.anchor}>
                         <StyledIconButton ref={menuButtonRef}
                             size='small'
                             onClick={handleMenuToggle}>
-                            <Menu />
+                            {
+                                isMenuOpen
+                                    ? (
+                                        <CloseOutlined />
+                                    ) :
+                                    (
+                                        <Menu />
+                                    )
+                            }
                         </StyledIconButton>
                         {
                             isMenuOpen && (
                                 <div className={styles.menu} ref={menuRef} onMouseEnter={handleDeviceMenuClose}>
+                                    {/* <Link className={styles.link} href={'/charts'} onMouseEnter={handleDeviceMenuClose}>
+                                        Charts
+                                    </Link> */}
                                     <Link className={styles.link} href={'/options'} onMouseEnter={handleDeviceMenuClose}>
                                         Options
                                     </Link>
-                                    {/* <Link className={styles.link} href={'/charts'} onMouseEnter={handleDeviceMenuClose}>
-                                        Charts
-                                    </Link>
-                                    <Link className={styles.link} href={'/projects'} onMouseEnter={handleDeviceMenuClose}>
+                                    {/* <Link className={styles.link} href={'/projects'} onMouseEnter={handleDeviceMenuClose}>
                                         Projects
                                     </Link> */}
                                     <div className={styles.anchor}>
