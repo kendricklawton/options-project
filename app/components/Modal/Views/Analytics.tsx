@@ -66,6 +66,8 @@ export default function Analytics() {
                 option: updatedOption,
             });
         }
+
+        setIsStrikesMenuOpen(false);
     };
     const handleUpdateQuantity = (quantity: number) => {
         setCurrentOptionOrder({
