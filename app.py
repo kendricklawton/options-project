@@ -1,7 +1,9 @@
 import gevent
 import gevent.monkey
 
+
 gevent.monkey.patch_all()
+
 
 import logging
 import os
@@ -13,25 +15,32 @@ import traceback
 import yfinance as yf
 from cachetools import TTLCache, cached
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 
+
 # Initialize Flask application
 app = Flask(__name__)
 
+
 # Load environment variables
 load_dotenv()
+
 
 # Environment variables
 site_url_one = os.getenv("SITE_URL_ONE")
 site_url_two = os.getenv("SITE_URL_TWO")
 site_url_three = os.getenv("SITE_URL_THREE")
 
-# Enable CORS for all origins
-CORS(app, origins=[site_url_one, site_url_two, site_url_three])
+
+# Enable CORS
+CORS(
+    app, origins=[site_url_one, site_url_two, site_url_three], supports_credentials=True
+)
+
 
 # Initialize SocketIO with gevent async_mode
 socketio = SocketIO(
@@ -39,6 +48,7 @@ socketio = SocketIO(
     cors_allowed_origins=[site_url_one, site_url_two, site_url_three],
     async_mode="gevent",
 )
+
 
 # Use a dictionary to store the symbol for each sid
 user_tasks = defaultdict(dict)
@@ -48,12 +58,14 @@ logging.basicConfig(
     level=logging.INFO,  # Set the logging level
     format="%(asctime)s - %(levelname)s - %(message)s",  # Log format with timestamps
     handlers=[
-        logging.StreamHandler(sys.stdout),  # Log to stdout for Cloud Run
+        logging.StreamHandler(sys.stdout)  # Log to stdout for Cloud Run
     ],
 )
 
+
 # Cache setup: TTLCache with a time-to-live (TTL) of 60 seconds for stock and index data
-cache = TTLCache(maxsize=100, ttl=60)
+cache = TTLCache(maxsize=100, ttl=15)
+
 
 # Stock market holidays for 2025
 MARKET_HOLIDAYS = [
@@ -64,13 +76,43 @@ MARKET_HOLIDAYS = [
 ]
 
 
-# return market_open <= now <= market_close
+# Get the current eastern timezone
+eastern = pytz.timezone("America/New_York")
+
+
+# Function to check if the market is open
 def is_market_open():
-    return False  # Always return True for testing
+    """Returns True if the market is open, otherwise False."""
+    now_et = (
+        datetime.now(pytz.utc).astimezone(eastern).time()
+    )  # Convert to Eastern Time
+    market_open_time = datetime.strptime("09:30", "%H:%M").time()  # 9:30 AM ET
+    market_close_time = datetime.strptime("16:00", "%H:%M").time()  # 4:00 PM ET
+    return market_open_time <= now_et < market_close_time
 
 
+# Function to check if today is a market holiday
+def time_until_market_open():
+    """Returns the time (in seconds) until the market opens, accounting for timezone differences."""
+    now_utc = datetime.now(pytz.utc)  # Get current time in UTC
+    now_et = now_utc.astimezone(eastern)  # Convert to Eastern Time
+
+    # Define today's market open time in ET
+    market_open_time = eastern.localize(
+        datetime(now_et.year, now_et.month, now_et.day, 9, 30)
+    )
+
+    # If it's already past market open today, set to next day's open time
+    if now_et.time() >= market_open_time.time():
+        market_open_time += timedelta(days=1)
+
+    return (market_open_time - now_et).total_seconds()
+
+
+# Function to check if today is a market holiday
 def close_market_tasks():
-    # Clear all subscriptions for indexes and stock
+    """Clears all market tasks and subscriptions."""
+    logging.info("Clearing all market tasks...")
     user_tasks["indexes"].clear()  # Clear all index subscriptions
     user_tasks["stock"].clear()  # Clear all stock subscriptions
     logging.info("All market tasks have been cleared.")
@@ -79,9 +121,14 @@ def close_market_tasks():
 # Caching the retrieval of stock data
 @cached(cache)
 def get_stock_data(symbol):
+    """Fetch stock data and option chain for the given symbol."""
     try:
         stock = yf.Ticker(symbol.strip().lower())
-        stock_info = stock.info
+        info = stock.info
+
+        if symbol.startswith("^"):
+            return info, {}
+
         dates = list(stock.options)
         option_chain = {}
 
@@ -128,113 +175,69 @@ def get_stock_data(symbol):
                     "puts": puts.to_dict(orient="records"),
                 }
 
-        return stock_info, option_chain
+        return info, option_chain
     except Exception as e:
         logging.error(
-            f"Error fetching stock data for {symbol}: {e}. Function: get_stock_data"
+            f"Error getting stock data for {symbol}: {e}. Function: get_stock_data"
         )
 
 
-# Caching the retrieval of index data
-@cached(cache)
-def get_index_data(symbol):
-    try:
-        index = yf.Ticker(symbol.strip().lower())
-        return index.info
-    except Exception as e:
-        logging.error(
-            f"Error fetching index data for {symbol}: {e}. Function: get_index_data"
-        )
-        return {"error": f"Failed to fetch data for {symbol}"}
-
-
-def broadcast_indexes_data():
-    try:
-        while True:
-            if is_market_open():
-                logging.info("Broadcasting index data...")
-                # Fetch index data
-                data = {
-                    "QQQ": get_index_data("QQQ"),
-                    "SPY": get_index_data("SPY"),
-                    "DIA": get_index_data("DIA"),
-                }
-                # Send data to all subscribed clients
-                for sid in list(
-                    user_tasks["indexes"]
-                ):  # Use list() to avoid runtime errors if modified
-                    try:
-                        logging.debug(f"Broadcasting data to {sid}")
-                        logging.debug(f"Data: {data}")
-
-                        # Send data to the subscribed client
-                        socketio.emit("data", data, to=sid, namespace="/indexes")
-                    except Exception as e:
-                        logging.error(
-                            f"Error broadcasting data to {sid}: {e}. Function: broadcast_indexes_data"
-                        )
-                        user_tasks["indexes"].discard(sid)  # Remove disconnected client
-            else:
-                logging.info(
-                    "Market is closed. Stopping index broadcasting. Waiting 60 seconds before checking again..."
-                )
-                # Wait until the market opens
-                while not is_market_open():
-                    gevent.sleep(60)  # Check every 60 seconds
-                    logging.info(
-                        "Waiting for market to open to broadcast index data..."
-                    )
-                logging.info("Market is open. Resuming index broadcasting...")
-            gevent.sleep(15)  # Wait for 15 seconds before the next iteration
-    except Exception as e:
-        logging.error(f"Error in broadcast_indexes_data: {str(e)}")
-
-
+# Function to broadcast stock data to all connected clients
 def broadcast_stock_data():
+    """Broadcast stock data to all connected clients."""
+    logging.info("Starting stock data broadcasting...")
     try:
         while True:
             if is_market_open():
-                logging.info("Broadcasting stock data...")
+
+                # Send data to all subscribed clients
                 for sid, symbol in user_tasks[
                     "stock"
                 ].items():  # Iterate over the dictionary
-                    stock_info, option_chain = get_stock_data(symbol)
+                    try:
+                        info, option_chain = get_stock_data(symbol)
+                        logging.info(f"Broadcasting stock data to {sid}")
+                        # logging.info(f"Data: {stock_info}")
 
-                    logging.debug(f"Broadcasting data to {sid}")
-                    logging.debug(f"Data: {stock_info}")
-
-                    # Send data to the subscribed client
-                    socketio.emit(
-                        "data",
-                        {"info": stock_info, "option_chain": option_chain},
-                        to=sid,
-                        namespace="/stock",
-                    )
+                        # Send data to the subscribed client
+                        socketio.emit(
+                            "data",
+                            {"info": info, "option_chain": option_chain},
+                            to=sid,
+                            namespace="/stock",
+                        )
+                    except Exception as e:
+                        logging.error(
+                            f"Error broadcasting data to {sid}: {e}. Function: broadcast_stock_data"
+                        )
+                        user_tasks["stock"].pop(sid, None)  # Remove disconnected client
 
             else:
-                logging.info(
-                    "Market is closed. Stopping stock broadcasting. Waiting 60 seconds before checking again..."
-                )
+                logging.info("Market is closed. Stopping stock broadcasting...")
                 # Wait until the market opens
                 while not is_market_open():
-                    gevent.sleep(60)  # Check every 60 seconds
+                    time_until_open = time_until_market_open()
+                    minutes_until_open = int(time_until_open // 60)
+                    seconds_until_open = int(time_until_open % 60)
                     logging.info(
-                        "Waiting for market to open to broadcast stock data..."
+                        f"Market is closed. It will reopen in {minutes_until_open} minutes and {seconds_until_open} seconds."
                     )
+                    gevent.sleep(time_until_open)
                 logging.info("Market is open. Resuming stock broadcasting...")
-            gevent.sleep(15)  # Wait for 15 seconds before the next iteration
+            gevent.sleep(15)  # Wait for 60 seconds before the next iteration
     except Exception as e:
         logging.error(f"Error in broadcast_stock_data: {str(e)}")
 
 
 # Start shared threads
-gevent.spawn(broadcast_indexes_data)
 gevent.spawn(broadcast_stock_data)
 
 
 # Middleware to check the Origin header
 @app.before_request
 def before_request():
+    """Check the Origin header for CORS."""
+    # Get the Origin header from the request
     origin = request.headers.get("Origin")
     logging.info(f"Origin: {origin}")
     # Check if the Origin header is present and matches the allowed origins
@@ -246,68 +249,36 @@ def before_request():
 # Route for home
 @app.route("/", methods=["GET"])
 def home():
+    """Home route."""
     return "Options Project"
-
-# Route for Indexes Data
-@app.route("/indexes-data", methods=["GET"])
-def fetch_indexes_list_data():
-    try:
-        data = {
-            "QQQ": get_index_data("QQQ"),
-            "SPY": get_index_data("SPY"),
-            "DIA": get_index_data("DIA"),
-        }
-        return jsonify(data)
-    except Exception as e:
-        logging.error(f"Error fetching index data: {str(e)}")
-        return jsonify({"error": str(e)}), 500
 
 
 # Route for Stock Data
 @app.route("/stock-data", methods=["GET"])
 def fetch_stock_data():
+    """Fetch stock data for a given symbol."""
     symbol = request.args.get("symbol")
     if not symbol:
         return jsonify({"error": "Symbol is required"}), 400
     try:
-        stock_info, option_chain = get_stock_data(symbol)
-        if not stock_info or not option_chain:
-            logging.error(
-                f"Failed to fetch stock data for {symbol}. Function: fetch_stock_data"
-            )
-            return jsonify({"error": "Failed to fetch stock data"}), 500
-        return jsonify({"info": stock_info, "option_chain": option_chain})
+        # Fetch stock data and option chain
+        if symbol.startswith("^"):
+            info = get_stock_data(symbol)
+            option_chain = {}
+        else:
+            info, option_chain = get_stock_data(symbol)
+        return jsonify({"info": info, "option_chain": option_chain})
     except Exception as e:
-        logging.error(f"Error fetching stock data: {str(e)}")
+        logging.error(
+            f"Error fetching stock data for {symbol}: {e}. Function: fetch_stock_data"
+        )
         return jsonify({"error": str(e)}), 500
-
-
-# WebSocket Index Data Subscription
-@socketio.on("subscribe", namespace="/indexes")
-def indexes_subscribe():
-    try:
-        sid = request.sid
-        # Add the client to the set of subscribers for indexes
-        user_tasks["indexes"].add(sid)
-        emit(
-            "message",
-            {"message": "Subscribed to indexes namespace"},
-            to=sid,
-            namespace="/indexes",
-        )
-    except Exception as e:
-        logging.error(f"Error in indexes subscribe: {str(e)}")
-        emit(
-            "error",
-            {"error": f"Error in subscribe: {str(e)}"},
-            to=sid,
-            namespace="/indexes",
-        )
 
 
 # WebSocket Stock Data Subscription
 @socketio.on("subscribe", namespace="/stock")
 def stock_subscribe(data):
+    """Handle subscription to stock data."""
     try:
         sid = request.sid
         symbol = data.get("symbol")
@@ -338,27 +309,18 @@ def stock_subscribe(data):
         )
 
 
-# WebSocket Index Data Unsubscription
-@socketio.on("unsubscribe", namespace="/indexes")
-def indexes_unsubscribe():
-    sid = request.sid
-    user_tasks["indexes"].discard(sid)
-    logging.info(f"Client {sid} unsubscribed from indexes namespace")
-
-
 # WebSocket Stock Data Unsubscription
 @socketio.on("unsubscribe", namespace="/stock")
 def stock_unsubscribe():
+    """Handle unsubscription from stock data."""
     sid = request.sid
     if sid in user_tasks["stock"]:
         del user_tasks["stock"][sid]  # Remove the subscription for the client
     logging.info(f"Client {sid} unsubscribed from stock namespace")
 
 
-import signal
-
-
 def handle_shutdown(signal_number, frame):
+    """Handle shutdown signal."""
     logging.info(f"Received shutdown signal: {signal_number}")
     logging.info("Stack trace at the time of shutdown:")
     # Log the stack trace for debugging purposes
@@ -372,6 +334,7 @@ def handle_shutdown(signal_number, frame):
 
 signal.signal(signal.SIGINT, handle_shutdown)
 signal.signal(signal.SIGTERM, handle_shutdown)
+
 
 if __name__ == "__main__":
     socketio.run(

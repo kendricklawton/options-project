@@ -47,4 +47,6 @@ ENV PATH="/app/venv/bin:$PATH"
 # HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl --fail http://localhost:8080/health || exit 1
 
 # Run the application with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+# Use gevent worker class for better performance
+CMD ["gunicorn", "--worker-class", "gevent", "--bind", "0.0.0.0:8080", "app:app"]

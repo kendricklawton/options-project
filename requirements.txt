@@ -3,6 +3,7 @@ flask
 flask-cors
 flask-socketio
 gevent
+gunicorn
 pandas
 python-dotenv
 pytz
