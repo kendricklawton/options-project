@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'markdown-to-jsx';
 import pageStyles from '../page.module.css';
 
 export default function Legal() {
@@ -31,8 +31,8 @@ export default function Legal() {
             {error ? (
                 <p>{error}</p> // Display error message if fetching fails
             ) : (
-                <ReactMarkdown>{markdownContent}</ReactMarkdown> // Render Markdown content
+                <Markdown>{markdownContent}</Markdown> // Render Markdown content
             )}
-        </div >
+        </div>
     );
 }

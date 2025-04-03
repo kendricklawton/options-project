@@ -16,6 +16,7 @@
     "@mui/material": "^6.4.4",
     "axios": "^1.7.9",
     "firebase": "^11.3.1",
+    "markdown-to-jsx": "^7.7.4",
     "next": "^15.2.4",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",

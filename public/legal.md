@@ -20,8 +20,6 @@ Users may not use our application for unlawful purposes, to manipulate financial
 ### 6. Limitation of Liability
 Machine Name LLC is not responsible for any losses, damages, or liabilities arising from the use of our platform.
 
-***
-
 ## Privacy Policy
 
 ### 1. Information We Collect
@@ -39,8 +37,6 @@ Users may request access, modification, or deletion of their data by contacting 
 ### 5. Security
 We implement security measures to protect user data but cannot guarantee complete security.
 
-***
-
 ## Cookie Policy
 
 ### 1. What Are Cookies?
@@ -51,8 +47,6 @@ We use cookies for authentication, analytics, and improving user experience.
 
 ### 3. Managing Cookies
 Users can disable cookies through their browser settings, but some features may not function properly.
-
-***
 
 ## Contact
 For any questions, contact us at info@machinename.io.
