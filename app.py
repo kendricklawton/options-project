@@ -1,13 +1,12 @@
 import gevent
 import gevent.monkey
 
-
 gevent.monkey.patch_all()
-
-
 import logging
 import os
 import pandas as pd
+
+pd.set_option("future.no_silent_downcasting", True)
 import pytz
 import signal
 import sys
@@ -49,17 +48,14 @@ socketio = SocketIO(
     async_mode="gevent",
 )
 
-
-# Use a dictionary to store the symbol for each sid
-user_tasks = defaultdict(dict)
+user_tasks = defaultdict(dict)  # Store user tasks for each sid
+user_activity = defaultdict(datetime.now)  # Store last activity time for each sid
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,  # Set the logging level
     format="%(asctime)s - %(levelname)s - %(message)s",  # Log format with timestamps
-    handlers=[
-        logging.StreamHandler(sys.stdout)  # Log to stdout for Cloud Run
-    ],
+    handlers=[logging.StreamHandler(sys.stdout)],  # Log to stdout for Cloud Run
 )
 
 
@@ -80,15 +76,20 @@ MARKET_HOLIDAYS = [
 eastern = pytz.timezone("America/New_York")
 
 
+# Maximum idle time (e.g., 5 minutes)
+MAX_IDLE_TIME = timedelta(minutes=5)
+
+
 # Function to check if the market is open
 def is_market_open():
-    """Returns True if the market is open, otherwise False."""
-    now_et = (
-        datetime.now(pytz.utc).astimezone(eastern).time()
-    )  # Convert to Eastern Time
-    market_open_time = datetime.strptime("09:30", "%H:%M").time()  # 9:30 AM ET
-    market_close_time = datetime.strptime("16:00", "%H:%M").time()  # 4:00 PM ET
-    return market_open_time <= now_et < market_close_time
+    return True
+    # """Returns True if the market is open, otherwise False."""
+    # now_et = (
+    #     datetime.now(pytz.utc).astimezone(eastern).time()
+    # )  # Convert to Eastern Time
+    # market_open_time = datetime.strptime("09:30", "%H:%M").time()  # 9:30 AM ET
+    # market_close_time = datetime.strptime("16:00", "%H:%M").time()  # 4:00 PM ET
+    # return market_open_time <= now_et < market_close_time
 
 
 # Function to check if today is a market holiday
@@ -113,8 +114,8 @@ def time_until_market_open():
 def close_market_tasks():
     """Clears all market tasks and subscriptions."""
     logging.info("Clearing all market tasks...")
-    user_tasks["indexes"].clear()  # Clear all index subscriptions
-    user_tasks["stock"].clear()  # Clear all stock subscriptions
+    user_tasks.clear()  # Clear all user tasks
+    user_activity.clear()  # Clear all user activity
     logging.info("All market tasks have been cleared.")
 
 
@@ -127,7 +128,7 @@ def get_stock_data(symbol):
         info = stock.info
 
         if symbol.startswith("^"):
-            return info, {}
+            return info
 
         dates = list(stock.options)
         option_chain = {}
@@ -149,18 +150,25 @@ def get_stock_data(symbol):
                 chain.calls["mark"] = (chain.calls["bid"] + chain.calls["ask"]) / 2
                 chain.puts["mark"] = (chain.puts["bid"] + chain.puts["ask"]) / 2
 
-                # Fill NaN values with 0
-                calls = chain.calls.fillna(value=0)
-                puts = chain.puts.fillna(value=0)
+                calls = chain.calls.fillna(value=0).infer_objects(copy=False)
+                puts = chain.puts.fillna(value=0).infer_objects(copy=False)
 
                 # Drop duplicate strikes
                 all_strikes = pd.concat(
                     [calls[["strike"]], puts[["strike"]]]
                 ).drop_duplicates()
 
-                # Merge the strikes with calls and puts
-                calls = all_strikes.merge(calls, on="strike", how="outer").fillna(0)
-                puts = all_strikes.merge(puts, on="strike", how="outer").fillna(0)
+                calls = (
+                    all_strikes.merge(calls, on="strike", how="outer")
+                    .fillna(0)
+                    .infer_objects(copy=False)
+                )
+
+                puts = (
+                    all_strikes.merge(puts, on="strike", how="outer")
+                    .fillna(0)
+                    .infer_objects(copy=False)
+                )
 
                 calls = calls.drop(columns=["lastTradeDate"], errors="ignore")
                 puts = puts.drop(columns=["lastTradeDate"], errors="ignore")
@@ -180,38 +188,79 @@ def get_stock_data(symbol):
         logging.error(
             f"Error getting stock data for {symbol}: {e}. Function: get_stock_data"
         )
+        raise
 
 
-# Function to broadcast stock data to all connected clients
+# Function to drop idle connections
+def drop_idle_connections():
+    """Drop idle WebSocket connections."""
+    logging.info("Starting idle connection cleanup...")
+    while True:
+        now = datetime.now()
+        for sid, last_time in list(user_activity.items()):
+            if now - last_time > MAX_IDLE_TIME:
+                logging.info(f"Disconnecting idle client: {sid}")
+                socketio.emit(
+                    "message",
+                    {"message": "Idle connection closed"},
+                    to=sid,
+                    namespace="/stock",
+                )
+
+                user_activity.pop(sid, None)  # Remove from last_activity
+                user_tasks.pop(sid, None)  # Remove from user_tasks
+        gevent.sleep(60)  # Check every 60 seconds
+
+
+# # Function to broadcast stock data to all connected clients
 def broadcast_stock_data():
     """Broadcast stock data to all connected clients."""
     logging.info("Starting stock data broadcasting...")
     try:
         while True:
             if is_market_open():
+                for sid, task_data in list(
+                    user_tasks.items()
+                ):  # Use a copy of the items
+                    logging.info(f"Broadcasting stock data to {sid}")
+                    symbols = task_data.get("symbols", [])
 
-                # Send data to all subscribed clients
-                for sid, symbol in user_tasks[
-                    "stock"
-                ].items():  # Iterate over the dictionary
+                    data = {}
+                    info = {}
+                    option_chain = {}
                     try:
-                        info, option_chain = get_stock_data(symbol)
-                        logging.info(f"Broadcasting stock data to {sid}")
-                        # logging.info(f"Data: {stock_info}")
+                        for symbol in symbols[:]:  # Use a copy of the symbols list
+                            try:
+                                if symbol.startswith("^"):
+                                    info = get_stock_data(symbol)
+                                else:
+                                    info, option_chain = get_stock_data(symbol)
+                                data[symbol] = {
+                                    "info": info,
+                                    "option_chain": option_chain,
+                                }
+                            except Exception as e:
+                                # Remove the symbol from the user's subscription list
+                                user_tasks[sid]["symbols"].remove(symbol)
+                                logging.error(
+                                    f"Error processing stock data for {symbol}: {e}. Function: broadcast_stock_data"
+                                )
+                                continue
 
-                        # Send data to the subscribed client
+                        # Emit the stock data to the client
                         socketio.emit(
                             "data",
-                            {"info": info, "option_chain": option_chain},
-                            to=sid,
+                            {"data": data},
                             namespace="/stock",
+                            to=sid,
                         )
                     except Exception as e:
+                        # Remove the sid from user_tasks if an error occurs
                         logging.error(
-                            f"Error broadcasting data to {sid}: {e}. Function: broadcast_stock_data"
+                            f"Error broadcasting data to {sid}: {e}. Removing sid from user_tasks."
                         )
-                        user_tasks["stock"].pop(sid, None)  # Remove disconnected client
-
+                        user_tasks.pop(sid, None)
+                        user_activity.pop(sid, None)
             else:
                 logging.info("Market is closed. Stopping stock broadcasting...")
                 # Wait until the market opens
@@ -224,13 +273,14 @@ def broadcast_stock_data():
                     )
                     gevent.sleep(time_until_open)
                 logging.info("Market is open. Resuming stock broadcasting...")
-            gevent.sleep(15)  # Wait for 60 seconds before the next iteration
+            gevent.sleep(15)  # Wait for 15 seconds before the next iteration
     except Exception as e:
         logging.error(f"Error in broadcast_stock_data: {str(e)}")
 
 
 # Start shared threads
 gevent.spawn(broadcast_stock_data)
+gevent.spawn(drop_idle_connections)
 
 
 # Middleware to check the Origin header
@@ -253,24 +303,30 @@ def home():
     return "Options Project"
 
 
-# Route for Stock Data
+# REST Route for Stock Data
 @app.route("/stock-data", methods=["GET"])
 def fetch_stock_data():
-    """Fetch stock data for a given symbol."""
-    symbol = request.args.get("symbol")
-    if not symbol:
-        return jsonify({"error": "Symbol is required"}), 400
+    """Handle GET request for stock data."""
     try:
-        # Fetch stock data and option chain
-        if symbol.startswith("^"):
-            info = get_stock_data(symbol)
-            option_chain = {}
-        else:
-            info, option_chain = get_stock_data(symbol)
-        return jsonify({"info": info, "option_chain": option_chain})
+        symbols = request.args.getlist("symbols[]")
+        if not symbols:
+            return jsonify({"error": "Symbol is required"}), 400
+
+        data = {}
+        info = {}
+        option_chain = {}
+        for symbol in symbols:
+            # Fetch stock data and option chain
+            if symbol.startswith("^"):
+                info = get_stock_data(symbol)
+            else:
+                info, option_chain = get_stock_data(symbol)
+            data[symbol] = {"info": info, "option_chain": option_chain}
+
+        return jsonify(data), 200
     except Exception as e:
         logging.error(
-            f"Error fetching stock data for {symbol}: {e}. Function: fetch_stock_data"
+            f"Error fetching stock data for {symbols}: {e}. Function: fetch_stock_data"
         )
         return jsonify({"error": str(e)}), 500
 
@@ -278,11 +334,13 @@ def fetch_stock_data():
 # WebSocket Stock Data Subscription
 @socketio.on("subscribe", namespace="/stock")
 def stock_subscribe(data):
-    """Handle subscription to stock data."""
+    """Handle WebSocket subscription for stock data."""
     try:
         sid = request.sid
-        symbol = data.get("symbol")
-        if not symbol:
+        user_activity[sid] = datetime.now()  # Update last activity timestamp
+
+        symbols = data.get("symbols")
+        if not symbols:
             emit(
                 "error",
                 {"error": "Symbol is required"},
@@ -291,11 +349,24 @@ def stock_subscribe(data):
             )
             return
 
-        # Add or update the subscription for the client
-        user_tasks["stock"][sid] = symbol.strip().lower()
+        indexes = ["^VIX", "^GSPC", "^DJI", "^IXIC"]
+
+        user_tasks[sid]["symbols"] = [
+            symbol
+            for symbol in user_tasks.setdefault(sid, {}).setdefault("symbols", [])
+            if symbol in indexes
+        ]
+
+        # Check if the symbols are valid
+        for symbol in symbols:
+            if symbol not in user_tasks.setdefault(sid, {}).setdefault("symbols", []):
+                user_tasks[sid]["symbols"].append(symbol)
+                print(f"Added symbol {symbol} for sid {sid}")
+            else:
+                print(f"Symbol {symbol} already exists for sid {sid}")
         emit(
             "message",
-            {"message": f"Subscribed to stock: {symbol}"},
+            {"message": f"{sid} subscribed"},
             to=sid,
             namespace="/stock",
         )
@@ -311,12 +382,33 @@ def stock_subscribe(data):
 
 # WebSocket Stock Data Unsubscription
 @socketio.on("unsubscribe", namespace="/stock")
-def stock_unsubscribe():
-    """Handle unsubscription from stock data."""
-    sid = request.sid
-    if sid in user_tasks["stock"]:
-        del user_tasks["stock"][sid]  # Remove the subscription for the client
-    logging.info(f"Client {sid} unsubscribed from stock namespace")
+def stock_unsubscribe(data):
+    """Handle WebSocket unsubscription for stock data."""
+    try:
+        sid = request.sid
+        logging.info(f"Unsubscribing {sid} from stock data")
+        if sid in user_tasks:
+            # Remove the sid from user_tasks
+            del user_tasks[sid]
+            # Remove the sid from user_activity
+            del user_activity[sid]
+            emit(
+                "message",
+                {"message": f"{sid} unsubscribed"},
+                to=sid,
+                namespace="/stock",
+            )
+            logging.info(f"Unsubscribed {sid} from stock data")
+        else:
+            logging.warning(f"Unsubscribe request for unknown sid: {sid}")
+    except Exception as e:
+        logging.error(f"Error in stock unsubscribe: {str(e)}")
+        emit(
+            "error",
+            {"error": f"Error in unsubscribe: {str(e)}"},
+            to=sid,
+            namespace="/stock",
+        )
 
 
 def handle_shutdown(signal_number, frame):
@@ -338,5 +430,9 @@ signal.signal(signal.SIGTERM, handle_shutdown)
 
 if __name__ == "__main__":
     socketio.run(
-        app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)), log_output=True
+        app,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8080)),
+        debug=True,
+        use_reloader=False,
     )
