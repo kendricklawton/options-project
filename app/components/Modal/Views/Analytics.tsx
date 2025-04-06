@@ -134,6 +134,17 @@ export default function Analytics() {
         };
     }, []);
 
+    return (
+        <div>
+            <h1>Analytics</h1>
+            {/* <LineChart width={500} height={300} data={data}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+            </LineChart> */}
+        </div>
+    );
     // return (
     //     <>
     //         {
