@@ -11,14 +11,15 @@
     align-items: center;
     display: flex;
     flex-direction: column;
+    position: relative;
     height: 100%;
     justify-content: center;
     text-align: center;
 }
 
 .wrapper h1 {
-    background: linear-gradient(90deg, #0077be, #005762);
-    color: transparent;
+    /* background: linear-gradient(90deg, #0077be, #005762); */
+    /* color: transparent; */
     font-size: clamp(3rem, 3vw, 3vw);
     font-weight: 600;
     -webkit-background-clip: text;
@@ -29,3 +30,94 @@
     font-size: clamp(1.5rem, 2vw, 2vw);
     font-weight: 500;
 }
+
+.marketsWrapper {
+    top: 0;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+
+}
+.marketsList,
+.marketsListSelector {
+    display: flex;
+    flex-direction: row;
+    justify-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    /* background-color: aliceblue; */
+    overflow-x: auto;
+}
+/* 
+.marketsListSelector {
+    padding-bottom: 0.5rem;
+}
+
+.marketsList {
+    padding-top: 0.5rem;
+} */
+
+.market,
+.marketNegative,
+.marketPositive {
+    --fade-transition: opacity 0.667s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    /* gap: 0.5rem; */
+    padding: 0.5rem;
+    color: #fff;
+    font-weight: bold;
+}
+
+.marketNegative {
+    background-color: #ce2b2b;
+}
+
+.marketPositive {
+    background-color: #008456;
+}
+
+.market div,
+.marketNegative div,
+.marketPositive div {
+    min-width: 12rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+}
+
+.content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+
+/* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
+.marketsList::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+
+.marketsList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.marketsList::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.marketsList::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+}
+
+
+
+/* -webkit-text-size-adjust: 100%; */
+/* font-family: Proxima Nova, */

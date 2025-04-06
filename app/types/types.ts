@@ -1,19 +1,28 @@
 import { User } from "firebase/auth";
 
+
 export interface AppContextType {
+
     currentExpirationDate?: string;
-    currentOption?: OptionType;
-    currentOptionOrder?: OptionOrderType;
-    currentStock?: StockType;
+    currentExpirationDates?: string[];
+    // currentOptionOrder?: OptionOrderType;
+    currentStock?: {
+        info: InfoType;
+        optionChain: OptionChainType;
+    };
     modalView?: string;
-    optionChain?: OptionChainType;
-    expirationDates: string[];
+    subscribedMap: Map<string, {
+            info: InfoType;
+            optionChain: OptionChainType;
+    }>;
     clearStockData: () => void;
-    fetchStockData: (symbol: string ) => Promise<void>;
+    fetchStockData: (request: string[]) => Promise<void>;
     setCurrentExpirationDate: (expirationDate: string) => void;
-    setCurrentNearPrice: (price: number) => void;
-    setCurrentOption: (option: OptionType) => void;
-    setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
+    setCurrentStock: (stock: {
+        info: InfoType;
+        optionChain: OptionChainType;
+    }) => void;
+    // setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
     setModalView: (view: string) => void;
 }
 
@@ -35,40 +44,7 @@ export interface AuthContextType {
     updateUserEmail: (newEmail: string, password: string) => Promise<void>;
 }
 
-export interface OptionType {
-    ask?: number;
-    bid?: number;
-    change?: number;
-    contractSize?: string;
-    contractSymbol?: string;
-    currency?: string;
-    expiration?: number;
-    impliedVolatility?: number;
-    inTheMoney?: boolean;
-    lastPrice?: number;
-    lastTradeDate?: string;
-    mark?: number;
-    openInterest?: number;
-    percentChange?: number;
-    strike?: number;
-    volume?: number;
-}
-
-export interface OptionChainType {
-    [date: string]: {
-        calls: OptionType[];
-        puts: OptionType[];
-        strikes: number[];
-    }
-}
-
-export interface OptionOrderType {
-    action?: 'Buy' | 'Sell';
-    option?: OptionType;
-    quantity?: number;
-}
-
-export interface StockType {
+export interface InfoType {
     ask?: number;
     bid?: number;
     country?: string;
@@ -203,4 +179,37 @@ export interface StockType {
     symbol?: string;
     volume?: number;
     website?: string;
+}
+
+export interface OptionType {
+    ask?: number;
+    bid?: number;
+    change?: number;
+    contractSize?: string;
+    contractSymbol?: string;
+    currency?: string;
+    expiration?: number;
+    impliedVolatility?: number;
+    inTheMoney?: boolean;
+    lastPrice?: number;
+    lastTradeDate?: string;
+    mark?: number;
+    openInterest?: number;
+    percentChange?: number;
+    strike?: number;
+    volume?: number;
+}
+
+export interface OptionChainType {
+    [date: string]: {
+        calls: OptionType[];
+        puts: OptionType[];
+        strikes: number[];
+    }
+}
+
+export interface OptionOrderType {
+    action?: 'Buy' | 'Sell';
+    option?: OptionType;
+    quantity?: number;
 }

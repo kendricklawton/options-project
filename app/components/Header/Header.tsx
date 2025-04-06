@@ -24,9 +24,11 @@ import styles from "./Header.module.css";
 import Link from 'next/link';
 import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
 
+
 export default function Header() {
     const { currentStock, fetchStockData } = useAppContext();
     const { isLoading,
+        setIsLoading,
         // logIn, logOut
     } = useAuthContext();
 
@@ -62,24 +64,23 @@ export default function Header() {
 
     const handleFetchStockData = async () => {
         if (inputValue.length === 0) return;
-        if (currentStock?.symbol?.toLowerCase() == inputValue.toLowerCase()) {
-            if (pathname === '/') {
-                router.push('/options');
-            } else {
-                return;
-            }
-        }
 
         try {
-            console.log('inputValue', inputValue);
-            await fetchStockData(inputValue);
+            setIsLoading(true);
+            const symbols: string[] = [inputValue];
+            if (currentStock?.info.symbol !== inputValue) {
+                await fetchStockData(symbols);
+            }
             if (pathname === '/') {
                 router.push('/options');
             }
-            setInputValue('');
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
+
+        setInputValue('');
     };
 
     const handleOnChange = (value: string) => {
@@ -125,12 +126,12 @@ export default function Header() {
             {/* Main Element */}
             <div className={styles.headerElement}>
                 <div className={styles.leading}>
-                    <Link className={styles.linkDesktop} href={'/'}>Options Project</Link>
+                    <Link className={styles.linkDesktop} href={'/'}>OPTIONS PROJECT</Link>
                     <StyledTextField
                         sx={{ maxWidth: '7.6rem' }}
                         onChange={(e) => handleOnChange(e.target.value)}
                         value={inputValue}
-                        placeholder={currentStock?.symbol ? currentStock.symbol : 'SYMBOL'}
+                        placeholder={currentStock?.info.symbol ? currentStock.info.symbol : 'SYMBOL'}
                         autoComplete="off"
                         slotProps={{
                             input: {
@@ -152,7 +153,7 @@ export default function Header() {
                     </StyledTextField>
                     <div className={styles.links}>
                         {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link> */}
-                        <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />Options</Link>
+                        <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />OPTIONS</Link>
                         {/* <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
                     </div>
                 </div>

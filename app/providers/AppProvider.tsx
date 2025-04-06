@@ -1,149 +1,216 @@
 'use client'
 
-import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode, useRef } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    useMemo,
+    useCallback,
+    ReactNode,
+    useRef,
+    useEffect,
+} from 'react';
 import { useAuthContext } from './AuthProvider';
-import { AppContextType,  OptionChainType, OptionOrderType, OptionType, StockType } from '../types/types';
-import {
-    stockDataREST,
-    stockDataWebSocket,
-} from '../services/services';
-import { stockMarketOpen } from '../utils/utils';
-// import { isStockMarketOpen } from '../utils/utils';
-// import { loadCSVFiles } from '../utils/utils';
+import { AppContextType, InfoType, OptionChainType } from '../types/types';
+import { stockDataREST, stockDataWebSocket } from '../services/services';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { setIsLoading, handleSetInfo } = useAuthContext();
-    const [currentDisplayStrikes, setCurrentDisplayStrikes] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
+    const { handleSetInfo } = useAuthContext();
+
     const [currentExpirationDate, setCurrentExpirationDate] = useState<string>();
-    const [currentNearPrice, setCurrentNearPrice] = useState<number>();
-    const [currentOption, setCurrentOption] = useState<OptionType>();
-    const [currentOptionOrder, setCurrentOptionOrder] = useState<OptionOrderType>();
-    const [currentStock, setCurrentStock] = useState<StockType>();
+    const [currentExpirationDates, setCurrentExpirationDates] = useState<string[]>([]);
+    const [currentStock, setCurrentStock] = useState<{
+        info: InfoType;
+        optionChain: OptionChainType;
+    }>();
     const [modalView, setModalView] = useState<string>();
-    const [expirationDates, setExpirationDates] = useState<string[]>([]);
-    const [optionChain, setOptionChain] = useState<OptionChainType>();
-    // const [recentSearches, setRecentSearches] = useState<string[]>([]);
-    const [totalStrikesToDisplay, setTotalStrikesToDisplay] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
+    const [subscribedMap, setSubscribedMap] = useState<Map<
+        string, {
+            info: InfoType;
+            optionChain: OptionChainType
+        }
+    >>(new Map());
+
     const stockWebSocketRef = useRef<{
         unsubscribe: () => void;
+        update: (symbols: string[]) => void;
         onEvent: (callback: (data: Record<string, unknown>) => void) => void;
     } | null>(null);
 
     // Clear Stock Data & Option Chain
     const clearStockData = useCallback((): void => {
         setCurrentStock(undefined);
-        setExpirationDates([]);
-        setOptionChain(undefined);
+        setSubscribedMap(new Map());
+        stockWebSocketRef.current?.unsubscribe();
+        stockWebSocketRef.current = null;
     }, []);
 
-    // Handle Search History
-    // const handleRecentSearches = useCallback((symbol: string) => {
-    //     if (recentSearches.includes(symbol.toLocaleUpperCase())) {
-    //         return;
-    //     }
-    //     const updatedSearches = [symbol.toLocaleUpperCase(), ...recentSearches];
-    //     if (updatedSearches.length > 5) {
-    //         updatedSearches.pop();
-    //     }
-    //     setRecentSearches(updatedSearches);
-    // }, [recentSearches]);
-
-
-    // Fetch Stock Data also uses both WebSocket and REST API, If the market is open
-    // this method will use WebSocket to get real-time data
-    // and if the market is closed it will use REST API to get the data. It also calls
-    // the REST API to get the initial for a better user experience
-    // and to avoid the WebSocket connection delay
-    const fetchStockData = useCallback(async (symbol: string): Promise<void> => {
-        setIsLoading(true);
+    // Fetch Stock Data
+    const fetchStockData = useCallback(async (request: string[]): Promise<void> => {
         try {
-            if (stockWebSocketRef.current) {
-                stockWebSocketRef.current.unsubscribe();
-                stockWebSocketRef.current = null;
-            }
+            const data = await stockDataREST(request);
+            // console.log(`REST Request - Data Received - Timestamp: ${Date.now()}`);
+            const symbols = Object.keys(data);
 
-            // Fetch initial stock data
-            const data =  await stockDataREST(symbol);
+            // console.log('REST - Symbols: ', symbols);
 
-            const stockData = data?.info as StockType | undefined;
-            setCurrentStock(stockData);
-            if (symbol.startsWith('^')) {
-                return;
-            }
-            
-            // Parse the data to get the option chain and expiration dates
-            const optionChainData: OptionChainType = data.option_chain as OptionChainType;
-            const expirationDatesData = Object.keys(optionChainData) as string[];
+            setSubscribedMap((prevMap) => {
+                const updatedMap = new Map(prevMap);
 
-            setExpirationDates(expirationDatesData);
-            setOptionChain(optionChainData);
-            setCurrentNearPrice(stockData?.regularMarketPrice || 0);
-            if(stockData?.symbol?.toLowerCase() !== currentStock?.symbol?.toLowerCase()) {
-                setCurrentExpirationDate(expirationDatesData[0]);
-            }
+                symbols
+                    .filter((symbol) => data[symbol]?.info && data[symbol]?.option_chain)
+                    .forEach((symbol) => {
+                        updatedMap.set(symbol, {
+                            info: data[symbol].info,
+                            optionChain: data[symbol].option_chain
+                        });
+                    });
 
-            // If the market is open, create a new WebSocket connection
-            // and listen for data updates
-            if (stockMarketOpen()) {
-                stockWebSocketRef.current = stockDataWebSocket(symbol);
+                // console.log('REST - Updated Map: ', updatedMap);
 
-                // Listen for data updates
-                stockWebSocketRef.current.onEvent((data) => {
-                    const stockData = data?.info as StockType | undefined;
-                    setCurrentStock(stockData);
-                    if (symbol.startsWith('^')) {
-                        return;
+                if (symbols.length === 1) {
+                    const currentSymbol = symbols[0];
+                    const stockData = updatedMap.get(currentSymbol);
+                    // console.log('REST - Stock Data: ', stockData);
+
+                    if (stockData) {
+                        setCurrentStock((prevStock) => ({
+                            ...prevStock,
+                            info: stockData.info,
+                            optionChain: stockData.optionChain
+                        }) as {
+                            info: InfoType;
+                            optionChain: OptionChainType;
+                        } | undefined
+                        );
+                        const expirationDates = Object.keys(stockData.optionChain);
+                        setCurrentExpirationDates((prevDates) => {
+                            const newDates = expirationDates.filter(date => !prevDates.includes(date));
+                            return [...prevDates, ...newDates];
+                        });
+
+                        setCurrentExpirationDate(expirationDates[0]);
                     }
+                } else {
+                    // console.log('REST - Only Setting Indexes Data - No Stock Data');
+                }
 
-                    const optionChainData: OptionChainType = data.option_chain as OptionChainType;
-                    const expirationDatesData = Object.keys(optionChainData) as string[];
-                    setExpirationDates(expirationDatesData);
-                    setOptionChain(optionChainData);
+                return updatedMap;
+            });
+
+            if (!stockWebSocketRef.current) {
+                stockWebSocketRef.current = stockDataWebSocket(request);
+                // console.log(`Creating New WebSocket Connection Ref: ${stockWebSocketRef.current} - Timestamp: ${Date.now()}`);
+
+                stockWebSocketRef.current.onEvent((wsData) => {
+                    // console.log(`WebSocket - Data Received - Timestamp: ${Date.now()}`);
+                    const data = wsData.data as Record<string, { info: InfoType; option_chain: OptionChainType }>;
+                    const symbols = Object.keys(data);
+
+                    // console.log('WebSocket - Symbols: ', symbols);
+
+                    setSubscribedMap((prevMap) => {
+                        const updatedMap = new Map(prevMap);
+
+                        symbols
+                            .filter((symbol) => data[symbol]?.info && data[symbol]?.option_chain)
+                            .forEach((symbol) => {
+                                updatedMap.set(symbol, {
+                                    info: data[symbol].info,
+                                    optionChain: data[symbol].option_chain
+                                });
+                            });
+
+                        // console.log('WebSocket - Updated Map: ', updatedMap);
+
+                        const currentSymbol = symbols[4];
+                        const stockData = updatedMap.get(currentSymbol);
+                        // console.log('WebSocket - Stock Data: ', stockData);
+
+                        if (stockData) {
+                            // setCurrentStock(stockData);
+                            // const expirationDates = Object.keys(stockData.optionChain);
+                            // setCurrentExpirationDates(expirationDates);
+                            setCurrentStock((prevStock) => ({
+                                ...prevStock,
+                                info: stockData.info,
+                                optionChain: stockData.optionChain
+                            }) as {
+                                info: InfoType;
+                                optionChain: OptionChainType;
+                            } | undefined
+                            );
+                            const expirationDates = Object.keys(stockData.optionChain);
+                            setCurrentExpirationDates((prevDates) => {
+                                const newDates = expirationDates.filter(date => !prevDates.includes(date));
+                                return [...prevDates, ...newDates];
+                            });
+                        }
+                        else {
+                            // console.log('WebSocket - Only Setting Indexes Data - No Stock Data');
+                        }
+
+                        return updatedMap;
+                    });
                 });
+            } else {
+                stockWebSocketRef.current.update(symbols);
+                // console.log(`Updating WebSocket Connection Ref: ${stockWebSocketRef} - Timestamp: ${Date.now()} - fetchStockData`);
             }
         } catch (error) {
-            handleSetInfo('Server Issues, Please Try Again Later');
+            handleSetInfo('Server Issues: ' + error);
             throw error;
-        } finally {
-            setIsLoading(false);
         }
-    }, [currentStock, handleSetInfo, setIsLoading]);
+    }, [handleSetInfo]);
+
+
+    // Fetch index data and setup WebSocket on mount
+    useEffect(() => {
+        const awaitData = async () => {
+            try {
+                await fetchStockData([
+                    '^VIX',
+                    '^GSPC',
+                    '^DJI',
+                    '^IXIC',
+                ]);
+            } catch (error) {
+                console.error('Error fetching stock data:', error);
+            }
+        };
+
+        const handleBeforeUnload = () => {
+            stockWebSocketRef.current?.unsubscribe();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        awaitData();
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            stockWebSocketRef.current?.unsubscribe();
+        };
+    }, [fetchStockData]);
 
     const contextValue = useMemo(() => ({
         currentExpirationDate,
-        currentOption,
-        currentOptionOrder,
+        currentExpirationDates,
         currentStock,
-        currentNearPrice,
-        currentDisplayStrikes,
         modalView,
-        optionChain,
-        expirationDates,
-        // recentSearches,
-        totalStrikesToDisplay,
+        subscribedMap,
         clearStockData,
         fetchStockData,
         setCurrentExpirationDate,
-        setCurrentNearPrice,
-        setCurrentOption,
-        setCurrentOptionOrder,
-        setCurrentDisplayStrikes,
-        setTotalStrikesToDisplay,
+        setCurrentStock,
         setModalView,
     }), [
         currentExpirationDate,
-        currentNearPrice,
-        currentOption,
-        currentOptionOrder,
+        currentExpirationDates,
         currentStock,
-        currentDisplayStrikes,
         modalView,
-        optionChain,
-        expirationDates,
-        // recentSearches,
-        totalStrikesToDisplay,
+        subscribedMap,
         clearStockData,
         fetchStockData,
     ]);

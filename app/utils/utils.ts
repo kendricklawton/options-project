@@ -64,7 +64,7 @@ export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     const dateOptions: Intl.DateTimeFormatOptions = {
         month: 'short', // Abbreviated month (e.g., "Apr")
         day: 'numeric', // Day of the month (e.g., "1")
-        year: 'numeric', // Full year (e.g., "2025")
+        // year: 'numeric', // Full year (e.g., "2025")
         timeZone: 'America/New_York', // Eastern Time Zone
     };
     const formattedDate = dateObj.toLocaleDateString('en-US', dateOptions);
@@ -79,7 +79,8 @@ export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     const formattedTime = dateObj.toLocaleTimeString('en-US', timeOptions);
 
     // Combine the date and time
-    return `Data as of ${formattedDate}, ${formattedTime} ET`;
+    // return `Data as of ${formattedDate}, ${formattedTime} ET`;
+    return `${formattedDate}, ${formattedTime} ET`;
 };
 
 export const convertUnixTimestampTwo = (timestamp: number | undefined): string => {

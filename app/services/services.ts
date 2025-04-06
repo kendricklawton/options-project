@@ -8,7 +8,7 @@ const restAPIService = async (endpoint: string, params?: object) => {
     const source = axios.CancelToken.source();
     const timeout = setTimeout(() => {
         source.cancel('Request Timed Out');
-    }, 20000);
+    }, 12000);
 
     try {
         const response = await axios.get(`${url}/${endpoint}`, {
@@ -23,101 +23,53 @@ const restAPIService = async (endpoint: string, params?: object) => {
     }
 };
 
-// Rest API Service for Indexes Data
-export const indexesDataREST = async () => {
-    return await restAPIService('indexes-data');
-};
-
-// Rest API Service for Stock Data
-export const stockDataREST = async (symbol: string) => {
-    return await restAPIService('stock-data', { symbol });
-};
-
-// WebSocket Service for Indexes Data
-export const indexesDataWebSocket = () => {
-    const socket: Socket = io(`${url}/indexes`);
-
-    const onEvent = (callback: (data: Record<string, unknown>) => void) => {
-        socket.on('data', (data) => {
-            callback(data);
-  
-        });
-    };
-
-    const unsubscribe = () => {
-        socket.emit('unsubscribe', {});
-        socket.disconnect();
-    };
-
-    socket.on('connect', () => {
-        socket.emit('subscribe', {});
-    });
-
-    socket.on('connect_error', (error) => {
-        console.error('Error connecting to indexes websocker: ', error);
-        socket.disconnect();
-    });
-
-    socket.on('connect_timeout', (timeout) => {
-        console.error('Indexes websocket connection timed out: ', timeout);
-        socket.disconnect();
-    });
-
-    socket.on('error', (error) => {
-        console.error('Indexes websocket error received: ', error);
-        socket.disconnect();
-    });
-
-    socket.on('message', (message) => {
-        console.log('Indexes websocket message received: ', message);
-    });
-
-    return {
-        unsubscribe,
-        onEvent,
-    };
+// Rest API Service for Stock Data Two
+export const stockDataREST = async (symbols: string[]) => {
+    return await restAPIService('stock-data', { symbols: symbols });
 };
 
 // WebSocket Service for Stock Data
-export const stockDataWebSocket = (symbol: string) => {
+export const stockDataWebSocket = (symbols: string[]) => {
     const socket: Socket = io(`${url}/stock`);
 
     const onEvent = (callback: (data: Record<string, unknown>) => void) => {
         socket.on('data', (data) => {
             callback(data);
-            console.log('Stock Websocket Data Received: ', data);
         });
+    };
+    
+    const update = (updateSymbols: string[]) => {
+        socket.emit('subscribe', { symbols: updateSymbols });
     };
 
     const unsubscribe = () => {
         socket.emit('unsubscribe', {});
-        socket.disconnect();
     };
 
     socket.on('connect', () => {
-        socket.emit('subscribe', { symbol });
+        socket.emit('subscribe', { symbols });
     });
 
     socket.on('connect_error', (error) => {
         console.error('Error connecting to server:', error);
-        socket.disconnect();
     });
 
     socket.on('connect_timeout', (timeout) => {
         console.error('Connection timed out:', timeout);
-        socket.disconnect();
     });
 
     socket.on('error', (errorData) => {
         console.error('Stock WebSocket Error:', errorData);
-        socket.disconnect();
     });
 
     socket.on('message', (message) => {
         console.log('Received Stock Message:', message);
     });
 
+    window.addEventListener('beforeunload', unsubscribe);
+
     return {
+        update,
         unsubscribe,
         onEvent,
     };

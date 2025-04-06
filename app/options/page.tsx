@@ -6,7 +6,8 @@ import styles from './page.module.css';
 import { IconButton } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '@/app/providers/AppProvider';
-import { StyledButton, StyledIconButton, 
+import {
+  StyledButton, StyledIconButton,
   // StyledTextField, 
 
 } from '@/app/components/Styled';
@@ -17,7 +18,7 @@ import {
 } from '@/app/utils/utils';
 import { OptionType } from '@/app/types/types';
 import React from 'react';
-import { useAuthContext } from '../providers/AuthProvider';
+
 
 const styledButtonStyles = {
   borderRadius: '0px',
@@ -30,23 +31,22 @@ const styledButtonStyles = {
 export default function Home() {
   // App context
   const {
-    currentStock,
     currentExpirationDate,
-    optionChain,
-    expirationDates,
-    setCurrentOption,
-    setCurrentOptionOrder,
+    currentExpirationDates,
+    currentStock,
     setCurrentExpirationDate,
     setModalView,
   } = useAppContext();
 
-  // Auth context
-  const {
-    handleSetInfo,
-  } = useAuthContext();
 
   // State variables
+
   const [displayStrikes, setDisplayStrikes] = useState<1 | 4 | 6 | 8 | 10 | 12 | 16 | 20 | 40>(1);
+  const [filteredOptionChain, setFilteredOptionChain] = useState<{
+    calls: OptionType[];
+    puts: OptionType[];
+    strikes: number[];
+  }>();
   // const [nearInputValue, setNearInputValue] = useState<string>('');
   const [isStrikesMenuOpen, setIsStrikesMenuOpen] = useState(false);
   const [isStrikesMobileMenuOpen, setIsStrikesMobileMenuOpen] = useState(false);
@@ -65,23 +65,25 @@ export default function Home() {
 
   // Function to handle the display of option analytics
   const handleDisplayOptionAnalytics = (option: OptionType, action?: 'Buy' | 'Sell',) => {
-    setCurrentOptionOrder({
-      action: action || 'Buy',
-      option: option,
-      quantity: 10,
-    });
-    setCurrentOption(option);
+    console.log('Selected Option:', option);
+    console.log('Action:', action);
+    // setCurrentOptionOrder({
+    //   action: action || 'Buy',
+    //   option: option,
+    //   quantity: 10,
+    // });
     setModalView('analytics');
   };
 
   // Function to retrieve option chain data for a specific expiration date
   const changeExpirationDate = (date: string) => {
+    console.log('Selected Expiration Date:', date);
     setCurrentExpirationDate(date);
   };
 
   // Function to handle the option strategy button
   const handleOptionStrategy = () => {
-    handleSetInfo('More Startegies Coming Soon!');
+
   };
 
   // Function to toggle the bottom element
@@ -145,6 +147,7 @@ export default function Home() {
 
   // useEffect to sync the scroll position of the three tables
   useEffect(() => {
+    console.log('Syncing scroll position');
     const callTable = callTableRef.current;
     const strikeTable = strikeTableRef.current;
     const putTable = putTableRef.current;
@@ -163,17 +166,7 @@ export default function Home() {
         putTable.removeEventListener('scroll', () => handleScroll(putTable));
       };
     }
-  }, [optionChain, isCallTableOpen, isPutTableOpen, callTableRef, strikeTableRef, putTableRef]);
-
-  // useEffect to set the near price input value
-  // useEffect(() => {
-  //   if (currentStock) {
-  //     const nearValue = currentStock?.regularMarketPrice;
-  //     if (nearValue) {
-  //       setNearInputValue(nearValue.toFixed(2));
-  //     }
-  //   }
-  // }, [currentStock]);
+  }, [filteredOptionChain, isCallTableOpen, isPutTableOpen, callTableRef, strikeTableRef, putTableRef]);
 
   // useEffect to close the strikes menu when clicking outside
   useEffect(() => {
@@ -197,13 +190,21 @@ export default function Home() {
     };
   }, []);
 
-  const regularMarketPrice = currentStock?.regularMarketPrice || 0;
-  const filteredOptionChain = getFilteredOptionChain(
-    optionChain,
-    currentExpirationDate,
-    displayStrikes,
-    regularMarketPrice,
-  );
+  // useEffect to filter the option chain when current stock changes
+  useEffect(() => {
+    if (currentStock) {
+      console.log('Current Stock Info:', currentStock.info);
+      console.log('Current Option Chain:', currentStock.optionChain);
+      console.log('Current Expiration Date:', currentExpirationDate);
+      const updatedFilteredOptionChain = getFilteredOptionChain(currentStock.optionChain, currentExpirationDate, displayStrikes, currentStock.info?.regularMarketPrice ?? 0);
+      console.log('Filtered Option Chain:', updatedFilteredOptionChain);
+      if(updatedFilteredOptionChain) {
+        setFilteredOptionChain(updatedFilteredOptionChain);
+      }
+     
+    };
+  }, [currentExpirationDate, currentStock, displayStrikes]);
+
 
   if (!currentStock) {
     return (
@@ -220,37 +221,36 @@ export default function Home() {
     <div className={pageStyles.page}>
       {/* Details Element */}
       {
-        (currentStock != null) && (
-          // (filteredOptionChain != null && currentStock != null) && (
+        (currentStock.info != null) && (
           <div className={styles.details}>
             <div className={styles.detailsLeadingColumn}>
               <div className={styles.detailsLeadingTop}>
-              <p>{currentStock.symbol?.startsWith('^') ? currentStock.symbol.slice(1).toLocaleUpperCase() : currentStock.symbol?.toLocaleUpperCase() ?? ''}</p>
-              <p>|</p>
-              <p>{currentStock?.shortName}</p>
+                <p>{currentStock.info.symbol?.startsWith('^') ? currentStock.info.symbol.slice(1).toLocaleUpperCase() : currentStock.info.symbol?.toLocaleUpperCase() ?? ''}</p>
+                <p>|</p>
+                <p>{currentStock.info?.shortName}</p>
 
-              <p className={currentStock?.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                ? currentStock.regularMarketChangePercent > 0
-                  ? styles.positive
-                  : styles.negative
-                : ''
-              }>{currentStock?.regularMarketPrice?.toFixed(2)} </p>
-              {/* <p>{currentStock.currency}</p> */}
-              <p className={currentStock?.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                ? currentStock.regularMarketChangePercent > 0
-                  ? styles.positive
-                  : styles.negative
-                : ''
-              }>{formatPlusMinus(currentStock?.regularMarketChange)}</p>
-              <p className={currentStock?.regularMarketChangePercent != null && currentStock.regularMarketChangePercent != 0
-                ? currentStock.regularMarketChangePercent > 0
-                  ? styles.positive
-                  : styles.negative
-                : ''
-              }>({formatPlusMinus(currentStock?.regularMarketChangePercent)}%)</p>
+                <p className={currentStock.info?.regularMarketChangePercent != null && currentStock.info.regularMarketChangePercent != 0
+                  ? currentStock.info.regularMarketChangePercent > 0
+                    ? styles.positive
+                    : styles.negative
+                  : ''
+                }>{currentStock.info?.regularMarketPrice?.toFixed(2)} </p>
+                {/* <p>{currentStock.info.currency}</p> */}
+                <p className={currentStock.info?.regularMarketChangePercent != null && currentStock.info.regularMarketChangePercent != 0
+                  ? currentStock.info.regularMarketChangePercent > 0
+                    ? styles.positive
+                    : styles.negative
+                  : ''
+                }>{formatPlusMinus(currentStock.info?.regularMarketChange)}</p>
+                <p className={currentStock.info?.regularMarketChangePercent != null && currentStock.info.regularMarketChangePercent != 0
+                  ? currentStock.info.regularMarketChangePercent > 0
+                    ? styles.positive
+                    : styles.negative
+                  : ''
+                }>({formatPlusMinus(currentStock.info?.regularMarketChangePercent)}%)</p>
               </div>
               <div className={styles.detailsLeadingBottom}>
-                  <p>{convertUnixTimestamp(currentStock?.regularMarketTime)}</p>
+                <p>{convertUnixTimestamp(currentStock.info?.regularMarketTime)}</p>
               </div>
             </div>
             <div className={styles.detailsTrailing}>
@@ -269,33 +269,33 @@ export default function Home() {
 
       {/* Details Extended Element */}
       {
-        (currentStock && isBottomElementOpen) && (
+        (currentStock.info && isBottomElementOpen) && (
           <div className={styles.detailsExt}>
             <div className={styles.elementThTwo}>
               <p>Open</p>
-              <p>{currentStock.regularMarketOpen}</p>
+              <p>{currentStock.info.regularMarketOpen}</p>
             </div>
             <div className={styles.elementThTwo}>
               <p>High</p>
-              <p>{currentStock.regularMarketDayHigh}</p>
+              <p>{currentStock.info.regularMarketDayHigh}</p>
             </div>
             <div className={styles.elementThTwo}>
               <p>Low</p>
-              <p>{currentStock.regularMarketDayLow}</p>
+              <p>{currentStock.info.regularMarketDayLow}</p>
             </div>
             <div className={styles.elementThTwo}>
               <p>Market Cap</p>
               <p>{
-                currentStock.marketCap != null && currentStock.marketCap != 0
+                currentStock.info.marketCap != null && currentStock.info.marketCap != 0
                   ?
-                  formatMarketCap(currentStock.marketCap) : '--'
+                  formatMarketCap(currentStock.info.marketCap) : '--'
               }</p>
             </div>
             <div className={styles.elementThTwo}>
               <p>P/E Ratio</p>
               <p>{
-                currentStock.forwardPE ?
-                  currentStock.forwardPE?.toFixed(2) :
+                currentStock.info.forwardPE ?
+                  currentStock.info.forwardPE?.toFixed(2) :
                   '--'
               }</p>
             </div>
@@ -303,8 +303,8 @@ export default function Home() {
               <p>Div Yield</p>
               <p>
                 {
-                  (currentStock.dividendYield != null && currentStock.dividendYield != 0)
-                    ? `${(currentStock.dividendYield.toFixed(2))}%`
+                  (currentStock.info.dividendYield != null && currentStock.info.dividendYield != 0)
+                    ? `${(currentStock.info.dividendYield.toFixed(2))}%`
                     : '--'
                 }
               </p>
@@ -313,28 +313,17 @@ export default function Home() {
               <p>Div Date</p>
               <p>
                 {
-                  (currentStock.dividendDate)
-                    ? convertUnixTimestampTwo(currentStock.dividendDate)
+                  (currentStock.info.dividendDate)
+                    ? convertUnixTimestampTwo(currentStock.info.dividendDate)
                     : '--'
                 }
               </p>
             </div>
             <div className={styles.elementThTwo}>
               <p>52 Week Range</p>
-              <p>{currentStock.fiftyTwoWeekRange}</p>
+              <p>{currentStock.info.fiftyTwoWeekRange}</p>
             </div>
           </div>
-        )
-      }
-
-      {/* Indexes Element */}
-      {
-        (currentStock?.symbol?.startsWith('^')) && (
-          <div className={styles.details}>
-            <div className={styles.detailsLeading}>
-              <p>{currentStock.symbol?.startsWith('^') ? currentStock.symbol.slice(1) : currentStock.symbol ?? ''} Does Not Offer Options</p>
-            </div>
-          </div >
         )
       }
 
@@ -390,7 +379,7 @@ export default function Home() {
             <div className={styles.controlsElementTwo}>
               <p>Near</p>
               <div className={styles.nearInput}>{
-                currentStock?.regularMarketPrice?.toFixed(2)
+                currentStock.info?.regularMarketPrice?.toFixed(2)
               }</div>
               {/* <p>Near</p>
               <StyledTextField
@@ -446,8 +435,8 @@ export default function Home() {
             <div className={styles.controlsElement}>
               <p>Near</p>
               <div className={styles.nearInput}>{
-                currentStock?.regularMarketPrice?.toFixed(2)
-                }</div>
+                currentStock.info?.regularMarketPrice?.toFixed(2)
+              }</div>
               {/* <StyledTextField
                 id="nearPriceMobile"
                 variant="outlined"
@@ -466,9 +455,9 @@ export default function Home() {
 
       {/* Dates Element */}
       {
-        (filteredOptionChain != null) && (
+        (filteredOptionChain && currentExpirationDates) && (
           <div className={styles.dates}>
-            {expirationDates.map((date: string, index) => (
+            {currentExpirationDates.map((date: string, index: number) => (
               <div className={styles.date} key={index} onClick={
                 () => changeExpirationDate(date)
               }>{
@@ -514,8 +503,8 @@ export default function Home() {
                 <ElementsHeaderTh />
                 {(filteredOptionChain?.calls ?? []).map((data: OptionType, index: React.Key | null | undefined) => (
                   <div key={index} className={
-                    (data?.strike && currentStock?.regularMarketPrice ) &&
-                      data?.strike < currentStock.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
+                    (data?.strike && currentStock.info?.regularMarketPrice) &&
+                      data?.strike < currentStock.info.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
                   } onClick={() => handleDisplayOptionAnalytics(data)}>
                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p
@@ -544,7 +533,7 @@ export default function Home() {
               <div className={styles.elementsHeaderThStrikes}>
                 <div className={styles.elementThStrikes}><p>{formatDate(currentExpirationDate)}</p><p>({calculateDaysRemaining(currentExpirationDate)} days)</p></div>
               </div>
- 
+
               {filteredOptionChain?.strikes && filteredOptionChain.strikes.map((data: number, index: React.Key | null | undefined) => (
                 <div key={index} className={styles.elementsHeaderTdStrikes}>
                   <div className={styles.elementTdStrikes}><p>{data.toString()}</p></div>
@@ -579,8 +568,8 @@ export default function Home() {
                 <ElementsHeaderTh />
                 {(filteredOptionChain?.puts ?? []).map((data: OptionType, index: React.Key | null | undefined) => (
                   <div key={index} className={
-                    (data?.strike && currentStock?.regularMarketPrice) &&
-                      data?.strike > currentStock.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
+                    (data?.strike && currentStock.info?.regularMarketPrice) &&
+                      data?.strike > currentStock.info.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
                   } onClick={() => handleDisplayOptionAnalytics(data)}>
                     <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p
