@@ -84,9 +84,9 @@ export default function AnalyticsModal() {
         // Handles edge case where the option is not found
         if (!option?.contractSymbol) {
             if (currentOptionType === 'call') {
-                handleSetInfo('Put Contract N/A');
+                handleSetInfo('Put option contract not available');
             } else {
-                handleSetInfo('Call Contract N/A');
+                handleSetInfo('Call option contract not available');
             }
             return;
         }
@@ -129,7 +129,7 @@ export default function AnalyticsModal() {
 
         // Handles edge case where the option is not found
         if (!option?.contractSymbol) {
-            handleSetInfo(`Strike ${strike} - Contract N/A`);
+            handleSetInfo('Option contract not available for strike: ' + strike);
             setIsStrikesMenuOpen(false);
             return;
         }

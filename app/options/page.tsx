@@ -83,7 +83,7 @@ export default function Home() {
       )
       setModalView('analytics');
     } else {
-      handleSetInfo('Contract N/A');
+      handleSetInfo('Option contract not available');
     }
   };
 
