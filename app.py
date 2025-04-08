@@ -77,19 +77,18 @@ eastern = pytz.timezone("America/New_York")
 
 
 # Maximum idle time (e.g., 5 minutes)
-MAX_IDLE_TIME = timedelta(minutes=5)
+MAX_IDLE_TIME = timedelta(minutes=15)
 
 
 # Function to check if the market is open
 def is_market_open():
-    return True
-    # """Returns True if the market is open, otherwise False."""
-    # now_et = (
-    #     datetime.now(pytz.utc).astimezone(eastern).time()
-    # )  # Convert to Eastern Time
-    # market_open_time = datetime.strptime("09:30", "%H:%M").time()  # 9:30 AM ET
-    # market_close_time = datetime.strptime("16:00", "%H:%M").time()  # 4:00 PM ET
-    # return market_open_time <= now_et < market_close_time
+    """Returns True if the market is open, otherwise False."""
+    now_et = (
+        datetime.now(pytz.utc).astimezone(eastern).time()
+    )  # Convert to Eastern Time
+    market_open_time = datetime.strptime("09:30", "%H:%M").time()  # 9:30 AM ET
+    market_close_time = datetime.strptime("16:00", "%H:%M").time()  # 4:00 PM ET
+    return market_open_time <= now_et < market_close_time
 
 
 # Function to check if today is a market holiday
@@ -366,7 +365,7 @@ def stock_subscribe(data):
                 print(f"Symbol {symbol} already exists for sid {sid}")
         emit(
             "message",
-            {"message": f"{sid} subscribed"},
+            {"message": f"{sid} subscribed to {symbols}"},
             to=sid,
             namespace="/stock",
         )
