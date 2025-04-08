@@ -18,6 +18,7 @@ import {
 } from '@/app/utils/utils';
 import { OptionType } from '@/app/types/types';
 import React from 'react';
+import { useAuthContext } from '../providers/AuthProvider';
 
 
 const styledButtonStyles = {
@@ -35,8 +36,11 @@ export default function Home() {
     currentExpirationDates,
     currentStock,
     setCurrentExpirationDate,
+    setCurrentOptionOrder,
     setModalView,
   } = useAppContext();
+
+  const { handleSetInfo } = useAuthContext();
 
 
   // State variables
@@ -63,27 +67,34 @@ export default function Home() {
   const strikeTableRef = useRef<HTMLDivElement>(null);
   const putTableRef = useRef<HTMLDivElement>(null);
 
+
   // Function to handle the display of option analytics
-  const handleDisplayOptionAnalytics = (option: OptionType, action?: 'Buy' | 'Sell',) => {
-    console.log('Selected Option:', option);
-    console.log('Action:', action);
-    // setCurrentOptionOrder({
-    //   action: action || 'Buy',
-    //   option: option,
-    //   quantity: 10,
-    // });
-    setModalView('analytics');
+  const handleDisplayOptionAnalytics = (option: OptionType, action?: 'buy' | 'sell') => {
+    console.log('Selected Option: ', option.contractSymbol); 
+    console.log ('Current Expiration Date: ', currentExpirationDate); 
+    if (option.contractSymbol && currentExpirationDate) {
+      setCurrentOptionOrder(
+        {
+          action: action ?? 'buy',
+          option: option,
+          orderType: undefined,
+          strikes: currentStock?.optionChain[currentExpirationDate]?.strikes,
+        }
+      )
+      setModalView('analytics');
+    } else {
+      handleSetInfo('Contract N/A');
+    }
   };
 
   // Function to retrieve option chain data for a specific expiration date
   const changeExpirationDate = (date: string) => {
-    console.log('Selected Expiration Date:', date);
     setCurrentExpirationDate(date);
   };
 
   // Function to handle the option strategy button
   const handleOptionStrategy = () => {
-
+    handleSetInfo('More strategies coming soon!');
   };
 
   // Function to toggle the bottom element
@@ -147,7 +158,7 @@ export default function Home() {
 
   // useEffect to sync the scroll position of the three tables
   useEffect(() => {
-    console.log('Syncing scroll position');
+    // console.log('Syncing scroll position');
     const callTable = callTableRef.current;
     const strikeTable = strikeTableRef.current;
     const putTable = putTableRef.current;
@@ -192,16 +203,11 @@ export default function Home() {
 
   // useEffect to filter the option chain when current stock changes
   useEffect(() => {
-    if (currentStock) {
-      console.log('Current Stock Info:', currentStock.info);
-      console.log('Current Option Chain:', currentStock.optionChain);
-      console.log('Current Expiration Date:', currentExpirationDate);
-      const updatedFilteredOptionChain = getFilteredOptionChain(currentStock.optionChain, currentExpirationDate, displayStrikes, currentStock.info?.regularMarketPrice ?? 0);
-      console.log('Filtered Option Chain:', updatedFilteredOptionChain);
-      if(updatedFilteredOptionChain) {
+    if (currentStock && currentExpirationDate && currentStock.info.regularMarketPrice) {
+      const updatedFilteredOptionChain = getFilteredOptionChain(currentStock.optionChain, currentExpirationDate, displayStrikes, currentStock.info.regularMarketPrice);
+      if (updatedFilteredOptionChain) {
         setFilteredOptionChain(updatedFilteredOptionChain);
       }
-     
     };
   }, [currentExpirationDate, currentStock, displayStrikes]);
 
@@ -304,7 +310,7 @@ export default function Home() {
               <p>
                 {
                   (currentStock.info.dividendYield != null && currentStock.info.dividendYield != 0)
-                    ? `${(currentStock.info.dividendYield.toFixed(2))}%`
+                    ? `${(currentStock?.info?.dividendYield.toFixed(2))}%`
                     : '--'
                 }
               </p>
@@ -506,11 +512,11 @@ export default function Home() {
                     (data?.strike && currentStock.info?.regularMarketPrice) &&
                       data?.strike < currentStock.info.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
                   } onClick={() => handleDisplayOptionAnalytics(data)}>
-                    <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '--'}</p></div>
+                    <div className={styles.elementTdLink}><p>{data?.contractSize ? data?.bid?.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p
                       className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : '--'}>
-                      {data?.mark ? data.mark.toFixed(2) : '--'}</p></div>
-                    <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '--'}</p></div>
+                      {data?.contractSize ? data?.mark?.toFixed(2) : '--'}</p></div>
+                    <div className={styles.elementTdLink}><p>{data?.contractSize ? data?.ask?.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.change ? formatPlusMinus(data.change) : '--'}</p></div>
                     <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '--'}</p></div>
@@ -571,12 +577,13 @@ export default function Home() {
                     (data?.strike && currentStock.info?.regularMarketPrice) &&
                       data?.strike > currentStock.info.regularMarketPrice ? styles.elementsHeaderTdTwo : styles.elementsHeaderTd
                   } onClick={() => handleDisplayOptionAnalytics(data)}>
-                    <div className={styles.elementTdLink}><p>{data?.bid ? data.bid.toFixed(2) : '--'}</p></div>
+                    <div className={styles.elementTdLink}><p>{data?.contractSize ? data?.bid?.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p
                       className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>
-                      {data?.mark ? data.mark.toFixed(2) : '--'}</p></div>
-                    <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '--'}</p></div>
-                    <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.lastPrice ? data.lastPrice.toFixed(2) : '--'}</p></div>
+                      {data?.contractSize ? data?.mark?.toFixed(2) : '--'}</p></div>
+                    {/* <div className={styles.elementTdLink}><p>{data?.ask ? data.ask.toFixed(2) : '--'}</p></div> */}
+                    <div className={styles.elementTdLink}><p>{data?.contractSize ? data?.ask?.toFixed(2) : '--'}</p></div>
+                    <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.contractSize ? data?.lastPrice?.toFixed(2) : '--'}</p></div>
                     <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.change ? formatPlusMinus(data.change) : '--'}</p></div>
                     <div className={styles.elementTd}><p className={data?.percentChange ? data.percentChange === 0 ? '' : isNumPositive(data.percentChange) ? styles.positive : styles.negative : ''}>{data?.percentChange ? `${formatPlusMinus(data.percentChange)}%` : '--'}</p></div>
                     <div className={styles.elementTd}><p>{data?.volume ? data.volume : '--'}</p></div>

@@ -1,132 +1,157 @@
-'use client'
+'use client';
 
-import { useEffect, 
-    // useState
- } from 'react';
-import { useAppContext } from "@/app/providers/AppProvider";
-// import { SearchOutlined } from "@mui/icons-material";
-// import styles from './Analytics.module.css';
-// import { StyledTextField } from '@/app/components/Styled';
-// import { InputAdornment } from "@mui/material";
-import React, { } from 'react';
-import {
-    //  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
-    //  TooltipProps 
-} from 'recharts';
-// import { ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from "@mui/icons-material";
-// import {
-//     StyledButton,
-//     StyledTextField
-// } from "../../Styled";
-import {
-    // determineOptionExpirationDate, determineOptionType,
-    // formatDate,
-    // formatDate
-} from '@/app/utils/utils';
-// import { StyledButton } from "../../Styled";
-// import { convertUnixTimestamp, formatPlusMinus } from "@/app/utils/utils";
+import React, { useEffect, useRef, useState } from 'react';
+import styles from './Analytics.module.css';
+import { ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from '@mui/icons-material';
+import { useAppContext } from '@/app/providers/AppProvider';
 
-export default function Analytics() {
-    const {
-        // currentExpirationDate,
-        // currentOptionOrder,
-        // expirationDates,
-        // optionChain,
-        // setCurrentOptionOrder, 
-    } = useAppContext();
+import { determineOptionBreakEven, determineOptionCost, determineOptionExpirationDate, determineOptionMaxLoss, determineOptionType } from '@/app/utils/utils';
+import { StyledButton, StyledTextField } from '../../Styled';
+import { OptionOrderType, OptionType } from '@/app/types/types';
+import { useAuthContext } from '@/app/providers/AuthProvider';
 
-  
-    // const [inputValue, setInputValue] = useState<number | ''>(quantity);
+export default function AnalyticsModal() {
+    const { currentStock, currentOptionOrder, setCurrentOptionOrder } = useAppContext();
+    const { handleSetInfo } = useAuthContext();
 
-    const strikesMenuButtonRef = React.useRef<HTMLButtonElement>(null);
-    const strikesMenuRef = React.useRef<HTMLDivElement>(null);
-    // const expirationMenuButtonRef = React.useRef<HTMLButtonElement>(null);
-    // const expirationMenuRef = React.useRef<HTMLDivElement>(null);
-    // const [isExpirationMenuOpen, setIsExpirationMenuOpen] = React.useState(false);
-    // const [isStrikesMenuOpen, setIsStrikesMenuOpen] = React.useState(false);
+    const [isStrikesMenuOpen, setIsStrikesMenuOpen] = useState(false);
+    const [quantity, setQuantity] = useState<number>(10);
 
-    // let strikes: number[] = [];
+    const strikesMenuButtonRef = useRef<HTMLButtonElement>(null);
+    const strikesMenuRef = useRef<HTMLDivElement>(null);
 
-    // if (currentExpirationDate && optionChain) {
-    //     strikes = optionChain[currentExpirationDate]?.strikes || [];
-    // }
+    // Functions To Handle Option Order Updates
 
-    // const handleUpdateStrike = (strike: number) => {
-    //     const updatedOption = currentExpirationDate 
-    //         ? optionChain?.[currentExpirationDate]?.calls.find((option) => option.strike === strike) 
-    //         : undefined;
+    // Function to handle the update of the action (buy/sell) of the option order
+    const handleUpdateAction = () => {
+        if (!currentOptionOrder?.action) {
+            console.error('Action is undefined');
+            return;
+        }
 
-    //     if (updatedOption == undefined) {
-    //         console.log('updatedOption is undefined');
-    //         return;
-    //     }
+        let newAction: 'buy' | 'sell';
 
-    //     if (updatedOption) {
-    //         setCurrentOptionOrder({
-    //             ...currentOptionOrder,
-    //             option: updatedOption,
-    //         });
-    //     }
+        if (currentOptionOrder.action === 'buy') {
+            newAction = 'sell';
+        } else {
+            newAction = 'buy';
+        }
 
-    //     setIsStrikesMenuOpen(false);
-    // };
-    // const handleUpdateQuantity = (quantity: number) => {
-    //     setCurrentOptionOrder({
-    //         ...currentOptionOrder,
-    //         quantity: quantity,
-    //     })
-    // };
+        const newOption = currentOptionOrder?.option;
+        const newOrderType = currentOptionOrder?.orderType;
+        const newStrikes = currentOptionOrder?.strikes;
 
-    // console.log('currentOptionOrder', currentOptionOrder);
-  
-    // let breakEvenPrice: number | undefined;
-    // let maxLoss: number | undefined;
-    // let maxProfit: number | undefined;
-    // const optionAsk = currentOptionOrder?.option?.ask || 0;
-    // console.log('optionAsk', optionAsk);
-    // const optionBid = currentOptionOrder?.option?.bid || 0;
-    // console.log('optionBid', optionBid);
-    // const optionStrike = currentOptionOrder?.option?.strike || 0;
-    // console.log('optionStrike', optionStrike);
-    // const optionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
-    // console.log('optionType', optionType);
-    // const quantity = currentOptionOrder?.quantity || 1;
+        if (!newOption) {
+            console.error('Option is undefined');
+            return;
+        }
 
-    // if (optionType === 'Call') {
-    //     breakEvenPrice = optionStrike + optionAsk;
-    //     maxLoss = optionAsk * (quantity * 100);
-    //     maxProfit = Infinity;
-    // } else {
-    //     breakEvenPrice = optionStrike - optionAsk;
-    //     maxLoss = optionAsk * (quantity * 100);
-    //     maxProfit = (optionStrike - optionAsk) * 100 * quantity;
-    // }
+        const newOptionOrder: OptionOrderType = {
+            action: newAction,
+            option: newOption,
+            orderType: newOrderType,
+            strikes: newStrikes,
+        };
 
-    // console.log('optionType', optionType);
-    // console.log('maxLoss', maxLoss);
-    // const contractSymbol = currentOptionOrder?.option?.contractSymbol;
-    // console.log('contractSymbol', contractSymbol);
-    // const expirationDate = determineOptionExpirationDate(currentOptionOrder?.option?.contractSymbol || '');
-    // console.log('expirationDate', expirationDate);
+        setCurrentOptionOrder(newOptionOrder);
+        console.log('Updated Option Order: ', newOptionOrder);
+    };
 
-    // if(contractSymbol == '0') {
-    //     maxLoss = 0;
-    //     maxProfit = 0;
-    //     breakEvenPrice = 0;
-    // }
+    // Function to handle the update of the option based on the option type (call/put)
+    const handleUpdateOptionByType = () => {
+        if (!currentOptionOrder || !currentStock) {
+            if (!currentOptionOrder) {
+                console.error('Option Order is undefined');
+            }
+            if (!currentStock) {
+                console.error('Current Stock is undefined');
+            }
+            handleSetInfo('Error: Current Stock or Option Order is undefined');
+            return;
+        }
+
+        const expirationDate = determineOptionExpirationDate(currentOptionOrder?.option?.contractSymbol || '');
+        const currentOptionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
+
+        let option: OptionType | undefined;
+
+        if (currentOptionType === 'call') {
+            option = currentStock.optionChain[expirationDate].puts.find((option: OptionType) => option.strike === currentOptionOrder?.option?.strike);
+        } else if (currentOptionType === 'put') {
+            option = currentStock.optionChain[expirationDate].calls.find((option: OptionType) => option.strike === currentOptionOrder?.option?.strike);
+        } 
+
+        // Handles edge case where the option is not found
+        if (!option?.contractSymbol) {
+            if (currentOptionType === 'call') {
+                handleSetInfo('Put Contract N/A');
+            } else {
+                handleSetInfo('Call Contract N/A');
+            }
+            return;
+        }
+
+        const updatedOptionOrder: OptionOrderType = {
+            action: currentOptionOrder?.action,
+            option: option,
+            orderType: currentOptionOrder?.orderType,
+            strikes: currentOptionOrder?.strikes,
+        };
+
+        setCurrentOptionOrder(updatedOptionOrder);
+        console.log('Updated Option Order: ', updatedOptionOrder);
+    };
+
+    // Function to handle the update of a the option based on the selected strike
+    const handleUpdateOptionByStrike = (strike: number) => {
+        if (!currentOptionOrder || !currentStock) {
+            if (!currentOptionOrder) {
+                console.error('Option Order is undefined');
+            }
+            if (!currentStock) {
+                console.error('Current Stock is undefined');
+            }
+            handleSetInfo('Error: Current Stock or Option Order is undefined');
+            setIsStrikesMenuOpen(false);
+            return;
+        }
+
+        const expirationDate = determineOptionExpirationDate(currentOptionOrder?.option?.contractSymbol || '');
+        const currentOptionType = determineOptionType(currentOptionOrder?.option?.contractSymbol || '');
+
+        let option: OptionType | undefined;
+
+        if (currentOptionType === 'call') {
+            option = currentStock.optionChain[expirationDate].calls.find((option: OptionType) => option.strike === strike);
+        } else if (currentOptionType === 'put') {
+            option = currentStock.optionChain[expirationDate].puts.find((option: OptionType) => option.strike === strike);
+        }
+
+        // Handles edge case where the option is not found
+        if (!option?.contractSymbol) {
+            handleSetInfo(`Strike ${strike} - Contract N/A`);
+            setIsStrikesMenuOpen(false);
+            return;
+        }
+
+        const updatedOptionOrder: OptionOrderType = {
+            action: currentOptionOrder?.action,
+            option: option,
+            orderType: currentOptionOrder?.orderType,
+            strikes: currentOptionOrder?.strikes,   
+        };
+        setCurrentOptionOrder(updatedOptionOrder);
+        setIsStrikesMenuOpen(false);
+        console.log('Updated Option Order: ', updatedOptionOrder);
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (strikesMenuRef.current && !strikesMenuRef.current.contains(event.target as Node)) {
                 if (!strikesMenuButtonRef.current?.contains(event.target as Node)) {
-                    // setIsStrikesMenuOpen(false);
+                    setIsStrikesMenuOpen(false);
                 }
             }
-            // if (expirationMenuRef.current && !expirationMenuRef.current.contains(event.target as Node)) {
-            //     if (!expirationMenuButtonRef.current?.contains(event.target as Node)) {
-            //         setIsExpirationMenuOpen(false);
-            //     }
-            // }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -135,154 +160,185 @@ export default function Analytics() {
     }, []);
 
     return (
-        <div>
-            <h1>Analytics</h1>
-            {/* <LineChart width={500} height={300} data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-            </LineChart> */}
-        </div>
-    );
-    // return (
-    //     <>
-    //         {
-    //             contractSymbol == '0' ?
-    //                 (
-    //                     <div className={styles.elementText}>
-    //                         <p>
-    //                             Option data not available for this strike. Please select another option. We are in early development and are using a limited dataset. Thank you for your patience.
-    //                         </p>
-    //                     </div>
-    //                 )
-    //                 :
-    //                 <div className={styles.elementTwo}>
-    //                     <div className={styles.elementTwoItem}>
-    //                         <p>Ask:</p>
-    //                         {/* {currentOptionOrder?.option?.ask?.toFixed(2)} */}
-    //                     </div>
-    //                     <div className={styles.elementTwoItem}>
-    //                         <p>Bid:</p>
-    //                         {/* {currentOptionOrder?.option?.bid?.toFixed(2)} */}
-    //                     </div>
-    //                     <div className={styles.elementTwoItem}>
-    //                         <p>Type:</p>
-    //                         {/* {determineOptionType(currentOptionOrder?.option?.contractSymbol || '')} */}
-    //                     </div>
-    //                 </div>
-    //         }
-    //         <div className={styles.elementTwo}>
-    //             <div className={styles.elementTwoItem}>
-    //                 <p>Action </p>
-    //                 <StyledButton endIcon={<CachedOutlined />}
-    //                 >
-    //                     {/* {currentOptionOrder?.action ? currentOptionOrder.action : 'Action'} */}
-    //                 </StyledButton>
-    //             </div>
-    //             <div className={styles.elementTwoItem}>
-    //                 <p>Quantity</p>
-    //                 <StyledTextField
-    //                     sx={{ maxWidth: '7rem' }}
-    //                     type="number"
-    //                     value={quantity}
-    //                     onChange={(e) => {
-    //                         const value = e.target.value;
-    //                         if (!value) {
-    //                             // setInputValue('');
-    //                             return;
-    //                         } else {
-    //                             if (parseInt(value) < 1) {
-    //                                 return;
-    //                             }
-    //                             handleUpdateQuantity(parseInt(value));
-    //                         }
+        <>
+            <div className={styles.elementTwo}>
+                <div className={styles.elementTwoItem}>
+                    <p>Ask:</p>
+                    {currentOptionOrder?.option?.ask?.toFixed(2)}
+                </div>
+                <div className={styles.elementTwoItem}>
+                    <p>Bid:</p>
+                    {currentOptionOrder?.option?.bid?.toFixed(2)}
+                </div>
+                <div className={styles.elementTwoItem}>
+                    <p>Type</p>
+                    <StyledButton variant="contained" endIcon={<CachedOutlined />} onClick={() => handleUpdateOptionByType()}
+                        sx={{
+                            borderRadius: '0px',
+                            backgroundColor: 'fff',
+                            justifyContent: 'space-between',
+                            minWidth: '7rem',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {determineOptionType(currentOptionOrder?.option?.contractSymbol || '') === 'call' ? 'Call' : 'Put'}
+                    </StyledButton>
+                </div>
+            </div>
 
-    //                     }}
-    //                 ></StyledTextField>
-    //             </div>
-    //         </div>
-    //         <div className={styles.elementTwo}>
-    //             <div className={styles.elementTwoItem}>
-    //                 <p>Expiration</p>
-    //                 <div className={styles.expirationInput}>
-    //                     {formatDate(currentExpirationDate)}
-    //                 </div>
-    //                 {/* <div className={styles.anchor}>
-    //                     <StyledButton variant="contained"
-    //                         onClick={() => setIsExpirationMenuOpen(prev => !prev)}
-    //                         endIcon={<ArrowDropDownOutlined />}
-    //                         ref={expirationMenuButtonRef}
-    //                         sx={{
-    //                             justifyContent: 'space-between',
-    //                             width: '9rem',
-    //                             whiteSpace: 'nowrap',
-    //                         }}>{expirationDate}</StyledButton>
-    //                     {isExpirationMenuOpen && (
-    //                         <div className={styles.menu} ref={expirationMenuRef}>
-    //                             {expirationDates.map((date, index) => (
-    //                                 <div className={styles.menuItem} key={index} onClick={() => handleUpdateExpirationDate(date)}>{
-    //                                     // formatDate(date).toLocaleUpperCase()
-    //                                     date.toLocaleUpperCase()
-    //                                 }</div>
-    //                             ))}
-    //                         </div >
-    //                     )}
-    //                 </div> */}
-    //             </div>
-    //             <div className={styles.elementTwoItem}>
-    //                 <p>Strike</p>
-    //                 <div className={styles.anchor}>
-    //                     <StyledButton variant="contained"
-    //                         onClick={() => setIsStrikesMenuOpen(prev => !prev)}
-    //                         endIcon={<ArrowDropDownOutlined />}
-    //                         ref={strikesMenuButtonRef}
-    //                         sx={{
-    //                             borderRadius: '0px',
-    //                             backgroundColor: 'fff',
-    //                             justifyContent: 'space-between',
-    //                             minWidth: '7rem',
-    //                             whiteSpace: 'nowrap',
-    //                         }}>
-    //                             {/* {currentOptionOrder?.option?.strike} */}
-    //                         </StyledButton>
-    //                     {isStrikesMenuOpen && (
-    //                         <div className={styles.menu} ref={strikesMenuRef}>
-    //                             {strikes.map((strike, index) => (
-    //                                 <div className={styles.menuItem}  // style={{ backgroundColor: 'red' }}
-    //                                     key={index} 
-    //                                     onClick={() => handleUpdateStrike(strike)}
-    //                                     >
-    //                                         {strike}
-    //                                 </div>
-    //                             ))}
-    //                         </div >
-    //                     )}
-    //                 </div>
-    //             </div>
-    //         </div>
-    //         <div className={styles.element}>
-    //             <div className={styles.elementItem}>
-    //                 <SentimentVerySatisfied sx={{ color: 'green' }} fontSize="large" /> <p>Max Profit: {maxProfit?.toFixed(2)}</p>
-    //             </div>
-    //         </div>
-    //         <div className={styles.element}>
-    //             <div className={styles.elementItem}>
-    //                 <SentimentVeryDissatisfied sx={{
-    //                     color: 'red',
-    //                 }} fontSize="large" /> <p>Max Loss: {maxLoss.toFixed(2)}</p>
-    //             </div>
-    //         </div>
-    //         <div className={styles.element}>
-    //             <div className={styles.elementItem}>
-    //                 <SentimentSatisfied sx={{
-    //                     color: 'grey',
-    //                 }} fontSize="large" /> <p>Break Even: {breakEvenPrice?.toFixed(2)}</p>
-    //             </div>
-    //         </div>
-    //         {/* <p>Quantity: {quantity}</p> */}
-    //         {/* <p>Option Ask Price: {currentOptionOrder?.option?.ask}</p> */}
-    //         {/* <p>Option Total Cost: {cost}</p> */}
-    //     </>
-    // );
+            <div className={styles.elementTwo}>
+                <div className={styles.elementTwoItem}>
+                    <p>Action </p>
+                    <StyledButton variant="contained" endIcon={<CachedOutlined />} onClick={() => handleUpdateAction()}
+                        sx={{
+                            borderRadius: '0px',
+                            backgroundColor: 'fff',
+                            justifyContent: 'space-between',
+                            minWidth: '7rem',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {currentOptionOrder?.action === 'buy' ? 'Buy' : 'Sell'}
+                    </StyledButton>
+                </div>
+                <div className={styles.elementTwoItem}>
+                    <p>Quantity</p>
+                    <StyledTextField
+                        sx={{ maxWidth: '7rem' }}
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value) && value > 0) {
+                                setQuantity(value);
+                            } else {
+                                return;
+                            }
+                        }}
+                    ></StyledTextField>
+                </div>
+            </div>
+
+            <div className={styles.elementTwo}>
+                <div className={styles.elementTwoItem}>
+                    <p>Expiration</p>
+                    <div className={styles.expirationInput}>
+                        {determineOptionExpirationDate(currentOptionOrder?.option?.contractSymbol || '')}
+                    </div>
+                </div>
+                <div className={styles.elementTwoItem}>
+                    <p>Strike</p>
+                    <div className={styles.anchor}>
+                        <StyledButton variant="contained"
+                            onClick={() => setIsStrikesMenuOpen(prev => !prev)}
+                            endIcon={<ArrowDropDownOutlined />}
+                            ref={strikesMenuButtonRef}
+                            sx={{
+                                borderRadius: '0px',
+                                backgroundColor: 'fff',
+                                justifyContent: 'space-between',
+                                minWidth: '7rem',
+                                whiteSpace: 'nowrap',
+                            }}>
+                            {currentOptionOrder?.option?.strike}
+                        </StyledButton>
+                        {isStrikesMenuOpen && (
+                            <div className={styles.menu} ref={strikesMenuRef}>
+                                {
+                                    currentOptionOrder?.strikes?.map((strike, index) => (
+                                        <div className={styles.menuItem} key={index} onClick={() => handleUpdateOptionByStrike(strike)}>
+                                            {strike}
+                                        </div>
+                                    ))
+                                }
+                            </div >
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className={styles.element}>
+                <div className={styles.elementItem}>
+                    <p>Estimated Total Cost: {determineOptionCost(
+                        currentOptionOrder?.action,
+                        currentOptionOrder?.option,
+                        quantity
+                    ).toFixed(2)}</p>
+                </div>
+            </div>
+
+            <div className={styles.element}>
+                <div className={styles.elementItem}>
+                    <SentimentVerySatisfied sx={{ color: 'green' }} fontSize="large" /> <p>Max Profit: {determineOptionMaxProfit(
+                        currentOptionOrder?.action,
+                        currentOptionOrder?.option,
+                        quantity
+                    ).toFixed(2)}</p>
+                </div>
+            </div>
+
+            <div className={styles.element}>
+                <div className={styles.elementItem}>
+                    <SentimentVeryDissatisfied sx={{
+                        color: 'red',
+                    }} fontSize="large" /> <p>Max Loss: {determineOptionMaxLoss(
+                        currentOptionOrder?.action,
+                        currentOptionOrder?.option,
+                        quantity
+                    ).toFixed(2)}</p>
+                </div>
+            </div>
+
+            <div className={styles.element}>
+                <div className={styles.elementItem}>
+                    <SentimentSatisfied sx={{
+                        color: 'grey',
+                    }} fontSize="large" /> <p>Break Even Price: {
+                        determineOptionBreakEven(
+                            currentOptionOrder?.action,
+                            currentOptionOrder?.option,
+                        ).toFixed(2
+                        )}</p>
+                </div>
+            </div>
+
+        </>
+    );
+}
+
+// Function to determine the maximum profit of an option order
+export const determineOptionMaxProfit = (
+    action: 'buy' | 'sell' | undefined,
+    option: OptionType | undefined,
+    quantity: number
+): number => {
+    if (action === undefined || option === undefined || option?.ask === undefined || option?.bid === undefined || option?.strike === undefined) {
+        return 0;
+    }
+
+    const optionType = determineOptionType(option?.contractSymbol || '');
+
+    console.log('Option Type: ', optionType);
+
+    if (optionType === 'call') {
+        if (action === 'buy') {
+            console.log('Max Profit: ', Infinity);
+            return Infinity
+        } else if (action === 'sell') {
+            console.log('Max Profit: ', option.bid * (quantity * 100));
+            return option.bid * (quantity * 100);
+        }
+    }
+
+    if (optionType === 'put') {
+        if (action === 'buy') {
+            console.log('Max Profit: ', option.strike * (quantity * 100) - option.ask * (quantity * 100));
+            return option.strike * (quantity * 100) - option.ask * (quantity * 100);
+        } else if (action === 'sell') {
+            console.log('Max Profit: ', option.bid * (quantity * 100));
+            return option.bid * (quantity * 100);
+        }
+    }
+
+    return 0;
 }

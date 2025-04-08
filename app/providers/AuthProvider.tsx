@@ -60,11 +60,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         throw error;
     }, []);
-
-    const handleSetInfo = useCallback((info: string) => {
+    const handleSetInfo = useCallback((info: string, limit?: number) => {
         setInfo(info);
-    }, []);
 
+        // Set a timer to reset info to an empty string after 4 seconds
+        const timer = setTimeout(() => {
+            setInfo('');
+        }, limit || 4000);
+
+        // Cleanup the timer if the component unmounts or the function is called again
+        return () => clearTimeout(timer);
+    }, []);
     // Auth Methods
     const createUserAccount = useCallback(async (email: string, password: string): Promise<void> => {
         setIsLoading(true);

@@ -1,5 +1,5 @@
 import Papa, { ParseResult } from 'papaparse';
-import { OptionChainType } from '@/app/types/types';
+import { OptionChainType, OptionType } from '@/app/types/types';
 
 // Store the symbols from both CSV files
 let file1Symbols: Set<string> = new Set();
@@ -21,39 +21,6 @@ const holidays = [
     '2025-11-27', // Thanksgiving Day
     '2025-12-25', // Christmas Day
 ];
-
-// export const convertUnixTimestamp = (timestamp: number | undefined): string => {
-//     if (timestamp == null) return '';
-
-//     const dateObj = new Date(timestamp * 1000);
-//     const hours = dateObj.getUTCHours();
-//     const minutes = dateObj.getUTCMinutes();
-//     const day = dateObj.getUTCDay();
-
-//     // Convert UTC time to Eastern Time (ET)
-//     const easternHours = (hours - 5 + 24) % 24; // ET is UTC-5
-
-//     // Check if it's a weekend (Saturday or Sunday) or a holiday
-//     if (day === 0 || day === 6 || isHoliday(dateObj)) {
-//         return 'US Market Closed';
-//     }
-
-//     // Check if the market is open (9:30 AM ET to 4:00 PM ET)
-//     if (easternHours < 9 || (easternHours === 9 && minutes < 30) || easternHours >= 16) {
-//         return 'US Market Closed';
-//     }
-
-//     // Format the time as "as of 12:50 PM ET"
-//     const options: Intl.DateTimeFormatOptions = {
-//         hour: 'numeric',
-//         minute: 'numeric',
-//         hour12: true,
-//         timeZone: 'America/New_York'
-//     };
-//     const formattedTime = dateObj.toLocaleTimeString('en-US', options);
-
-//     return `as of ${formattedTime} ET`;
-// };
 
 export const convertUnixTimestamp = (timestamp: number | undefined): string => {
     if (timestamp == null) return '';
@@ -218,6 +185,7 @@ const cdf = (x: number) => {
     return (1.0 + erf(x / Math.sqrt(2))) / 2.0;
 };
 
+// Function to calculate the Black-Scholes call option price
 export const blackScholesCall = (S: number, X: number, T: number, r: number, sigma: number) => {
     const d1 = (Math.log(S / X) + (r + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
     const d2 = d1 - sigma * Math.sqrt(T);
@@ -234,20 +202,18 @@ export const calculateDaysRemaining = (expirationDate: string | undefined) => {
     return daysDiff;
 };
 
+// Function to check if the stock market is open
 export const stockMarketOpen = (): boolean => {
     return true;
 };
 
+// Function to filter the option chain based on the current expiration date, display strikes, and market price
 export const getFilteredOptionChain = (
-    optionChain: OptionChainType | undefined,
-    currentExpirationDate: string | undefined,
+    optionChain: OptionChainType,
+    currentExpirationDate: string,
     displayStrikes: number,
     regularMarketPrice: number
 ) => {
-    // console.log('Option Chain:', optionChain);
-    // console.log('Current Expiration Date:', currentExpirationDate);
-    // console.log('Display Strikes:', displayStrikes);
-    // console.log('Near Price Input Value:', regularMarketPrice);
     if (!currentExpirationDate || !optionChain) {
         return null;
     }
@@ -299,29 +265,43 @@ export const getFilteredOptionChain = (
     return filteredOptionChain;
 };
 
-export const determineOptionType = (symbol: string): string => {
-    // Traverse the symbol from right to left
-    for (let i = symbol.length - 1; i >= 0; i--) {
+// Function to determine the option cost based on action, option type, and quantity
+export const determineOptionCost = (
+    action: 'buy' | 'sell' | undefined,
+    option: OptionType | undefined,
+    quantity: number
+) => {
+    if (action === 'buy' && option?.ask) {
+        return option.ask * (quantity * 100);
+    } else if (action === 'sell' && option?.bid) {
+        return option.bid * (quantity * 100);
+    }
+    return 0;
+}
+
+// Function to determine the option type (Call or Put) based on the symbol
+export const determineOptionType = (symbol: string): 'call' | 'put' | 'n/a' => {
+    // Contract symbols can be in various formats, e.g., "AAPL230421C00150000" or "AAPL230421P00150000"
+    // The option type will always be the first letter after the first set of digits
+    // Example: "AAPL230421C00150000" -> "C" (Call) or "P" (Put)
+    for (let i = 0; i < symbol.length - 2; i++) {
         const char = symbol.charAt(i);
+        const char2 = symbol.charAt(i + 1);
+        const isNum = !isNaN(parseInt(char));
 
-        // Check if the character is a non-numeric character (either 'C' or 'P')
-        if (char === 'C') {
-            return 'Call';
-        } else if (char === 'P') {
-            return 'Put';
-        }
-
-        // If it's a number, continue to the next character
-        if (!/\d/.test(char)) {
-            continue;
+        if (isNum && (char2.toLowerCase() == 'c' || char2.toLowerCase() =='p')) {
+           if (char2.toLowerCase() == 'c') {
+                return 'call';
+            } else if (char2.toLowerCase() == 'p') {
+                return 'put';
+            }     
         }
     }
 
-    // If no 'C' or 'P' found, throw an error
-    // throw new Error('Invalid option contract symbol');
-    return 'N/A';
+    return 'n/a';
 };
 
+// Function to determine the expiration date from the symbol
 export const determineOptionExpirationDate = (symbol: string): string => {
     // Find the first numeric sequence in the symbol
     const match = symbol.match(/\d+/);
@@ -346,3 +326,67 @@ export const determineOptionExpirationDate = (symbol: string): string => {
     // const formattedDate = formatDate(`${year}-${month}-${day}`);
     // return formattedDate;
 };
+
+// Function to determine the break-even point for an option order
+export const determineOptionBreakEven = (
+    action: 'buy' | 'sell' | undefined,
+    option: OptionType | undefined,
+): number => {
+    if (action === undefined || option === undefined) {
+        return 0;
+    }
+
+    const optionPrice = action === 'buy' ? option?.ask : option?.bid;
+    const optionType = determineOptionType(option?.contractSymbol || '');
+    const strikePrice = option?.strike;
+
+    if (optionPrice === undefined || optionType === null || strikePrice === undefined) {
+        return 0;
+    }
+
+    if (optionType === 'call') {
+        return optionPrice + strikePrice;
+    } else if (optionType === 'put') {
+        return strikePrice - optionPrice;
+    }
+
+    return 0;
+}
+
+
+// Function to determine the maximum loss of an option order
+export const determineOptionMaxLoss = (
+    action: 'buy' | 'sell' | undefined,
+    option: OptionType | undefined,
+    quantity: number
+): number => {
+    if (action === undefined || option === undefined || option?.ask === undefined || option?.bid === undefined || option?.strike === undefined) {
+        return 0;
+    }
+
+    const optionType = determineOptionType(option?.contractSymbol || '');
+
+    console.log('Option Type: ', optionType);
+
+    if (optionType === 'call') {
+        if (action === 'buy') {
+            console.log('Max Loss: ', option.ask * (quantity * 100));
+            return option.ask * (quantity * 100);
+        } else if (action === 'sell') {
+            console.log('Max Loss: ', Infinity);
+            return Infinity
+        }
+    }
+
+    if (optionType === 'put') {
+        if (action === 'buy') {
+            console.log('Max Loss: ', option.ask * (quantity * 100));
+            return option.ask * (quantity * 100);
+        } else if (action === 'sell') {
+            return option.strike * (quantity * 100) - option.bid * (quantity * 100);
+
+        }
+    }
+
+    return 0;
+}

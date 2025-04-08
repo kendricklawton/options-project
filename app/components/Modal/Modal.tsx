@@ -11,7 +11,7 @@ import { useAppContext } from '../../providers/AppProvider';
 export default function Modal() {
     const {  modalView, setModalView } = useAppContext();
 
-    const renderView = () => {
+    const RenderView = () => {
         if (!modalView) return null;
         switch (modalView.toLowerCase()) {
             case 'account':
@@ -52,7 +52,7 @@ export default function Modal() {
                             }}onClick={onClose}><Close /></IconButton>
                         </div>
                     </div>
-                    {renderView()}
+                    {RenderView()}
                 </div>
             </div>
         )

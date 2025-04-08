@@ -12,6 +12,8 @@
     padding-top: 1rem;
     padding-bottom: 1rem;
     z-index: 990;
+
+
 }
 
 .wrapper {
@@ -23,6 +25,7 @@
     overflow: auto;
     border: 1px solid gray;
     background-color: #fff;
+    
 }
 
 .header {

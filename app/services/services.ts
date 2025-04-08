@@ -15,6 +15,7 @@ const restAPIService = async (endpoint: string, params?: object) => {
             params,
             cancelToken: source.token,
         });
+        console.log('REST API Response:', response.data);
         clearTimeout(timeout);
         return response.data;
     } catch (error) {

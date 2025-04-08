@@ -1,16 +1,14 @@
 import { User } from "firebase/auth";
 
-
 export interface AppContextType {
-
     currentExpirationDate?: string;
     currentExpirationDates?: string[];
-    // currentOptionOrder?: OptionOrderType;
+    currentOptionOrder?: OptionOrderType;
     currentStock?: {
         info: InfoType;
         optionChain: OptionChainType;
     };
-    modalView?: string;
+    modalView: 'account' | 'analytics' | '';
     subscribedMap: Map<string, {
             info: InfoType;
             optionChain: OptionChainType;
@@ -18,12 +16,12 @@ export interface AppContextType {
     clearStockData: () => void;
     fetchStockData: (request: string[]) => Promise<void>;
     setCurrentExpirationDate: (expirationDate: string) => void;
+    setCurrentOptionOrder: (order: OptionOrderType) => void;
     setCurrentStock: (stock: {
         info: InfoType;
         optionChain: OptionChainType;
     }) => void;
-    // setCurrentOptionOrder: (optionOrder: OptionOrderType) => void;
-    setModalView: (view: string) => void;
+    setModalView: (view: 'account' | 'analytics' | '') => void;
 }
 
 export interface AuthContextType {
@@ -209,7 +207,8 @@ export interface OptionChainType {
 }
 
 export interface OptionOrderType {
-    action?: 'Buy' | 'Sell';
-    option?: OptionType;
-    quantity?: number;
+    action: 'buy' | 'sell';
+    option: OptionType;
+    orderType?: 'limit' | 'market';
+    strikes?: number[];
 }

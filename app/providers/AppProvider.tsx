@@ -11,7 +11,7 @@ import React, {
     useEffect,
 } from 'react';
 import { useAuthContext } from './AuthProvider';
-import { AppContextType, InfoType, OptionChainType } from '../types/types';
+import { AppContextType, InfoType, OptionChainType, OptionOrderType } from '../types/types';
 import { stockDataREST, stockDataWebSocket } from '../services/services';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -21,11 +21,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const [currentExpirationDate, setCurrentExpirationDate] = useState<string>();
     const [currentExpirationDates, setCurrentExpirationDates] = useState<string[]>([]);
+    const [currentOptionOrder, setCurrentOptionOrder] = useState<OptionOrderType>();
     const [currentStock, setCurrentStock] = useState<{
         info: InfoType;
         optionChain: OptionChainType;
     }>();
-    const [modalView, setModalView] = useState<string>();
+    const [modalView, setModalView] = useState<'account' | 'analytics' | ''>('');
     const [subscribedMap, setSubscribedMap] = useState<Map<
         string, {
             info: InfoType;
@@ -93,8 +94,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
                         setCurrentExpirationDate(expirationDates[0]);
                     }
-                } else {
-                    // console.log('REST - Only Setting Indexes Data - No Stock Data');
                 }
 
                 return updatedMap;
@@ -130,9 +129,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                         // console.log('WebSocket - Stock Data: ', stockData);
 
                         if (stockData) {
-                            // setCurrentStock(stockData);
-                            // const expirationDates = Object.keys(stockData.optionChain);
-                            // setCurrentExpirationDates(expirationDates);
                             setCurrentStock((prevStock) => ({
                                 ...prevStock,
                                 info: stockData.info,
@@ -147,9 +143,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
                                 const newDates = expirationDates.filter(date => !prevDates.includes(date));
                                 return [...prevDates, ...newDates];
                             });
-                        }
-                        else {
-                            // console.log('WebSocket - Only Setting Indexes Data - No Stock Data');
                         }
 
                         return updatedMap;
@@ -197,17 +190,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const contextValue = useMemo(() => ({
         currentExpirationDate,
         currentExpirationDates,
+        currentOptionOrder,
         currentStock,
         modalView,
         subscribedMap,
         clearStockData,
         fetchStockData,
         setCurrentExpirationDate,
+        setCurrentOptionOrder,
         setCurrentStock,
         setModalView,
     }), [
         currentExpirationDate,
         currentExpirationDates,
+        currentOptionOrder,
         currentStock,
         modalView,
         subscribedMap,
