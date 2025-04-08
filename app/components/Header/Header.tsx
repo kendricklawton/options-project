@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
     // AccountTreeOutlined,
+    // AccountTreeOutlined,
     CloseOutlined,
     CropOutlined,
     Menu,
@@ -153,7 +154,7 @@ export default function Header() {
                     </StyledTextField>
                     <div className={styles.links}>
                         {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link> */}
-                        <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />OPTIONS</Link>
+                        <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />Options</Link>
                         {/* <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
                     </div>
                 </div>

@@ -94,14 +94,13 @@
 
 .menu {
     position: absolute;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     right: 0;
 }
 
 .modeMenu {
     position: absolute;
-    /* right: 5rem; */
-    right: 4.5rem;
+    right: 5rem;
     bottom: -0.525rem;
     /* top: -2.525rem; */
 }

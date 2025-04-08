@@ -2,7 +2,7 @@
 import styles from './page.module.css';
 import React from 'react';
 import { useAppContext } from './providers/AppProvider';
-import { ArrowDropDownOutlined } from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, ArrowRightOutlined } from '@mui/icons-material';
 import { convertUnixTimestamp, formatPlusMinus, isNumPositive } from './utils/utils';
 // import { ArrowDropDownOutlined } from '@mui/icons-material';
 
@@ -10,6 +10,12 @@ export default function Home() {
   const { subscribedMap } = useAppContext();
 
   const symbols = ['^VIX', '^GSPC', '^DJI', '^IXIC'];
+  const symbolsMap = new Map<string, string>([
+    ['^VIX', 'VIX'],
+    ['^GSPC', 'S&P 500'],
+    ['^DJI', 'Dow Jones'],
+    ['^IXIC', 'NASDAQ'],
+  ]);
 
   return (
     <div className={styles.page}>
@@ -34,11 +40,18 @@ export default function Home() {
                           }
                         >
                           <div>
-                            <p>{key}</p>
+                            <p>{symbolsMap.get(key)}</p>
                             <p>{subscribedMap.get(key)?.info?.regularMarketPrice}</p>
                           </div>
                           <div>
-                            <ArrowDropDownOutlined />
+                            {
+                              subscribedMap.get(key)?.info.regularMarketChangePercent === 0
+                                ? <ArrowRightOutlined />
+                                : 
+                                isNumPositive(subscribedMap.get(key)?.info.regularMarketChangePercent || 0)
+                                  ? <ArrowDropUpOutlined />
+                                  : <ArrowDropDownOutlined />
+                            }
                             <p>
                               {`${formatPlusMinus(subscribedMap.get(key)?.info?.regularMarketChange)} `}
                               {`(${formatPlusMinus(subscribedMap.get(key)?.info?.regularMarketChangePercent)}%)`}
@@ -56,11 +69,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={styles.content}>
-          <h1>Options Project</h1>
-          <h2>Less is more. Lets focus on options.</h2>
-          <h2>Search a symbol to get started.</h2>
-        </div>
+        <h1>Options Project</h1>
+        <h2>Less is more. Lets focus on options.</h2>
+        <h2>Search a symbol to get started.</h2>
       </div>
     </div>
   );

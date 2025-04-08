@@ -243,6 +243,11 @@
     z-index: 5;
 }
 
+.elementTh {
+    width: 100%;
+    z-index: 989;
+}
+
 .elementsHeaderTd,
 .elementsHeaderTdTwo,
 .elementsHeaderTh {
@@ -373,7 +378,7 @@
     }
 
     .elementsHeaderTdTwo {
-        background-color: #a8b7c7;
+        background-color: #afbac5;
     }
 
     .menu {
