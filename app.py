@@ -48,6 +48,7 @@ socketio = SocketIO(
     async_mode="gevent",
 )
 
+
 user_tasks = defaultdict(dict)  # Store user tasks for each sid
 user_activity = defaultdict(datetime.now)  # Store last activity time for each sid
 
@@ -59,8 +60,8 @@ logging.basicConfig(
 )
 
 
-# Cache setup: TTLCache with a time-to-live (TTL) of 60 seconds for stock and index data
-cache = TTLCache(maxsize=100, ttl=15)
+# Cache setup: TTLCache with a time-to-live (TTL) of 30 seconds for stock and index data
+cache = TTLCache(maxsize=100, ttl=30)
 
 
 # Stock market holidays for 2025
@@ -77,7 +78,7 @@ eastern = pytz.timezone("America/New_York")
 
 
 # Maximum idle time (e.g., 5 minutes)
-MAX_IDLE_TIME = timedelta(minutes=15)
+MAX_IDLE_TIME = timedelta(minutes=4)
 
 
 # Function to check if the market is open
@@ -125,13 +126,19 @@ def get_stock_data(symbol):
     try:
         stock = yf.Ticker(symbol.strip().lower())
         info = stock.info
-
-        if symbol.startswith("^"):
-            return info
-
-        dates = list(stock.options)
         option_chain = {}
+        dates = []
 
+        if stock.options:
+            print(f"Options available for {symbol}: {stock.options}")
+            dates = list(stock.options)
+
+        if dates == []:
+            print(
+                f"No options available for {symbol}. Returning empty option chain."
+            )
+            return info, option_chain
+ 
         # Fetch option chain for each expiration date
         for date in dates:
             try:
@@ -195,28 +202,53 @@ def drop_idle_connections():
     """Drop idle WebSocket connections."""
     logging.info("Starting idle connection cleanup...")
     while True:
+        logging.info("Checking for idle connections...")
         now = datetime.now()
-        for sid, last_time in list(user_activity.items()):
-            if now - last_time > MAX_IDLE_TIME:
-                logging.info(f"Disconnecting idle client: {sid}")
-                socketio.emit(
-                    "message",
-                    {"message": "Idle connection closed"},
-                    to=sid,
-                    namespace="/stock",
+        if is_market_open():
+            for sid, last_time in list(user_activity.items()):
+                if now - last_time > MAX_IDLE_TIME:
+                    logging.info(f"Disconnecting idle client: {sid}")
+                    socketio.emit(
+                        "message",
+                        {"message": "Idle connection closed"},
+                        to=sid,
+                        namespace="/stock",
+                    )
+
+                    user_activity.pop(sid, None)  # Remove from last_activity
+                    user_tasks.pop(sid, None)  # Remove from user_tasks
+            gevent.sleep(60)  # Check every 60 seconds
+        else:
+            logging.info(
+                "drop_idle_connections - Market is closed. Stopping idle connection cleanup..."
+            )
+            # Wait until the market opens
+            while not is_market_open():
+                time_until_open = time_until_market_open()
+                minutes_until_open = int(time_until_open // 60)
+                seconds_until_open = int(time_until_open % 60)
+                logging.info(
+                    f"drop_idle_connections - Market is closed. It will reopen in {minutes_until_open} minutes and {seconds_until_open} seconds."
                 )
+                # Clear all user tasks and subscriptions
+                user_tasks.clear()
+                user_activity.clear()
 
-                user_activity.pop(sid, None)  # Remove from last_activity
-                user_tasks.pop(sid, None)  # Remove from user_tasks
-        gevent.sleep(60)  # Check every 60 seconds
+                # Sleep until the market opens
+                gevent.sleep(time_until_open)
+            logging.info(
+                "drop_idle_connections - Market is open. Resuming idle connection cleanup..."
+            )
+            gevent.sleep(60) # Wait 60 seconds before the next iteration
 
 
-# # Function to broadcast stock data to all connected clients
+# Function to broadcast stock data to all connected clients
 def broadcast_stock_data():
     """Broadcast stock data to all connected clients."""
     logging.info("Starting stock data broadcasting...")
     try:
         while True:
+            logging.info("Broadcasting stock data...")
             if is_market_open():
                 for sid, task_data in list(
                     user_tasks.items()
@@ -230,10 +262,7 @@ def broadcast_stock_data():
                     try:
                         for symbol in symbols[:]:  # Use a copy of the symbols list
                             try:
-                                if symbol.startswith("^"):
-                                    info = get_stock_data(symbol)
-                                else:
-                                    info, option_chain = get_stock_data(symbol)
+                                info, option_chain = get_stock_data(symbol)
                                 data[symbol] = {
                                     "info": info,
                                     "option_chain": option_chain,
@@ -261,18 +290,28 @@ def broadcast_stock_data():
                         user_tasks.pop(sid, None)
                         user_activity.pop(sid, None)
             else:
-                logging.info("Market is closed. Stopping stock broadcasting...")
+                logging.info(
+                    "broadcast_stock_data - Market is closed. Stopping stock broadcasting..."
+                )
                 # Wait until the market opens
                 while not is_market_open():
                     time_until_open = time_until_market_open()
                     minutes_until_open = int(time_until_open // 60)
                     seconds_until_open = int(time_until_open % 60)
                     logging.info(
-                        f"Market is closed. It will reopen in {minutes_until_open} minutes and {seconds_until_open} seconds."
+                        f"broadcast_stock_data - Market is closed. It will reopen in {minutes_until_open} minutes and {seconds_until_open} seconds."
                     )
-                    gevent.sleep(time_until_open)
-                logging.info("Market is open. Resuming stock broadcasting...")
-            gevent.sleep(15)  # Wait for 15 seconds before the next iteration
+
+                    # Clear all user tasks and subscriptions
+                    user_tasks.clear()
+                    user_activity.clear()
+
+                    # Sleep until the market opens
+                    gevent.sleep(time_until_open)  # Wait until the market opens
+                logging.info(
+                    "broadcast_stock_data - Market is open. Resuming stock broadcasting..."
+                )
+            gevent.sleep(60)
     except Exception as e:
         logging.error(f"Error in broadcast_stock_data: {str(e)}")
 
@@ -308,6 +347,7 @@ def fetch_stock_data():
     """Handle GET request for stock data."""
     try:
         symbols = request.args.getlist("symbols[]")
+        print(f"Received symbols: {symbols}")
         if not symbols:
             return jsonify({"error": "Symbol is required"}), 400
 
@@ -315,11 +355,7 @@ def fetch_stock_data():
         info = {}
         option_chain = {}
         for symbol in symbols:
-            # Fetch stock data and option chain
-            if symbol.startswith("^"):
-                info = get_stock_data(symbol)
-            else:
-                info, option_chain = get_stock_data(symbol)
+            info, option_chain = get_stock_data(symbol)
             data[symbol] = {"info": info, "option_chain": option_chain}
 
         return jsonify(data), 200
@@ -348,7 +384,11 @@ def stock_subscribe(data):
             )
             return
 
-        indexes = ["^VIX", "^GSPC", "^DJI", "^IXIC"]
+        indexes = ["^VIX", "^GSPC", "^DJI", "^IXIC", "^RUT"]
+
+        # Remove previous symbol subscription minus the indexes
+        # This will remove any symbols that are not in the indexes list
+        # and keep the indexes in the user's subscription list
 
         user_tasks[sid]["symbols"] = [
             symbol
@@ -356,7 +396,9 @@ def stock_subscribe(data):
             if symbol in indexes
         ]
 
-        # Check if the symbols are valid
+        # Add new symbols to the user's subscription list
+        # This will add the new symbols to the user's subscription list
+        # and keep the indexes in the user's subscription list
         for symbol in symbols:
             if symbol not in user_tasks.setdefault(sid, {}).setdefault("symbols", []):
                 user_tasks[sid]["symbols"].append(symbol)
