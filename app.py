@@ -66,10 +66,12 @@ cache = TTLCache(maxsize=100, ttl=30)
 
 # Stock market holidays for 2025
 MARKET_HOLIDAYS = [
-    date(2025, 1, 1),
-    date(2025, 7, 4),
-    date(2025, 11, 27),
-    date(2025, 12, 25),
+    date(2025, 1, 1), ## New Year's Day
+    date(2025, 7, 4), ## Independence Day
+    date(2025, 4, 18), ## Good Friday
+    date(2025, 9, 1), ## Labor Day
+    date(2025, 11, 27), ## Thanksgiving Day
+    date(2025, 12, 25), ## Christmas Day
 ]
 
 
@@ -83,10 +85,13 @@ MAX_IDLE_TIME = timedelta(minutes=4)
 
 # Function to check if the market is open
 def is_market_open():
+    if date.today() in MARKET_HOLIDAYS:
+        return False
     """Returns True if the market is open, otherwise False."""
     now_et = (
         datetime.now(pytz.utc).astimezone(eastern).time()
     )  # Convert to Eastern Time
+
     market_open_time = datetime.strptime("09:30", "%H:%M").time()  # 9:30 AM ET
     market_close_time = datetime.strptime("16:00", "%H:%M").time()  # 4:00 PM ET
     return market_open_time <= now_et < market_close_time
@@ -126,19 +131,16 @@ def get_stock_data(symbol):
     try:
         stock = yf.Ticker(symbol.strip().lower())
         info = stock.info
-        option_chain = {}
         dates = []
+        news = stock.news
+        option_chain = {}
 
         if stock.options:
-            print(f"Options available for {symbol}: {stock.options}")
             dates = list(stock.options)
 
         if dates == []:
-            print(
-                f"No options available for {symbol}. Returning empty option chain."
-            )
-            return info, option_chain
- 
+            return info, option_chain, news
+
         # Fetch option chain for each expiration date
         for date in dates:
             try:
@@ -156,25 +158,17 @@ def get_stock_data(symbol):
                 chain.calls["mark"] = (chain.calls["bid"] + chain.calls["ask"]) / 2
                 chain.puts["mark"] = (chain.puts["bid"] + chain.puts["ask"]) / 2
 
-                calls = chain.calls.fillna(value=0).infer_objects(copy=False)
-                puts = chain.puts.fillna(value=0).infer_objects(copy=False)
+                calls = chain.calls.fillna(value=0)
+                puts = chain.puts.fillna(value=0)
 
                 # Drop duplicate strikes
                 all_strikes = pd.concat(
                     [calls[["strike"]], puts[["strike"]]]
                 ).drop_duplicates()
 
-                calls = (
-                    all_strikes.merge(calls, on="strike", how="outer")
-                    .fillna(0)
-                    .infer_objects(copy=False)
-                )
+                calls = all_strikes.merge(calls, on="strike", how="outer").fillna(0)
 
-                puts = (
-                    all_strikes.merge(puts, on="strike", how="outer")
-                    .fillna(0)
-                    .infer_objects(copy=False)
-                )
+                puts = all_strikes.merge(puts, on="strike", how="outer").fillna(0)
 
                 calls = calls.drop(columns=["lastTradeDate"], errors="ignore")
                 puts = puts.drop(columns=["lastTradeDate"], errors="ignore")
@@ -189,7 +183,7 @@ def get_stock_data(symbol):
                     "puts": puts.to_dict(orient="records"),
                 }
 
-        return info, option_chain
+        return info, option_chain, news
     except Exception as e:
         logging.error(
             f"Error getting stock data for {symbol}: {e}. Function: get_stock_data"
@@ -239,7 +233,7 @@ def drop_idle_connections():
             logging.info(
                 "drop_idle_connections - Market is open. Resuming idle connection cleanup..."
             )
-            gevent.sleep(60) # Wait 60 seconds before the next iteration
+            gevent.sleep(60)  # Wait 60 seconds before the next iteration
 
 
 # Function to broadcast stock data to all connected clients
@@ -259,13 +253,15 @@ def broadcast_stock_data():
                     data = {}
                     info = {}
                     option_chain = {}
+                    news = {}
                     try:
                         for symbol in symbols[:]:  # Use a copy of the symbols list
                             try:
-                                info, option_chain = get_stock_data(symbol)
+                                info, option_chain, news = get_stock_data(symbol)
                                 data[symbol] = {
                                     "info": info,
                                     "option_chain": option_chain,
+                                    "news": news,
                                 }
                             except Exception as e:
                                 # Remove the symbol from the user's subscription list
@@ -347,16 +343,16 @@ def fetch_stock_data():
     """Handle GET request for stock data."""
     try:
         symbols = request.args.getlist("symbols[]")
-        print(f"Received symbols: {symbols}")
         if not symbols:
             return jsonify({"error": "Symbol is required"}), 400
 
         data = {}
         info = {}
         option_chain = {}
+        news = {}
         for symbol in symbols:
-            info, option_chain = get_stock_data(symbol)
-            data[symbol] = {"info": info, "option_chain": option_chain}
+            info, option_chain, news = get_stock_data(symbol)
+            data[symbol] = {"info": info, "option_chain": option_chain, "news": news}
 
         return jsonify(data), 200
     except Exception as e:
@@ -384,12 +380,11 @@ def stock_subscribe(data):
             )
             return
 
-        indexes = ["^VIX", "^GSPC", "^DJI", "^IXIC", "^RUT"]
+        indexes = ["^VIX", "^GSPC", "^DJI", "^IXIC", "^RUI", "^RUT", "^RUA"]
 
         # Remove previous symbol subscription minus the indexes
         # This will remove any symbols that are not in the indexes list
         # and keep the indexes in the user's subscription list
-
         user_tasks[sid]["symbols"] = [
             symbol
             for symbol in user_tasks.setdefault(sid, {}).setdefault("symbols", [])
@@ -402,9 +397,6 @@ def stock_subscribe(data):
         for symbol in symbols:
             if symbol not in user_tasks.setdefault(sid, {}).setdefault("symbols", []):
                 user_tasks[sid]["symbols"].append(symbol)
-                print(f"Added symbol {symbol} for sid {sid}")
-            else:
-                print(f"Symbol {symbol} already exists for sid {sid}")
         emit(
             "message",
             {"message": f"{sid} subscribed to {symbols}"},
