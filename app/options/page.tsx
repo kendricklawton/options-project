@@ -3,45 +3,51 @@
 import { ArrowDropDownOutlined, ArrowLeftOutlined, ArrowRightOutlined, CheckOutlined } from '@mui/icons-material';
 import pageStyles from '../page.module.css';
 import styles from './page.module.css';
-import { IconButton } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
-import { useAppContext } from '@/app/providers/AppProvider';
+// import { useAppContext } from '@/app/providers/AppProvider';
+import { useAppStore } from '@/app/stores/useAppStore';
 import {
-  StyledButton, StyledIconButton,
+  StyledButton,
   // StyledTextField, 
 
 } from '@/app/components/Styled';
 import {
-  calculateDaysRemaining, convertUnixTimestamp, convertUnixTimestampTwo, formatDate, formatMarketCap, formatPlusMinus,
+  calculateDaysRemaining, formatDate, formatPlusMinus,
   getFilteredOptionChain,
   isNumPositive,
 } from '@/app/utils/utils';
 import { OptionType } from '@/app/types/types';
 import React from 'react';
 import { useAuthContext } from '../providers/AuthProvider';
+import PageHeader from '../components/PageHeader/PageHeader';
 
-
-const styledButtonStyles = {
-  borderRadius: '0px',
-  backgroundColor: 'fff',
+const buttonStyles = {
+  color: 'white',
+  backgroundColor: 'grey',
   justifyContent: 'space-between',
   minWidth: '6rem',
-  whiteSpace: 'nowrap',
-};
+}
 
 export default function Home() {
   // App context
+  // const {
+  //   currentExpirationDate,
+  //   currentExpirationDates,
+  //   currentStock,
+  //   setCurrentExpirationDate,
+  //   setCurrentOptionOrder,
+  // } = useAppContext();
+
   const {
     currentExpirationDate,
     currentExpirationDates,
     currentStock,
     setCurrentExpirationDate,
     setCurrentOptionOrder,
-    setModalView,
-  } = useAppContext();
+    setModalView
+  } = useAppStore();
 
   const { handleSetInfo } = useAuthContext();
-
 
   // State variables
 
@@ -56,7 +62,6 @@ export default function Home() {
   const [isStrikesMobileMenuOpen, setIsStrikesMobileMenuOpen] = useState(false);
   const [isCallTableOpen, setIsCallTableOpen] = useState(true);
   const [isPutTableOpen, setIsPutTableOpen] = useState(true);
-  const [isBottomElementOpen, setIsBottomElementOpen] = useState(true);
 
   // Refs for DOM elements
   const strikesMenuRef = useRef<HTMLDivElement>(null);
@@ -70,8 +75,8 @@ export default function Home() {
 
   // Function to handle the display of option analytics
   const handleDisplayOptionAnalytics = (option: OptionType, action?: 'buy' | 'sell') => {
-    console.log('Selected Option: ', option.contractSymbol); 
-    console.log ('Current Expiration Date: ', currentExpirationDate); 
+    console.log('Selected Option: ', option.contractSymbol);
+    console.log('Current Expiration Date: ', currentExpirationDate);
     if (option.contractSymbol && currentExpirationDate) {
       setCurrentOptionOrder(
         {
@@ -81,10 +86,11 @@ export default function Home() {
           strikes: currentStock?.optionChain[currentExpirationDate]?.strikes,
         }
       )
-      setModalView('analytics');
-    } else {
-      handleSetInfo('Option contract not available');
+      setModalView('snapshot');
     }
+    // else {
+    //   handleSetInfo('Contract N/A');
+    // }
   };
 
   // Function to retrieve option chain data for a specific expiration date
@@ -97,10 +103,6 @@ export default function Home() {
     handleSetInfo('More strategies coming soon!');
   };
 
-  // Function to toggle the bottom element
-  const handleSetIsBottomElementOpen = () => {
-    setIsBottomElementOpen(prev => !prev);
-  };
 
   // Function to toggle the call table
   const handleSetIsCallTableOpen = () => {
@@ -207,6 +209,8 @@ export default function Home() {
       const updatedFilteredOptionChain = getFilteredOptionChain(currentStock.optionChain, currentExpirationDate, displayStrikes, currentStock.info.regularMarketPrice);
       if (updatedFilteredOptionChain) {
         setFilteredOptionChain(updatedFilteredOptionChain);
+      } else {
+        setFilteredOptionChain(undefined);
       }
     };
   }, [currentExpirationDate, currentStock, displayStrikes]);
@@ -216,138 +220,27 @@ export default function Home() {
     return (
       <div className={pageStyles.page}>
         <div className={pageStyles.wrapper}>
-          <h1>Options</h1>
-          <h2>Search for a stock symbol to view options</h2>
+          <h2>Options</h2>
+          <h3>Search for a stock symbol to view options.</h3>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={pageStyles.page}>
-      {/* Details Element */}
-      {
-        (currentStock.info != null) && (
-          <div className={styles.details}>
-            <div className={styles.detailsLeadingColumn}>
-              <div className={styles.detailsLeadingTop}>
-                <p>{currentStock.info.symbol?.startsWith('^') ? currentStock.info.symbol.slice(1).toLocaleUpperCase() : currentStock.info.symbol?.toLocaleUpperCase() ?? ''}</p>
-                <p>|</p>
-                <p>{currentStock.info?.shortName}</p>
-
-                <p className={currentStock.info?.regularMarketChangePercent != null && currentStock.info.regularMarketChangePercent != 0
-                  ? currentStock.info.regularMarketChangePercent > 0
-                    ? styles.positive
-                    : styles.negative
-                  : ''
-                }>{currentStock.info?.regularMarketPrice?.toFixed(2)} </p>
-                {/* <p>{currentStock.info.currency}</p> */}
-                <p className={currentStock.info?.regularMarketChangePercent != null && currentStock.info.regularMarketChangePercent != 0
-                  ? currentStock.info.regularMarketChangePercent > 0
-                    ? styles.positive
-                    : styles.negative
-                  : ''
-                }>{formatPlusMinus(currentStock.info?.regularMarketChange)}</p>
-                <p className={currentStock.info?.regularMarketChangePercent != null && currentStock.info.regularMarketChangePercent != 0
-                  ? currentStock.info.regularMarketChangePercent > 0
-                    ? styles.positive
-                    : styles.negative
-                  : ''
-                }>({formatPlusMinus(currentStock.info?.regularMarketChangePercent)}%)</p>
-              </div>
-              <div className={styles.detailsLeadingBottom}>
-                <p>{convertUnixTimestamp(currentStock.info?.regularMarketTime)}</p>
-              </div>
-            </div>
-            <div className={styles.detailsTrailing}>
-              <StyledIconButton onClick={handleSetIsBottomElementOpen} size='small'>
-                {isBottomElementOpen
-                  ?
-                  <ArrowDropDownOutlined />
-                  :
-                  <ArrowLeftOutlined />
-                }
-              </StyledIconButton>
-            </div>
-          </div >
-        )
-      }
-
-      {/* Details Extended Element */}
-      {
-        (currentStock.info && isBottomElementOpen) && (
-          <div className={styles.detailsExt}>
-            <div className={styles.elementThTwo}>
-              <p>Open</p>
-              <p>{currentStock.info.regularMarketOpen}</p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>High</p>
-              <p>{currentStock.info.regularMarketDayHigh}</p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>Low</p>
-              <p>{currentStock.info.regularMarketDayLow}</p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>Market Cap</p>
-              <p>{
-                currentStock.info.marketCap != null && currentStock.info.marketCap != 0
-                  ?
-                  formatMarketCap(currentStock.info.marketCap) : '--'
-              }</p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>P/E Ratio</p>
-              <p>{
-                currentStock.info.forwardPE ?
-                  currentStock.info.forwardPE?.toFixed(2) :
-                  '--'
-              }</p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>Div Yield</p>
-              <p>
-                {
-                  (currentStock.info.dividendYield != null && currentStock.info.dividendYield != 0)
-                    ? `${(currentStock?.info?.dividendYield.toFixed(2))}%`
-                    : '--'
-                }
-              </p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>Div Date</p>
-              <p>
-                {
-                  (currentStock.info.dividendDate)
-                    ? convertUnixTimestampTwo(currentStock.info.dividendDate)
-                    : '--'
-                }
-              </p>
-            </div>
-            <div className={styles.elementThTwo}>
-              <p>52 Week Range</p>
-              <p>{currentStock.info.fiftyTwoWeekRange}</p>
-            </div>
-          </div>
-        )
-      }
-
+    <div className={pageStyles.pageTwo}>
+      <PageHeader />
+      {/* Header Element */}
       {/* Controls Element */}
       {
-        (filteredOptionChain != null) && (
+        (filteredOptionChain) && (
           <div className={styles.controls}>
             <div className={styles.controlsElement}>
               <p>Strategies</p>
               <StyledButton variant="contained"
                 onClick={handleOptionStrategy}
                 endIcon={<ArrowDropDownOutlined />}
-                sx={{
-                  borderRadius: '0px',
-                  width: 'fit-content',
-                  whiteSpace:
-                    'nowrap',
-                }}>CALL / PUT</StyledButton>
+                sx={buttonStyles}>CALL / PUT</StyledButton>
             </div>
             <div className={styles.controlsElementTwo}>
               <p>Strikes</p>
@@ -356,7 +249,7 @@ export default function Home() {
                   onClick={() => setIsStrikesMenuOpen(prev => !prev)}
                   endIcon={<ArrowDropDownOutlined />}
                   ref={strikesMenuButtonRef}
-                  sx={styledButtonStyles}>{displayStrikes === 1 ? "ALL" : displayStrikes}</StyledButton>
+                  sx={buttonStyles}>{displayStrikes === 1 ? "ALL" : displayStrikes}</StyledButton>
                 {
                   isStrikesMenuOpen && (
                     <div className={styles.menu} ref={strikesMenuRef}>
@@ -369,15 +262,6 @@ export default function Home() {
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</div>
                       <div className={styles.menuItem} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</div>
-                      {/* <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(4)}>4</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(6)}>6</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(8)}>8</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(10)}>10</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(12)}>12</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(16)}>16</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(20)}>20</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(40)}>40</StyledButtonTwo>
-                      <StyledButtonTwo variant='contained' sx={styledButtonStyles} onClick={() => handleSetTotalStrikesToDisplay(1)}>ALL</StyledButtonTwo> */}
                     </div >
                   )}
               </div>
@@ -406,7 +290,7 @@ export default function Home() {
 
       {/* Controls Mobile Element */}
       {
-        (filteredOptionChain != null) && (
+        (filteredOptionChain) && (
           <div className={styles.controlsMobile}>
             <div className={styles.controlsElement}>
               <p>Strikes</p>
@@ -415,13 +299,8 @@ export default function Home() {
                   onClick={() => setIsStrikesMobileMenuOpen(prev => !prev)}
                   endIcon={<ArrowDropDownOutlined />}
                   ref={strikesMobileMenuButtonRef}
-                  sx={{
-                    borderRadius: '0px',
-                    backgroundColor: 'fff',
-                    justifyContent: 'space-between',
-                    minWidth: '6rem',
-                    whiteSpace: 'nowrap',
-                  }}>{displayStrikes === 1 ? "ALL" : displayStrikes}</StyledButton>
+                  sx={buttonStyles}
+                >{displayStrikes === 1 ? "ALL" : displayStrikes}</StyledButton>
                 {
                   isStrikesMobileMenuOpen && (
                     <div className={styles.menu} ref={strikesMobileMenuRef}>
@@ -464,7 +343,7 @@ export default function Home() {
         (filteredOptionChain && currentExpirationDates) && (
           <div className={styles.dates}>
             {currentExpirationDates.map((date: string, index: number) => (
-              <div className={styles.date} key={index} onClick={
+              <div className={styles.shadowButton} key={index} onClick={
                 () => changeExpirationDate(date)
               }>{
                   date == currentExpirationDate
@@ -480,7 +359,7 @@ export default function Home() {
 
       {/* Option Chain Element */}
       {
-        (filteredOptionChain != null) && (
+        (filteredOptionChain) && (
           <div className={styles.optionChainWrapper}>
             {/* Calls Table */}
             {isCallTableOpen && (
@@ -489,20 +368,21 @@ export default function Home() {
                   <div>
                     {
                       !isPutTableOpen &&
-                      (<IconButton size='small' onClick={handleSetIsCallTableOpen}>
-                        <ArrowLeftOutlined sx={{
+                      (
+
+                        <ArrowLeftOutlined onClick={handleSetIsCallTableOpen} sx={{
                           color: 'gray'
                         }} />
-                      </IconButton>)
+
+                      )
                     }
                     <p>Calls</p>
                     {
                       isPutTableOpen && (
-                        <IconButton size='small' onClick={handleSetIsCallTableOpen}>
-                          <ArrowRightOutlined sx={{
-                            color: 'gray'
-                          }} />
-                        </IconButton>)
+                        <ArrowRightOutlined onClick={handleSetIsCallTableOpen} sx={{
+                          color: 'gray'
+                        }} />
+                      )
                     }
                   </div>
                 </div>
@@ -554,20 +434,29 @@ export default function Home() {
                   <div>
                     {
                       isCallTableOpen &&
-                      (<IconButton size='small' onClick={handleSetIsPutTableOpen}>
-                        <ArrowLeftOutlined sx={{
-                          color: 'gray'
-                        }} />
-                      </IconButton>)
+                      (
+                      // <IconButton size='small' onClick={handleSetIsPutTableOpen}>
+                      //   <ArrowLeftOutlined sx={{
+                      //     color: 'gray'
+                      //   }} />
+                      // </IconButton>
+                      <ArrowLeftOutlined onClick={handleSetIsPutTableOpen} sx={{
+                        color: 'gray'
+                      }} />
+                      )
                     }
                     <p>Puts</p>
                     {
                       !isCallTableOpen && (
-                        <IconButton size='small' onClick={handleSetIsPutTableOpen}>
-                          <ArrowRightOutlined sx={{
+                        // <IconButton size='small' onClick={handleSetIsPutTableOpen}>
+                        //   <ArrowRightOutlined sx={{
+                        //     color: 'gray'
+                        //   }} />
+                        // </IconButton>
+                          <ArrowRightOutlined onClick={handleSetIsPutTableOpen} sx={{
                             color: 'gray'
                           }} />
-                        </IconButton>)
+                        )
                     }
                   </div>
                 </div>
@@ -597,6 +486,9 @@ export default function Home() {
           </div>
         )
       }
+
     </div>
   );
 };
+
+

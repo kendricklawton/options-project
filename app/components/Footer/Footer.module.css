@@ -3,12 +3,13 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    position: sticky;
-    bottom: 0;
     height: 2rem;
-    padding: 0 2svw;
-    /* background-color: inherit; */
+    color: gray;
     width: 100%;
+    bottom: 0;
+    float: bottom;
+    position: sticky;
+    padding: 0 4svw;
 }
 
 .leading,

@@ -390,3 +390,40 @@ export const determineOptionMaxLoss = (
 
     return 0;
 }
+
+// Function to determine the maximum profit of an option order
+export const determineOptionMaxProfit = (
+    action: 'buy' | 'sell' | undefined,
+    option: OptionType | undefined,
+    quantity: number
+): number => {
+    if (action === undefined || option === undefined || option?.ask === undefined || option?.bid === undefined || option?.strike === undefined) {
+        return 0;
+    }
+
+    const optionType = determineOptionType(option?.contractSymbol || '');
+
+    console.log('Option Type: ', optionType);
+
+    if (optionType === 'call') {
+        if (action === 'buy') {
+            console.log('Max Profit: ', Infinity);
+            return Infinity
+        } else if (action === 'sell') {
+            console.log('Max Profit: ', option.bid * (quantity * 100));
+            return option.bid * (quantity * 100);
+        }
+    }
+
+    if (optionType === 'put') {
+        if (action === 'buy') {
+            console.log('Max Profit: ', option.strike * (quantity * 100) - option.ask * (quantity * 100));
+            return option.strike * (quantity * 100) - option.ask * (quantity * 100);
+        } else if (action === 'sell') {
+            console.log('Max Profit: ', option.bid * (quantity * 100));
+            return option.bid * (quantity * 100);
+        }
+    }
+
+    return 0;
+}

@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import styles from './Analytics.module.css';
-import { ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from '@mui/icons-material';
-import { useAppContext } from '@/app/providers/AppProvider';
+import styles from './Snapshot.module.css';
+import { AddOutlined, ArrowDropDownOutlined, CachedOutlined, SentimentSatisfied, SentimentVeryDissatisfied, SentimentVerySatisfied } from '@mui/icons-material';
 
-import { determineOptionBreakEven, determineOptionCost, determineOptionExpirationDate, determineOptionMaxLoss, determineOptionType } from '@/app/utils/utils';
+import { determineOptionBreakEven, determineOptionCost, determineOptionExpirationDate, determineOptionMaxLoss, determineOptionMaxProfit, determineOptionType } from '@/app/utils/utils';
 import { StyledButton, StyledTextField } from '../../Styled';
 import { OptionOrderType, OptionType } from '@/app/types/types';
 import { useAuthContext } from '@/app/providers/AuthProvider';
+import { useAppStore } from '@/app/stores/useAppStore';
 
-export default function AnalyticsModal() {
-    const { currentStock, currentOptionOrder, setCurrentOptionOrder } = useAppContext();
+export default function SnapshotModal() {
+    const { currentStock, currentOptionOrder, setCurrentOptionOrder } = useAppStore();
     const { handleSetInfo } = useAuthContext();
 
     const [isStrikesMenuOpen, setIsStrikesMenuOpen] = useState(false);
@@ -79,7 +79,7 @@ export default function AnalyticsModal() {
             option = currentStock.optionChain[expirationDate].puts.find((option: OptionType) => option.strike === currentOptionOrder?.option?.strike);
         } else if (currentOptionType === 'put') {
             option = currentStock.optionChain[expirationDate].calls.find((option: OptionType) => option.strike === currentOptionOrder?.option?.strike);
-        } 
+        }
 
         // Handles edge case where the option is not found
         if (!option?.contractSymbol) {
@@ -129,7 +129,7 @@ export default function AnalyticsModal() {
 
         // Handles edge case where the option is not found
         if (!option?.contractSymbol) {
-            handleSetInfo('Option contract not available for strike: ' + strike);
+            handleSetInfo('Contract N/A');
             setIsStrikesMenuOpen(false);
             return;
         }
@@ -138,7 +138,7 @@ export default function AnalyticsModal() {
             action: currentOptionOrder?.action,
             option: option,
             orderType: currentOptionOrder?.orderType,
-            strikes: currentOptionOrder?.strikes,   
+            strikes: currentOptionOrder?.strikes,
         };
         setCurrentOptionOrder(updatedOptionOrder);
         setIsStrikesMenuOpen(false);
@@ -302,43 +302,10 @@ export default function AnalyticsModal() {
                 </div>
             </div>
 
+            <div className={styles.elementTwo}>
+                <StyledButton variant="contained">Alpha AI</StyledButton>
+                <StyledButton variant="contained" endIcon={<AddOutlined/>}>Project</StyledButton>
+            </div>
         </>
     );
-}
-
-// Function to determine the maximum profit of an option order
-export const determineOptionMaxProfit = (
-    action: 'buy' | 'sell' | undefined,
-    option: OptionType | undefined,
-    quantity: number
-): number => {
-    if (action === undefined || option === undefined || option?.ask === undefined || option?.bid === undefined || option?.strike === undefined) {
-        return 0;
-    }
-
-    const optionType = determineOptionType(option?.contractSymbol || '');
-
-    console.log('Option Type: ', optionType);
-
-    if (optionType === 'call') {
-        if (action === 'buy') {
-            console.log('Max Profit: ', Infinity);
-            return Infinity
-        } else if (action === 'sell') {
-            console.log('Max Profit: ', option.bid * (quantity * 100));
-            return option.bid * (quantity * 100);
-        }
-    }
-
-    if (optionType === 'put') {
-        if (action === 'buy') {
-            console.log('Max Profit: ', option.strike * (quantity * 100) - option.ask * (quantity * 100));
-            return option.strike * (quantity * 100) - option.ask * (quantity * 100);
-        } else if (action === 'sell') {
-            console.log('Max Profit: ', option.bid * (quantity * 100));
-            return option.bid * (quantity * 100);
-        }
-    }
-
-    return 0;
 }

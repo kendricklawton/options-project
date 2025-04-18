@@ -5,19 +5,21 @@ import styles from './Modal.module.css';
 import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import Account from './Views/Account';
-import Analytics from './Views/Analytics';
-import { useAppContext } from '../../providers/AppProvider';
+import Snapshot from './Views/Snapshot';
+// import { useAppContext } from '../../providers/AppProvider';
+import { useAppStore } from '@/app/stores/useAppStore';
 
 export default function Modal() {
-    const {  modalView, setModalView } = useAppContext();
+    // const {  modalView, setModalView } = useAppContext();
+    const { modalView, setModalView} = useAppStore();
 
     const RenderView = () => {
         if (!modalView) return null;
         switch (modalView.toLowerCase()) {
             case 'account':
                 return <Account />;
-            case 'analytics':
-                return <Analytics />;
+            case 'snapshot':
+                return <Snapshot />;
             default:
                 return null;
         }
@@ -42,9 +44,9 @@ export default function Modal() {
                 <div className={styles.wrapper}>
                     <div className={styles.header}>
                         <div className={styles.headerLeading}>
-                            <h1>
-                                {modalView === 'account' ? 'Account' : 'Analytics'}
-                            </h1>
+                            <h2>
+                                {modalView === 'account' ? 'Account' : 'Snapshot'}
+                            </h2>
                         </div>
                         <div className={styles.headerTrailing}>
                             <IconButton sx={{

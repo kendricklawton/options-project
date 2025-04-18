@@ -1,40 +1,22 @@
 import { Button, IconButton, styled, TextField } from "@mui/material";
 
+// const defaultFontFamily = 'var(--font-geist-sans)';
+const defaultFontFamily = 'var(--font-geist-mono)';
+const defaultHeight = '2rem';
+const defaultBoxShadow = '0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1)';
+
 export const StyledButton = styled(Button)({
-    backgroundColor: 'grey',
-    fontFamily: 'inherit',
-    height: '2rem',
-    color: 'white',
-    width: 'fit-content',
-    borderRadius: '0',
-    whiteSpace: 'nowrap',
-    '& .MuiButton-label': {
-        color: 'white',
-    },
+    backgroundColor: 'inherit',
+    borderRadius: '0rem',
+    boxShadow: defaultBoxShadow,
+    color: 'inherit',
+    fontFamily: defaultFontFamily,
+    fontSize: 'inherit',
+    fontWeight: 'inherit',
+    height: defaultHeight,
+    whiteSpace: 'nowrap'
 });
 
-export const StyledButtonTwo = styled(Button)({
-    fontFamily: 'inherit',
-    backgroundColor: 'inherit',
-    height: '2rem',
-    color: 'black',
-    width: 'fit-content',
-    borderRadius: '0',
-    whiteSpace: 'nowrap',
-    '&:hover': {
-        boxShadow: 'none', // Ensure no shadow on hover
-    },
-    '&:focus': {
-        outline: 'none', // Ensure no outline when focused
-        boxShadow: 'none', // Ensure no shadow when focused
-    },
-    border: 'none', // Remove border
-    outline: 'none', // Remove outline
-    boxShadow: 'none', 
-    '& .MuiButton-label': {
-        color: 'black',
-    },
-});
 
 export const StyledIconButton = styled(IconButton)({
     border: 'none',
@@ -43,10 +25,11 @@ export const StyledIconButton = styled(IconButton)({
 
 export const StyledTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
-        fontFamily: 'inherit',
-        borderRadius: '0',
-        height: '2rem',
+        fontFamily: defaultFontFamily,
         fontSize: 'inherit',
+        fontWeight: 'inherit',
+        borderRadius: '0rem',
+        height: defaultHeight,
         backgroundColor: 'lightgray',
         '& fieldset': {
             border: 'none',

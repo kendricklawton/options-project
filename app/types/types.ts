@@ -7,21 +7,41 @@ export interface AppContextType {
     currentStock?: {
         info: InfoType;
         optionChain: OptionChainType;
+        news: unknown[];
     };
-    modalView: 'account' | 'analytics' | '';
+    projects: ProjectType[],
+    modalView: 'account' | 'snapshot' | '';
+    showPageHeaderExt: boolean;
     subscribedMap: Map<string, {
-            info: InfoType;
-            optionChain: OptionChainType;
+        info: InfoType;
+        optionChain: OptionChainType;
+        news: unknown[];
     }>;
+    createProject: (newProject: ProjectType) => Promise<void>;
+    updateProject: (updatedProject: ProjectType) => Promise<void>;
+    deleteProject: (id: string) => Promise<void>;
     clearStockData: () => void;
     fetchStockData: (request: string[]) => Promise<void>;
     setCurrentExpirationDate: (expirationDate: string) => void;
     setCurrentOptionOrder: (order: OptionOrderType) => void;
-    setCurrentStock: (stock: {
-        info: InfoType;
-        optionChain: OptionChainType;
-    }) => void;
-    setModalView: (view: 'account' | 'analytics' | '') => void;
+    setModalView: (view: 'account' | 'snapshot' | '') => void;
+    setShowPageHeaderExt: (showPageHeaderExt: boolean) => void;
+}
+
+export interface ProjectType {
+    id: string,
+    title: string,
+    createdDate: string,
+    resources?: unknown[],
+    tickers?: unknown[],
+    trades?: unknown[],
+    notes?: unknown[]
+}
+export interface ArticleType {
+    content: {
+        title: string;
+    },
+    id: string;
 }
 
 export interface AuthContextType {

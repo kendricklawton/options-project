@@ -1,65 +1,52 @@
-.page {
+.page,
+.pageTwo {
     display: flex;
     flex-direction: column;
-    height: calc(100svh - 5rem);
-    overflow-x: auto;
-    padding-left: 2vw;
-    padding-right: 2vw;
+    padding: 0 4svw;
+    overflow-y: auto;
 }
 
-.wrapper {
+.page {
+    height: calc(100svh - 6rem);
+}
+
+.pageTwo {
+    max-height: calc(100svh - 6rem);
+}
+
+.wrapper,
+.wrapperCentered{
     display: flex;
     flex-direction: column;
-    position: relative;
     height: 100%;
 }
 
-.wrapper h1 {
-    /* background: linear-gradient(90deg, #0077be, #005762); */
-    /* color: transparent; */
-    font-size: clamp(3rem, 3vw, 3vw);
-    font-weight: 600;
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-
-.wrapper h1 {
-    padding-top: 6rem;
-}
-
-.wrapper h2 {
-    font-size: clamp(1.5rem, 2vw, 2vw);
-    font-weight: 500;
+.wrapperCentered {
+    align-items: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    justify-content: center;
+    padding: 0 4svw;
+    position: absolute;
+    text-align: center;
 }
 
 .marketsWrapper {
-    top: 0;
-    position: absolute;
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 1rem;
-}
-
-.marketsList,
-.marketsListSelector {
-    display: flex;
-    flex-direction: row;
-    justify-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    /* background-color: aliceblue; */
-    overflow-x: auto;
-}
-
-/* 
-.marketsListSelector {
-    padding-bottom: 0.5rem;
 }
 
 .marketsList {
-    padding-top: 0.5rem;
-} */
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100%;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+}
 
 .market,
 .marketNegative,
@@ -67,10 +54,9 @@
     --fade-transition: opacity 0.667s ease-in-out;
     display: flex;
     flex-direction: column;
-    /* gap: 0.5rem; */
     padding: 0.5rem;
     color: #fff;
-    font-weight: bold;
+    min-height: 4rem;
 }
 
 .marketNegative {
@@ -84,12 +70,22 @@
 .market div,
 .marketNegative div,
 .marketPositive div {
-    min-width: 12rem;
+
+    max-width: 14rem;
+    gap: 2rem;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     white-space: nowrap;
+    cursor: pointer;
+}
+
+.marketElement {
+    min-height: 2rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 /* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
@@ -109,6 +105,3 @@
 .marketsList::-webkit-scrollbar-thumb:hover {
     background: transparent;
 }
-
-/* -webkit-text-size-adjust: 100%; */
-/* font-family: Proxima Nova, */

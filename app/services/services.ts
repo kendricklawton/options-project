@@ -5,27 +5,28 @@ const url = process.env.SERVER_URL as string || '';
 
 // Function to fetch data from the REST API
 const restAPIService = async (endpoint: string, params?: object) => {
-    const source = axios.CancelToken.source();
-    const timeout = setTimeout(() => {
-        source.cancel('Request Timed Out');
-    }, 12000);
+    // const source = axios.CancelToken.source();
+    // const timeout = setTimeout(() => {
+    //     source.cancel('Request Timed Out');
+    // }, 30000);
 
     try {
         const response = await axios.get(`${url}/${endpoint}`, {
             params,
-            cancelToken: source.token,
+            // cancelToken: source.token,
         });
         console.log('REST API Response:', response.data);
-        clearTimeout(timeout);
+        // clearTimeout(timeout);
         return response.data;
     } catch (error) {
-        clearTimeout(timeout);
+        // clearTimeout(timeout);
         throw error;
     }
 };
 
 // Rest API Service for Stock Data Two
 export const stockDataREST = async (symbols: string[]) => {
+    console.log('REST API Request:', symbols);
     return await restAPIService('stock-data', { symbols: symbols });
 };
 

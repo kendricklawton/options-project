@@ -1,15 +1,12 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import {
-    // AccountTreeOutlined,
-    // AccountTreeOutlined,
-    CloseOutlined,
-    CropOutlined,
-    Menu,
-    // RefreshOutlined, 
+    // CloseOutlined,
+    // Menu,
+    Person2,
     SearchOutlined,
-    // StackedBarChartOutlined
 } from '@mui/icons-material';
 import {
     CircularProgress,
@@ -19,15 +16,18 @@ import {
     usePathname,
     useRouter
 } from 'next/navigation';
-import { useAppContext } from '@/app/providers/AppProvider';
 import { useAuthContext } from '@/app/providers/AuthProvider';
 import styles from "./Header.module.css";
 import Link from 'next/link';
-import { StyledIconButton, StyledTextField } from '@/app/components/Styled';
+import { StyledTextField } from '@/app/components/Styled';
+import { useAppStore } from '@/app/stores/useAppStore';
 
+const iconStyles = {
+    cursor: 'pointer',
+}
 
 export default function Header() {
-    const { currentStock, fetchStockData } = useAppContext();
+    const { currentStock, clearStockData, fetchStockData } = useAppStore();
     const { isLoading,
         setIsLoading,
         // logIn, logOut
@@ -36,11 +36,10 @@ export default function Header() {
     const [inputValue, setInputValue] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
-    const [headerScrolled, setHeaderScrolled] = useState(false);
 
     const deviceMenuRef = useRef<HTMLDivElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
-    const menuButtonRef = useRef<HTMLButtonElement>(null);
+    const menuButtonRef = useRef<SVGSVGElement>(null);
     // const refreshButtonRef = useRef<HTMLButtonElement>(null);
 
     const pathname = usePathname();
@@ -60,28 +59,31 @@ export default function Header() {
     };
 
     const handleMenuToggle = () => {
-        setIsMenuOpen(prev => !prev);
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleClearStockData = () => {
+        clearStockData();
     };
 
     const handleFetchStockData = async () => {
         if (inputValue.length === 0) return;
-
+        setIsLoading(true);
         try {
-            setIsLoading(true);
             const symbols: string[] = [inputValue];
             if (currentStock?.info.symbol !== inputValue) {
                 await fetchStockData(symbols);
             }
-            if (pathname === '/') {
+            if (pathname === '/' || pathname === '/projects') {
                 router.push('/options');
             }
         } catch (error) {
             console.log(error);
         } finally {
             setIsLoading(false);
+            setInputValue('');
         }
-
-        setInputValue('');
+     
     };
 
     const handleOnChange = (value: string) => {
@@ -104,32 +106,27 @@ export default function Header() {
         };
     }, []);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 0) {
-                setHeaderScrolled(true);
-            } else {
-                setHeaderScrolled(false);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
     if (pathname === '/login') {
         return null;
     }
 
     return (
-        <header className={headerScrolled ? styles.headerScrolling : styles.header}>
-            {/* Main Element */}
-            <div className={styles.headerElement}>
+        <header className={styles.headerWrapper}>
+            <div className={styles.header}>
                 <div className={styles.leading}>
-                    <Link className={styles.linkDesktop} href={'/'}>OPTIONS PROJECT</Link>
+                    {/* <Link href={'/'} className={styles.optionsProject}>
+                        OPTIONSPROJECT.IO
+                    </Link> */}
+                    <Link href={'/'}>
+                        <Image
+                            src="next.svg"
+                            width={100}
+                            height={40}
+                            alt=""
+                        />
+                    </Link>
                     <StyledTextField
-                        sx={{ maxWidth: '7.6rem' }}
+                        sx={{ minWidth: '8rem', maxWidth: '7rem' }}
                         onChange={(e) => handleOnChange(e.target.value)}
                         value={inputValue}
                         placeholder={currentStock?.info.symbol ? currentStock.info.symbol : 'SYMBOL'}
@@ -152,65 +149,71 @@ export default function Header() {
                             }
                         }}>
                     </StyledTextField>
-                    <div className={styles.links}>
-                        {/* <Link className={styles.linkDesktop} href={'/charts'}><StackedBarChartOutlined />Charts</Link> */}
-                        <Link className={styles.linkDesktop} href={'/options'}><CropOutlined />Options</Link>
-                        {/* <Link className={styles.linkDesktop} href={'/projects'}><AccountTreeOutlined />Projects</Link> */}
-                    </div>
-                </div>
-                <div className={styles.trailing}>
                     {
-                        isLoading && (
-                            <StyledIconButton size='small' disabled>
-                                <CircularProgress size={20} />
-                            </StyledIconButton>
+                        currentStock && (
+                            <p className={styles.link} onClick={handleClearStockData}>CLEAR</p>
                         )
                     }
+                    {
+                        isLoading && (
+                            <CircularProgress size={20} sx={iconStyles} />
+                        )
+                    }
+                </div>
+
+                <div className={styles.trailing}>
                     <div className={styles.anchor}>
-                        <StyledIconButton ref={menuButtonRef}
-                            size='small'
-                            onClick={handleMenuToggle}>
-                            {
-                                isMenuOpen
-                                    ? (
-                                        <CloseOutlined />
-                                    ) :
-                                    (
-                                        <Menu />
-                                    )
-                            }
-                        </StyledIconButton>
+                        <Person2 onClick={handleMenuToggle} sx={iconStyles} ref={
+                            menuButtonRef
+                        } />
                         {
                             isMenuOpen && (
                                 <div className={styles.menu} ref={menuRef} onMouseEnter={handleDeviceMenuClose}>
-                                    {/* <Link className={styles.link} href={'/charts'} onMouseEnter={handleDeviceMenuClose}>
-                                        Charts
-                                    </Link> */}
-                                    <Link className={styles.link} href={'/options'} onMouseEnter={handleDeviceMenuClose}>
-                                        Options
-                                    </Link>
-                                    {/* <Link className={styles.link} href={'/projects'} onMouseEnter={handleDeviceMenuClose}>
-                                        Projects
-                                    </Link> */}
                                     <div className={styles.anchor}>
-                                        <div onClick={handleDeviceMenuOpen}
-                                            onMouseEnter={handleDeviceMenuOpen}
-                                            className={styles.link}>
-                                            <p>Device</p>
+                                        <div className={styles.menuItem} onClick={handleDeviceMenuOpen} onMouseEnter={handleDeviceMenuOpen}>
+                                            {/* <SettingsBrightnessOutlined /> */}
+                                            <p>DEVICE</p>
                                         </div>
                                         {isDeviceMenuOpen && (
                                             <div className={styles.modeMenu} ref={deviceMenuRef}>
-                                                <div className={styles.link}><p>Light Mode</p></div>
-                                                <div className={styles.link}><p>Dark Mode</p></div>
-                                                <div className={styles.link}><p>System</p></div>
+                                                <div className={styles.menuItem}>
+                                                    {/* <LightModeOutlined /> */}
+                                                    LIGHT MODE
+                                                </div>
+                                                <div className={styles.menuItem}>
+                                                    {/* <DarkModeOutlined /> */}
+                                                    DARK MODE
+                                                </div>
+                                                <div className={styles.menuItem}>
+                                                    {/* <SettingsBrightnessOutlined /> */}
+                                                    DEVICE
+                                                </div>
                                             </div>
                                         )}
+                                    </div>
+                                    <div className={styles.menuItem}>
+
+                                    <Link href='/login' onMouseEnter={handleDeviceMenuClose}>
+                                        LOGIN
+                                    </Link>
                                     </div>
                                 </div>
                             )}
                     </div>
                 </div>
-            </div >
+            </div>
+            <div className={styles.header}>
+                <div className={styles.links}>
+                    <Link className={pathname === '/options' ? styles.linkActive : styles.link} href={'/options'}>
+                        {/* <CropOutlined />  */}
+                        OPTIONS
+                    </Link>
+                    <Link className={pathname === '/projects' ? styles.linkActive : styles.link} href={'/projects'}>
+                        {/* <AccountTreeOutlined />  */}
+                        PROJECTS
+                    </Link>
+                </div>
+            </div>
         </header>
     );
 };

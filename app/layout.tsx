@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header/Header";
 import Info from "./components/Info/Info";
@@ -6,7 +7,7 @@ import Modal from "./components/Modal/Modal";
 import ProviderWrapper from "./providers/ProviderWrapper";
 // import Loading from "./components/Loading/Loading";
 // import Alpha from "./components/Alpha/Alpha";
-import Footer from "./components/Footer/Footer";
+// import Footer from "./components/Footer/Footer";
 
 export const metadata: Metadata = {
   authors: {
@@ -37,6 +38,17 @@ export const metadata: Metadata = {
   robots: "index, follow",
 };
 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+
 
 export default function RootLayout({
   children,
@@ -45,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ProviderWrapper>
           <Header />
           {children}
@@ -53,7 +65,7 @@ export default function RootLayout({
           <Modal />
           {/* <Loading /> */}
           {/* <Alpha /> */}
-          <Footer />
+          {/* <Footer /> */}
         </ProviderWrapper>
       </body>
     </html>

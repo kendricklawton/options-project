@@ -49,4 +49,4 @@ We use cookies for authentication, analytics, and improving user experience.
 Users can disable cookies through their browser settings, but some features may not function properly.
 
 ## Contact
-For any questions, contact us at info@machinename.io.
+For any questions, contact us at info@machinename.io

@@ -1,45 +1,26 @@
-.header,
-.headerScrolled {
-    background-color: inherit;
+.headerWrapper {
+    background-color: #fff;
     display: flex;
     flex-direction: column;
-    padding: 0 2svw;
+    justify-content: center;
+    align-items: center;
+    padding: 0 4svw;
     position: sticky;
     top: 0;
     width: 100%;
-    z-index: 9;
-    /* border-bottom: 0.5px solid gray; */
+    z-index: 999;
 }
 
-.headerScrolled {
-    box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.2);
-}
-
-.headerElement,
-.headerElementSmall {
+.header {
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 0.5rem;
     justify-content: space-between;
+    min-height: 3rem;
     width: 100%;
 }
 
-.headerElementSmallMobile {
-    display: none;
-}
-
-.headerElement {
-    min-height: 3rem;
-}
-
-.headerElementSmall {
-    min-height: 2rem;
-}
-
-
 .links,
-.stock,
 .leading,
 .trailing {
     align-items: center;
@@ -47,20 +28,37 @@
     flex-direction: row;
 }
 
-.stockList {
-    width: 100%;
-    justify-content: space-between;
-}
-
-.links,
-.stock,
 .leading {
-    gap: 0.5rem;
+    gap: 1rem;
+    width: 100%;
 }
 
-.stock {
-    cursor: pointer;
-    white-space: nowrap;
+.trailing {
+    gap: 1rem;
+}
+
+.links {
+    gap: 1rem;
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
+.links::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+
+.links::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.links::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.links::-webkit-scrollbar-thumb:hover {
+    background: transparent;
 }
 
 .leading a,
@@ -68,76 +66,92 @@
     white-space: nowrap;
 }
 
-.positive {
-    color: green;
-}
-
-.negative {
-    color: red;
-}
-
 .anchor {
+    display: flex;
     position: relative;
+    cursor: pointer;
 }
 
 .menu,
 .modeMenu {
-    background-color: #ffffff;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0.05, 0.05);
-    border: 0.5px solid gray;
+    padding: 0.5rem 0rem;
+    box-shadow: 1px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    border: 0.25px solid  lightgray;
     display: flex;
     flex-direction: column;
-    padding: 0.5rem;
-    z-index: 7;
-    /* width: 7rem; */
+    /* padding: 0.5rem; */
+    background-color: #fff;
+    z-index: 999;
+}
+
+.menu,
+.modeMenu {
+    /* border-radius: 0.25rem; */
 }
 
 .menu {
     position: absolute;
-    margin-top: 0.25rem;
+    top: 2.25rem;
     right: 0;
 }
 
 .modeMenu {
     position: absolute;
-    right: 5rem;
-    bottom: -0.525rem;
-    /* top: -2.525rem; */
+    right: 4.65rem;
+    bottom: -2.525rem;
+    align-items: flex-start;
 }
 
-.link,
-.linkDesktop {
-    align-items: center;
-    color: gray;
-    cursor: pointer;
+.menuItem,
+.menuItemActive {
+    width: 100%;
+    min-height: 2rem;
     display: flex;
-    flex-direction: row;
-    gap: 0.25rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
     white-space: nowrap;
+    padding: 0 0.5rem;
+    /* font-weight: 500;
+    font-size: 1rem; */
 }
 
-
-.link {
-    height: 2rem;
-    padding: 0.5rem 0.5rem;
-}
-
-.linkActive,
-.link:hover {
+.menuItem:hover {
     background-color: lightgray;
 }
 
-@media screen and (max-width: 618px) {
-    .links {
-        display: none;
-    }
+.menuItemActive {
+    background-color: lightgray;
 }
 
+.link,
+.linkActive {
+    /* font-weight: 500;
+    font-size: 1rem; */
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.link {
+    color: gray;
+}
+
+.linkActive {
+    color: #171717;
+    /* text-decoration: underline; */
+}
+
+.link:hover {
+    color: #171717;
+}
+
+
 @media (prefers-color-scheme: dark) {
-    .linkActive,
-    .link:hover {
-        background-color: #424242;
-    }
 
     .menu,
     .modeMenu {

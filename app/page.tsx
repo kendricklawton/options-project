@@ -1,78 +1,32 @@
 'use client';
 import styles from './page.module.css';
-import React from 'react';
-import { useAppContext } from './providers/AppProvider';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, ArrowRightOutlined } from '@mui/icons-material';
-import { convertUnixTimestamp, formatPlusMinus, isNumPositive } from './utils/utils';
+import React, { useEffect } from 'react';
+import Image from 'next/image';
+import PageHeader from './components/PageHeader/PageHeader';
+import { useAppStore } from './stores/useAppStore';
 // import { ArrowDropDownOutlined } from '@mui/icons-material';
 
 export default function Home() {
-  const { subscribedMap } = useAppContext();
+  const { fetchStockData } = useAppStore();
 
-  const symbols = ['^VIX', '^GSPC', '^DJI', '^IXIC'];
-  const symbolsMap = new Map<string, string>([
-    ['^VIX', 'VIX'],
-    ['^GSPC', 'S&P 500'],
-    ['^DJI', 'Dow Jones'],
-    ['^IXIC', 'NASDAQ'],
-  ]);
+  useEffect(() => {
+    fetchStockData(['^VIX','^GSPC','^DJI','^IXIC','^RUI','^RUT','^RUA']);
+  }, [fetchStockData]);
 
   return (
     <div className={styles.page}>
-      <div className={styles.wrapper}>
-        <div className={styles.marketsWrapper}>
-          <div className={styles.marketsList}>
-            {
-              subscribedMap.size > 0 && (
-                <div className={styles.marketsList}>
-                  {
-                    Array.from(subscribedMap.keys())
-                      .filter((key) => symbols.includes(key)) // Only include keys that match the symbols array
-                      .map((key, index) => (
-                        <div
-                          key={index}
-                          className={
-                            subscribedMap.get(key)?.info.regularMarketChangePercent === 0
-                              ? styles.market
-                              : isNumPositive(subscribedMap.get(key)?.info.regularMarketChangePercent || 0)
-                                ? styles.marketPositive
-                                : styles.marketNegative
-                          }
-                        >
-                          <div>
-                            <p>{symbolsMap.get(key)}</p>
-                            <p>{subscribedMap.get(key)?.info?.regularMarketPrice}</p>
-                          </div>
-                          <div>
-                            {
-                              subscribedMap.get(key)?.info.regularMarketChangePercent === 0
-                                ? <ArrowRightOutlined />
-                                : 
-                                isNumPositive(subscribedMap.get(key)?.info.regularMarketChangePercent || 0)
-                                  ? <ArrowDropUpOutlined />
-                                  : <ArrowDropDownOutlined />
-                            }
-                            <p>
-                              {`${formatPlusMinus(subscribedMap.get(key)?.info?.regularMarketChange)} `}
-                              {`(${formatPlusMinus(subscribedMap.get(key)?.info?.regularMarketChangePercent)}%)`}
-                            </p>
-                          </div>
-                          <div>
-                            <p>{convertUnixTimestamp(subscribedMap.get(key)?.info?.regularMarketTime)}</p>
-                          </div>
-                        </div>
-                      ))
-                  }
-                </div>
-              )
-            }
-          </div>
-        </div>
-
-        <h1>Options Project</h1>
-        <h2>Less is more. Lets focus on options.</h2>
-        <h2>Search a symbol to get started.</h2>
+      <PageHeader />
+      <div className={styles.wrapperCentered}>
+        <Image
+          src="next.svg"
+          width={200}
+          height={60}
+          alt=""
+        />
+        <h3 className={styles.h3}>Create trading projects and gain AI driven insights.</h3>
+        <h3 className={styles.h3}>Or simply search a symbol to explore.</h3>
       </div>
     </div>
   );
 }
+

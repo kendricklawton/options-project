@@ -1,11 +1,4 @@
-.projectContainer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-}
-
-.projectContainerHeader {
+.controls {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -14,46 +7,60 @@
     min-height: 3rem;
 }
 
-.projectContainerHeaderLeading,
-.projectContainerHeaderTrailing {
+.leading,
+.trailing {
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 100%;
 }
 
-.projectContainerHeaderLeading {
+.leading {
     justify-content: flex-start;
 }
-.projectContainerHeaderTrailing {
+.trailing {
     justify-content: flex-end;
 }
 
-
-
-.projectContainerBody {
+.container {
     display: flex;
     flex-direction: column;
     width: 100%;
+    background-color: gray;
 }
 
-.projectContainerBodyHeader {
+.element {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    position: sticky;
-    top: 0;
-    background-color: #fff;
+    flex-direction: row;
     min-height: 3rem;
+    width: 100%;
 }
 
-.projectContainerBodyItem {
+.elementLeading,
+.elementCenter {
     display: flex;
     flex-direction: row;
     align-items: center;
+    width: 100%;
+}
+
+.elementLeading {
+    justify-content: flex-start;
+}
+.elementCenter {
     justify-content: center;
+}
+
+.editMenu {
+    
+}
+
+
+/* 
+.project {
+    display: flex;
+    flex-direction: row;
     width: 100%;
     min-height: 3rem;
-}
+} */
