@@ -1,0 +1,125 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: auto;
+    min-height: fit-content;
+    /* top: 0;
+    position: sticky; */
+    z-index: 9;
+}
+
+.element,
+.elementExt {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    min-height: 3rem;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.elementExt {
+    gap: 1rem;
+}
+
+.marketList {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 1rem;
+}
+
+.market,
+.marketPositive,
+.marketNegative {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    padding: 0.5rem;
+    /* border-radius: 1rem; */
+    border-radius: 0rem;
+}
+
+.market {
+    background-color: darkgray;
+}
+
+.marketNegative {
+    background-color: #ce2b2b;
+}
+.marketPositive {
+    background-color: #008456;
+}
+
+.marketElement,
+.marketElementTwo,
+.marketElement div,
+.marketElementTwo div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.marketElementTwo {
+    gap: 2rem;
+}
+
+.marketElementTwo div {
+    gap: 0.5rem;
+}
+
+.marketElement,
+.marketElementTwo {
+    justify-content: space-between;
+}
+
+.marketTime {
+    font-size: 0.8rem;
+}
+
+
+.leading,
+.trailing,
+.leadingTop,
+.leadingBottom {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.positive {
+    color: #008456;
+}
+
+.negative {
+    color: #ce2b2b;
+}
+
+
+.elementExt div {
+    align-items: flex-start;
+    white-space: nowrap;
+}
+
+/* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
+.wrapper::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+
+.wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.wrapper::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.wrapper::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+}

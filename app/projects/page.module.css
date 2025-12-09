@@ -1,0 +1,66 @@
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 3rem;
+}
+
+.leading,
+.trailing {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.leading {
+    justify-content: flex-start;
+}
+.trailing {
+    justify-content: flex-end;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: gray;
+}
+
+.element {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    min-height: 3rem;
+    width: 100%;
+}
+
+.elementLeading,
+.elementCenter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.elementLeading {
+    justify-content: flex-start;
+}
+.elementCenter {
+    justify-content: center;
+}
+
+.editMenu {
+    
+}
+
+
+/* 
+.project {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 3rem;
+} */

@@ -1,0 +1,428 @@
+.detailsWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: auto;
+    min-height: fit-content;
+}
+
+.details,
+.detailsExt {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    min-height: 3rem;
+    width: 100%;
+}
+
+.details {
+    justify-content: space-between;
+}
+
+.leadingColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.leading,
+.trailing,
+.leadingTop,
+.leadingBottom {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.detailsExt {
+    min-height: 3rem;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.positive {
+    color: #008456;
+}
+
+.negative {
+    color: #ce2b2b;
+}
+
+.mid {
+    text-align: center;
+}
+
+.controls,
+.dates {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    min-height: 3rem;
+}
+
+.dates {
+    gap: 1rem;
+    overflow-x: auto;
+}
+
+.shadowButton {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0rem 1rem;
+    background-color: inherit;
+    box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    /* border-radius: 1rem; */
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    height: 2rem;
+    justify-content: center;
+    padding: 0 1rem;
+    white-space: nowrap;
+}
+
+.shadowButtonGray {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0rem 1rem;
+    background-color: gray;
+     /* border-radius: 1rem; */
+    color: white;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    height: 2rem;
+    justify-content: center;
+    padding: 0 1rem;
+    white-space: nowrap;
+}
+
+.controlsMobile {
+    display: none;
+}
+
+.controls {
+    gap: 1rem;
+}
+
+.controlsElement,
+.controlsElementTwo {
+    position: relative;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.anchor {
+    position: relative;
+}
+
+.menu {
+    background-color: #fff;
+    box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 100%;
+    z-index: 11;
+}
+
+.menuItem {
+    padding-left: 1rem;
+    width: "fit-content";
+    min-height: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.menuItem:hover {
+    background-color: lightgray;
+}
+
+.nearInput {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0rem 1rem;
+    background-color: gray;
+    color: white;
+    /* border-radius: 1rem; */
+}
+
+.optionChainWrapper {
+    background-color: inherit;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    min-height: 240px;
+    width: 100%;
+    overflow: hidden;
+    cursor: default;
+}
+
+.tableCalls,
+.tableStrikes,
+.tablePuts {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.tableCalls,
+.tablePuts {
+    width: 100%;
+}
+
+.tableStrikes {
+    min-width: 8rem;
+}
+
+.elementThStrikes {
+    padding: 0 0.5rem;
+    white-space: nowrap;
+}
+
+.displayMobile {
+    display: none;
+}
+
+.tableHeaderCalls,
+.tableHeaderStrikes,
+.tableHeaderPuts {
+    top: 0;
+    position: sticky;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 3rem;
+    /* background-color: #fff; */
+}
+
+.tableHeaderCalls {
+    right: 0;
+    left: 0;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+}
+
+.tableHeaderCalls div,
+.tableHeaderPuts div {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tableHeaderStrikes {
+    justify-content: center;
+}
+
+.tableHeaderPuts {
+    right: 0;
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+}
+
+.elementsHeaderTd,
+.elementsHeaderTdTwo,
+.elementsHeaderTdLess,
+.elementsHeaderTh {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: fit-content;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.elementsHeaderThStrikes {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.elementsHeaderTh,
+.elementsHeaderThStrikes {
+    width: 100%;
+    position: sticky;
+    top: 3rem;
+}
+
+.elementTh,
+.elementsHeaderThStrikes,
+.elementsHeaderTh,
+.tableHeaderCalls,
+.tableHeaderStrikes,
+.tableHeaderPuts {
+    background-color: #fff;
+    z-index: 5;
+}
+
+.elementTh {
+    width: 100%;
+    z-index: 989;
+}
+
+.elementsHeaderTd,
+.elementsHeaderTdTwo,
+.elementsHeaderTh {
+    justify-content: space-between;
+}
+
+.elementsHeaderTd:hover,
+.elementsHeaderTdTwo:hover {
+    background-color: lightgray;
+}
+
+.elementsHeaderTdTwo {
+    background-color: #f6faff;
+}
+
+.elementsHeadersTdStrikes {
+    padding: 0.5rem;
+}
+
+.elementTh,
+.elementThStrikes,
+.elementTd,
+.elementTdLink,
+.elementTdStrikes {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 2rem;
+}
+
+.elementTh,
+.elementThStrikes {
+    z-index: 6;
+}
+
+.elementTh,
+.elementTd,
+.elementTdLink {
+    align-items: flex-start;
+    min-width: 6rem;
+    white-space: nowrap;
+}
+
+.elementThTwo {
+    align-items: flex-start;
+    white-space: nowrap;
+}
+
+.elementTdLink p {
+    color: blueviolet;
+    cursor: pointer;
+}
+
+.tableHeaderStrikes,
+.elementTdStrikes,
+.elementThStrikes {
+    align-items: center;
+}
+
+/* Transparent scrollbar for WebKit browsers (Chrome, Safari) */
+.dates::-webkit-scrollbar,
+.detailsWrapper::-webkit-scrollbar,
+.tableCalls::-webkit-scrollbar,
+.tableStrikes::-webkit-scrollbar,
+.tablePuts::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+
+.dates::-webkit-scrollbar-track,
+.detailsWrapper::-webkit-scrollbar-track,
+.tableCalls::-webkit-scrollbar-track,
+.tableStrikes::-webkit-scrollbar-track,
+.tablePuts::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dates::-webkit-scrollbar-thumb,
+.detailsWrapper::-webkit-scrollbar-thumb,
+.tableCalls::-webkit-scrollbar-thumb,
+.tableStrikes::-webkit-scrollbar-thumb,
+.tablePuts::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.dates::-webkit-scrollbar-thumb:hover,
+.detailsWrapper::-webkit-scrollbar-thumb:hover,
+.tableCalls::-webkit-scrollbar-thumb:hover,
+.tableStrikes::-webkit-scrollbar-thumb:hover,
+.tablePuts::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+}
+
+
+
+@media screen and (max-width: 800px) {
+    .displayMobile {
+        display: flex;
+    }
+
+    .controlsElementTwo {
+        display: none;
+    }
+
+    .controlsMobile {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        min-height: 3rem;
+        gap: 1rem;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .date {
+        border: 1px solid gray;
+    }
+
+    .elementsHeaderThStrikes,
+    .elementsHeaderTh,
+    .tableHeaderCalls,
+    .tableHeaderStrikes,
+    .tableHeaderPuts {
+        background-color: #0a0a0a;
+    }
+
+    .elementTh,
+    .elementsHeaderThStrikes,
+    .elementsHeaderTh,
+    .tableHeaderCalls,
+    .tableHeaderStrikes,
+    .tableHeaderPuts {
+        background-color: #0a0a0a;
+    }
+
+    .elementsHeaderTdTwo {
+        background-color: #afbac5;
+    }
+
+    .menu {
+        background-color: #0a0a0a;
+        box-shadow: 0px 2px 4px rgba(0.1, 0.1, 0.1, 0.1);
+        border: 1px solid gray;
+    }
+}

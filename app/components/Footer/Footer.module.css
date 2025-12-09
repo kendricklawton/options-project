@@ -1,0 +1,20 @@
+.footer {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 2rem;
+    color: gray;
+    width: 100%;
+    bottom: 0;
+    float: bottom;
+    position: sticky;
+    padding: 0 4svw;
+}
+
+.leading,
+.trailing {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
